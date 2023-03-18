@@ -1,5 +1,9 @@
 import { css } from '@emotion/react';
+import { Store } from '../lib/Store';
+import { Camera } from '../model/Camera';
 import { Editor } from './Editor';
+
+const store = new Store<Camera>(Camera.create());
 
 export const App = () => (
     <div
@@ -8,6 +12,6 @@ export const App = () => (
             inset: 0;
         `}
     >
-        <Editor />
+        <Editor store={store} />
     </div>
 );
