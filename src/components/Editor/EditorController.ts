@@ -1,5 +1,6 @@
 import { Store } from '../../lib/Store';
 import { Camera } from '../../model/Camera';
+import { Entity } from '../../model/Entity';
 import { EditorState } from './EditorState';
 
 export abstract class EditorController {
@@ -23,4 +24,7 @@ export abstract class EditorController {
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onMouseDown(x: number, y: number) {}
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onEntityMouseDown(entity: Entity) {}
 }
