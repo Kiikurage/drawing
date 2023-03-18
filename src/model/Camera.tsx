@@ -14,20 +14,20 @@ export module Camera {
         };
     }
 
-    export function setScale(oldCamera: Camera, fx: number, fy: number, newScale: number): Camera {
-        const { x: oldX, y: oldY, scale: oldScale } = oldCamera;
+    export function setScale(prevCamera: Camera, fx: number, fy: number, nextScale: number): Camera {
+        const { x: prevX, y: prevY, scale: prevScale } = prevCamera;
 
         /**
          * 焦点とviewportの左上の画面座標系での距離は変わらない
-         * (fx-oldX)*oldScale = (fx-newX)*newScale
-         * newScale*newX = newScale*fx - oldScale*(fx-oldX)
+         * (fx-prevX)*prevScale = (fx-nextX)*nextScale
+         * nextScale*nextX = nextScale*fx - prevScale*(fx-prevX)
          *
-         * newX = fx - oldScale/newScale*(fx-oldX)
+         * nextX = fx - prevScale/nextScale*(fx-prevX)
          */
 
-        const newX = fx - (oldScale / newScale) * (fx - oldX);
-        const newY = fy - (oldScale / newScale) * (fy - oldY);
+        const nextX = fx - (prevScale / nextScale) * (fx - prevX);
+        const nextY = fy - (prevScale / nextScale) * (fy - prevY);
 
-        return { scale: newScale, x: newX, y: newY };
+        return { scale: nextScale, x: nextX, y: nextY };
     }
 }

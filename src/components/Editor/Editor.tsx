@@ -1,35 +1,27 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { useEffect, useMemo, useRef } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Store } from '../../lib/Store';
+import { Camera } from '../../model/Camera';
 import { Page } from '../../model/Page';
 import { useStore } from '../hooks/useStore';
 import { Preview } from '../Preview';
-import { EditorController } from './EditorController';
 import { EditorState } from './EditorState';
+import { RectModeEditorController } from './RectModeEditorController';
 import { SelectModeEditorController } from './SelectModeEditorController';
 
-const samplePage: Page = {
-    entities: [
-        {
-            type: 'rect',
-            x: 100,
-            y: 100,
-            width: 100,
-            height: 100,
-            strokeColor: '#000',
-            fillColor: '#ff0',
-        },
-        {
-            type: 'text',
-            x: 300,
-            y: 100,
-            value: 'Hello World!',
-        },
-    ],
-};
-export const Editor = ({ store }: { store: Store<EditorState> }) => {
-    const { camera, mode } = useStore(store);
+export const Editor = ({ defaultValue }: { defaultValue: Page }) => {
+    const store = useMemo(
+        () =>
+            new Store<EditorState>({
+                page: defaultValue,
+                mode: 'select',
+                camera: Camera.create(),
+            }),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        []
+    );
+    const { page, camera, mode } = useStore(store);
 
     const ref = useRef<HTMLDivElement>(null);
 
@@ -37,17 +29,26 @@ export const Editor = ({ store }: { store: Store<EditorState> }) => {
         switch (mode) {
             case 'select':
                 return new SelectModeEditorController(store);
-            default:
-                return new EditorController(store);
+            case 'rect':
+                return new RectModeEditorController(store);
         }
     }, [mode, store]);
 
+    const onMouseDown: MouseEventHandler = useCallback(
+        (ev) => {
+            const x = ev.clientX / camera.scale + camera.x;
+            const y = ev.clientY / camera.scale + camera.y;
+            controller.onMouseDown(x, y);
+        },
+        [camera.scale, camera.x, camera.y, controller]
+    );
+
     useEffect(() => {
-        const handleWheel = (ev: WheelEvent) => {
+        const onWheel = (ev: WheelEvent) => {
             ev.preventDefault();
             if (ev.ctrlKey) {
-                const fx = ev.x / camera.scale + camera.x;
-                const fy = ev.y / camera.scale + camera.y;
+                const fx = ev.clientX / camera.scale + camera.x;
+                const fy = ev.clientY / camera.scale + camera.y;
                 controller.onZoom(fx, fy, 0.001 * ev.deltaY);
             } else if (ev.shiftKey) {
                 controller.onScroll(ev.deltaY, ev.deltaX);
@@ -59,9 +60,9 @@ export const Editor = ({ store }: { store: Store<EditorState> }) => {
         const container = ref.current;
         if (container === null) return;
 
-        container.addEventListener('wheel', handleWheel, { passive: false });
+        container.addEventListener('wheel', onWheel, { passive: false });
         return () => {
-            container.removeEventListener('wheel', handleWheel);
+            container.removeEventListener('wheel', onWheel);
         };
     }, [camera.scale, camera.x, camera.y, controller, store]);
 
@@ -73,8 +74,9 @@ export const Editor = ({ store }: { store: Store<EditorState> }) => {
                 inset: 0;
                 background: #f3f6fc;
             `}
+            onMouseDown={onMouseDown}
         >
-            <Preview page={samplePage} camera={camera} />
+            <Preview page={page} camera={camera} />
             <div
                 css={css`
                     position: absolute;
@@ -95,8 +97,12 @@ export const Editor = ({ store }: { store: Store<EditorState> }) => {
                         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
                     `}
                 >
-                    <ModeButton>選択</ModeButton>
-                    <ModeButton>長方形</ModeButton>
+                    <ModeButton aria-pressed={mode === 'select'} onClick={() => store.setState({ mode: 'select' })}>
+                        選択
+                    </ModeButton>
+                    <ModeButton aria-pressed={mode === 'rect'} onClick={() => store.setState({ mode: 'rect' })}>
+                        長方形
+                    </ModeButton>
                 </div>
             </div>
         </div>
@@ -117,5 +123,10 @@ const ModeButton = styled.button`
 
     &:hover {
         background: #e8e8e8;
+    }
+
+    &[aria-pressed='true'] {
+        color: #fff;
+        background: #666;
     }
 `;
