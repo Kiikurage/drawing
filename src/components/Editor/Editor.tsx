@@ -1,11 +1,13 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { useEffect, useRef } from 'react';
-import { Store } from '../lib/Store';
-import { Camera } from '../model/Camera';
-import { Page } from '../model/Page';
-import { useStore } from './hooks/useStore';
-import { Preview } from './Preview';
+import { useEffect, useMemo, useRef } from 'react';
+import { Store } from '../../lib/Store';
+import { Page } from '../../model/Page';
+import { useStore } from '../hooks/useStore';
+import { Preview } from '../Preview';
+import { EditorController } from './EditorController';
+import { EditorState } from './EditorState';
+import { SelectModeEditorController } from './SelectModeEditorController';
 
 const samplePage: Page = {
     entities: [
@@ -26,25 +28,31 @@ const samplePage: Page = {
         },
     ],
 };
-export const Editor = ({ store }: { store: Store<Camera> }) => {
-    const camera = useStore(store);
+export const Editor = ({ store }: { store: Store<EditorState> }) => {
+    const { camera, mode } = useStore(store);
 
     const ref = useRef<HTMLDivElement>(null);
+
+    const controller = useMemo(() => {
+        switch (mode) {
+            case 'select':
+                return new SelectModeEditorController(store);
+            default:
+                return new EditorController(store);
+        }
+    }, [mode, store]);
 
     useEffect(() => {
         const handleWheel = (ev: WheelEvent) => {
             ev.preventDefault();
             if (ev.ctrlKey) {
-                store.setState((prevState) => {
-                    const newScale = Math.max(0.1, Math.min(prevState.scale - 0.001 * ev.deltaY, 2));
-                    const fx = ev.x / prevState.scale + prevState.x;
-                    const fy = ev.y / prevState.scale + prevState.y;
-                    return Camera.setScale(prevState, fx, fy, newScale);
-                });
+                const fx = ev.x / camera.scale + camera.x;
+                const fy = ev.y / camera.scale + camera.y;
+                controller.onZoom(fx, fy, 0.001 * ev.deltaY);
             } else if (ev.shiftKey) {
-                store.setState((prevState) => ({ x: prevState.x + ev.deltaY }));
+                controller.onScroll(ev.deltaY, ev.deltaX);
             } else {
-                store.setState((prevState) => ({ y: prevState.y + ev.deltaY }));
+                controller.onScroll(ev.deltaX, ev.deltaY);
             }
         };
 
@@ -55,7 +63,7 @@ export const Editor = ({ store }: { store: Store<Camera> }) => {
         return () => {
             container.removeEventListener('wheel', handleWheel);
         };
-    }, [store]);
+    }, [camera.scale, camera.x, camera.y, controller, store]);
 
     return (
         <div

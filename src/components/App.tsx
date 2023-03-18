@@ -1,9 +1,13 @@
 import { css } from '@emotion/react';
 import { Store } from '../lib/Store';
 import { Camera } from '../model/Camera';
-import { Editor } from './Editor';
+import { Editor } from './Editor/Editor';
+import { EditorState } from './Editor/EditorState';
 
-const store = new Store<Camera>(Camera.create());
+const store = new Store<EditorState>({
+    mode: 'select',
+    camera: Camera.create(),
+});
 
 export const App = () => (
     <div
