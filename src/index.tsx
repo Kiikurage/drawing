@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { App } from './App';
+import { App } from './components/App';
 
 window.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('root');
