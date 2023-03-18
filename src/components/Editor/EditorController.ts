@@ -4,7 +4,7 @@ import { Entity } from '../../model/Entity';
 import { EditorState } from './EditorState';
 
 export abstract class EditorController {
-    constructor(protected readonly store: Store<EditorState>) {}
+    constructor(public readonly store: Store<EditorState>) {}
 
     onZoom(fx: number, fy: number, diff: number) {
         this.store.setState(({ camera }) => {
@@ -27,4 +27,14 @@ export abstract class EditorController {
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onEntityMouseDown(entity: Entity) {}
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onEntityMouseOver(entity: Entity) {
+        this.store.setState({ hoveredEntity: entity });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onEntityMouseLeave(entity: Entity) {
+        this.store.setState({ hoveredEntity: null });
+    }
 }

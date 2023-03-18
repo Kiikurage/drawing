@@ -11,7 +11,7 @@ const page: Page = {
             width: 100,
             height: 100,
             strokeColor: '#000',
-            fillColor: '#ff0',
+            fillColor: 'transparent',
         },
         {
             type: 'text',

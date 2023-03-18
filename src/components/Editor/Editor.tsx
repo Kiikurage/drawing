@@ -7,6 +7,7 @@ import { useStore } from '../hooks/useStore';
 import { Preview } from '../Preview';
 import { EditorControllerContextProvider } from './EditorControllerContext';
 import { EditorState } from './EditorState';
+import { IndicatorLayer } from './IndicatorLayer';
 import { RectModeEditorController } from './RectModeEditorController';
 import { SelectModeEditorController } from './SelectModeEditorController';
 
@@ -16,8 +17,7 @@ export const Editor = ({ defaultValue }: { defaultValue: Page }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         []
     );
-    const { page, camera, mode, selectedEntities } = useStore(store);
-    console.log(selectedEntities);
+    const { page, camera, mode, selectedEntities, hoveredEntity } = useStore(store);
 
     const ref = useRef<HTMLDivElement>(null);
 
@@ -64,6 +64,7 @@ export const Editor = ({ defaultValue }: { defaultValue: Page }) => {
                 `}
             >
                 <Preview page={page} camera={camera} />
+                <IndicatorLayer camera={camera} selectedEntities={selectedEntities} hoveredEntity={hoveredEntity} />
                 <div
                     css={css`
                         position: absolute;

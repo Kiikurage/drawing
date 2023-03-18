@@ -8,6 +8,7 @@ export interface EditorState {
     mode: 'select' | 'rect';
     camera: Camera;
 
+    hoveredEntity: Entity | null;
     selectedEntities: Entity[];
 }
 
@@ -18,6 +19,7 @@ export module EditorState {
                 page: { entities: [] },
                 mode: 'select',
                 camera: Camera.create(),
+                hoveredEntity: null,
                 selectedEntities: [],
             },
             initialData
