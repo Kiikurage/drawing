@@ -1,8 +1,10 @@
 import { Store } from '../../../lib/Store';
-import { Entity } from '../../../model/Entity';
+import { Entity } from '../../../model/entity/Entity';
 import { Camera } from '../model/Camera';
 import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
+import { EventInfo } from '../model/EventInfo';
+import { Transaction } from '../model/transaction/Transaction';
 
 export abstract class EditorController {
     constructor(public readonly store: Store<EditorState>) {}
@@ -34,7 +36,7 @@ export abstract class EditorController {
     onMouseDown(x: number, y: number) {}
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onEntityMouseDown(entity: Entity, shiftKey: boolean) {}
+    onEntityMouseDown(entity: Entity, info: EventInfo) {}
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onEntityMouseOver(entity: Entity) {
@@ -44,5 +46,9 @@ export abstract class EditorController {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onEntityMouseLeave(entity: Entity) {
         this.store.setState({ hoveredEntity: null });
+    }
+
+    applyTransaction(transaction: Transaction) {
+        this.store.setState((prevState) => transaction.redo(prevState));
     }
 }

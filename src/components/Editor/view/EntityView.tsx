@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
-import { Entity } from '../../../model/Entity';
-import { RectEntity } from '../../../model/RectEntity';
-import { TextEntity } from '../../../model/TextEntity';
+import { Entity } from '../../../model/entity/Entity';
+import { RectEntity } from '../../../model/entity/RectEntity';
+import { TextEntity } from '../../../model/entity/TextEntity';
 import { useEditorController } from '../EditorControllerContext';
 
 export const EntityView = ({ entity }: { entity: Entity }) => {
@@ -28,6 +28,9 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
             height={entity.height + 200}
         >
             <rect
+                css={css`
+                    pointer-events: all;
+                `}
                 x={100}
                 y={100}
                 width={entity.width}
@@ -36,8 +39,7 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
                 strokeWidth={4}
                 fill={entity.fillColor}
                 onMouseDown={(ev) => {
-                    ev.stopPropagation();
-                    controller.onEntityMouseDown(entity, ev.shiftKey);
+                    controller.onEntityMouseDown(entity, ev);
                 }}
                 onMouseOver={(ev) => {
                     ev.stopPropagation();
@@ -64,8 +66,7 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
                 user-select: none;
             `}
             onMouseDown={(ev) => {
-                ev.stopPropagation();
-                controller.onEntityMouseDown(entity, ev.shiftKey);
+                controller.onEntityMouseDown(entity, ev);
             }}
         >
             <span>{entity.value}</span>

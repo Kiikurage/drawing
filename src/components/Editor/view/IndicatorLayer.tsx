@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
-import { Entity } from '../../../model/Entity';
-import { RectEntity } from '../../../model/RectEntity';
+import { Entity } from '../../../model/entity/Entity';
+import { RectEntity } from '../../../model/entity/RectEntity';
 import { Camera } from '../model/Camera';
 import { EntityBoundingBoxView } from './EntityBoundingBoxView';
 import { SelectionView } from './SelectionView';

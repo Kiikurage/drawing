@@ -1,4 +1,4 @@
-import { RectEntity } from '../../../model/RectEntity';
+import { RectEntity } from '../../../model/entity/RectEntity';
 import { EditorController } from './EditorController';
 
 export class RectModeEditorController extends EditorController {

@@ -1,4 +1,4 @@
-import { Entity } from '../../../model/Entity';
+import { Entity } from '../../../model/entity/Entity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
 import { Camera } from './Camera';

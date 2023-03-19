@@ -1,4 +1,5 @@
 export interface RectEntity {
+    id: string;
     type: 'rect';
     x: number;
     y: number;
@@ -11,13 +12,14 @@ export interface RectEntity {
 export module RectEntity {
     export function create(data: Partial<Omit<RectEntity, 'type'>>): RectEntity {
         return {
+            id: `${performance.now()}`,
             type: 'rect',
             x: 0,
             y: 0,
             width: 100,
             height: 100,
             strokeColor: '#000',
-            fillColor: '#fff',
+            fillColor: 'transparent',
             ...data,
         };
     }

@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import { Entity } from '../../../model/Entity';
+import { Entity } from '../../../model/entity/Entity';
 import { COLOR_SELECTION } from '../../styles';
 import { Camera } from '../model/Camera';
 

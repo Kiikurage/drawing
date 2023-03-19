@@ -1,4 +1,6 @@
-import { Entity } from '../../../model/Entity';
+import { Entity } from '../../../model/entity/Entity';
+import { EditorMode } from '../model/EditorMode';
+import { EventInfo } from '../model/EventInfo';
 import { EditorController } from './EditorController';
 
 export class SelectModeEditorController extends EditorController {
@@ -6,8 +8,10 @@ export class SelectModeEditorController extends EditorController {
         this.store.setState({ selectedEntities: [] });
     }
 
-    onEntityMouseDown(entity: Entity, shiftKey: boolean) {
-        if (shiftKey) {
+    onEntityMouseDown(entity: Entity, info: EventInfo) {
+        info.stopPropagation();
+
+        if (info.shiftKey) {
             this.store.setState((prevState) => {
                 if (prevState.selectedEntities.includes(entity)) {
                     return {
@@ -20,5 +24,10 @@ export class SelectModeEditorController extends EditorController {
         } else {
             this.store.setState({ selectedEntities: [entity] });
         }
+    }
+
+    setMode(mode: EditorMode) {
+        super.setMode(mode);
+        this.store.setState({ selectedEntities: [] });
     }
 }
