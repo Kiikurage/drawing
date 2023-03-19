@@ -12,12 +12,12 @@ export module Box {
             y1 = -Infinity;
 
         for (const entity of entities) {
-            x0 = Math.min(entity.x, x0);
-            y0 = Math.min(entity.y, y0);
+            x0 = Math.min(entity.point.x, x0);
+            y0 = Math.min(entity.point.y, y0);
 
             if (entity.type === 'rect') {
-                x1 = Math.max(entity.x + entity.width, x1);
-                y1 = Math.max(entity.y + entity.height, y1);
+                x1 = Math.max(entity.point.x + entity.width, x1);
+                y1 = Math.max(entity.point.y + entity.height, y1);
             }
         }
         const width = x1 - x0;

@@ -21,8 +21,8 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
         <svg
             css={css`
                 position: absolute;
-                left: ${entity.x - 100}px;
-                top: ${entity.y - 100}px;
+                left: ${entity.point.x - 100}px;
+                top: ${entity.point.y - 100}px;
             `}
             width={entity.width + 200}
             height={entity.height + 200}
@@ -38,17 +38,8 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
                 stroke={entity.strokeColor}
                 strokeWidth={4}
                 fill={entity.fillColor}
-                onMouseDown={(ev) => {
-                    controller.onEntityMouseDown(entity, ev);
-                }}
-                onMouseOver={(ev) => {
-                    ev.stopPropagation();
-                    controller.onEntityMouseOver(entity);
-                }}
-                onMouseLeave={(ev) => {
-                    ev.stopPropagation();
-                    controller.onEntityMouseLeave(entity);
-                }}
+                onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
+                onMouseLeave={() => controller.onUnhover()}
             />
         </svg>
     );
@@ -61,13 +52,12 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
         <div
             css={css`
                 position: absolute;
-                left: ${entity.x}px;
-                top: ${entity.y}px;
+                left: ${entity.point.x}px;
+                top: ${entity.point.y}px;
                 user-select: none;
             `}
-            onMouseDown={(ev) => {
-                controller.onEntityMouseDown(entity, ev);
-            }}
+            onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
+            onMouseLeave={() => controller.onUnhover()}
         >
             <span>{entity.value}</span>
         </div>

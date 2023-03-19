@@ -1,15 +1,15 @@
-import { Entity } from '../../../model/entity/Entity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
 import { Camera } from './Camera';
+import { HoverState } from './HoverState';
 
 export interface EditorState {
     page: Page;
     mode: 'select' | 'rect';
     camera: Camera;
 
-    hoveredEntity: Entity | null;
-    selectedEntities: Entity[];
+    hover: HoverState | null;
+    selectedEntityIds: string[];
 }
 
 export module EditorState {
@@ -19,8 +19,8 @@ export module EditorState {
                 page: { entities: [] },
                 mode: 'select',
                 camera: Camera.create(),
-                hoveredEntity: null,
-                selectedEntities: [],
+                hover: null,
+                selectedEntityIds: [],
             },
             initialData
         );

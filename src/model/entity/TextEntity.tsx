@@ -1,8 +1,9 @@
+import { ModelCordPoint } from '../Point';
+
 export interface TextEntity {
     id: string;
     type: 'text';
-    x: number;
-    y: number;
+    point: ModelCordPoint;
     value: string;
 }
 
@@ -11,8 +12,7 @@ export module TextEntity {
         return {
             id: `${performance.now()}`,
             type: 'text' as const,
-            x: 0,
-            y: 0,
+            point: ModelCordPoint({ x: 0, y: 0 }),
             value: 'Hello World!',
             ...initialData,
         };

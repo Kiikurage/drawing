@@ -1,8 +1,9 @@
+import { ModelCordPoint } from '../Point';
+
 export interface RectEntity {
     id: string;
     type: 'rect';
-    x: number;
-    y: number;
+    point: ModelCordPoint;
     width: number;
     height: number;
     strokeColor: string;
@@ -14,8 +15,7 @@ export module RectEntity {
         return {
             id: `${performance.now()}`,
             type: 'rect',
-            x: 0,
-            y: 0,
+            point: ModelCordPoint({ x: 0, y: 0 }),
             width: 100,
             height: 100,
             strokeColor: '#000',

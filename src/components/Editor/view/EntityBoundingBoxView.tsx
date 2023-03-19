@@ -1,19 +1,19 @@
 import { css } from '@emotion/react';
 import { Entity } from '../../../model/entity/Entity';
+import { Point } from '../../../model/Point';
 import { COLOR_SELECTION } from '../../styles';
 import { Camera } from '../model/Camera';
 
 export const EntityBoundingBoxView = ({ camera, entity }: { camera: Camera; entity: Entity }) => {
     if (entity.type !== 'rect') return null;
 
-    const x = (entity.x - camera.x) * camera.scale;
-    const y = (entity.y - camera.y) * camera.scale;
+    const point = Point.toDisplay(camera, entity.point);
     return (
         <div
             css={css`
                 position: absolute;
-                left: ${x - 100}px;
-                top: ${y - 100}px;
+                left: ${point.x - 100}px;
+                top: ${point.y - 100}px;
             `}
         >
             <svg width={entity.width * camera.scale + 200} height={entity.height * camera.scale + 200}>

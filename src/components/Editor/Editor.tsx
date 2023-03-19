@@ -1,30 +1,18 @@
 import { css } from '@emotion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Store } from '../../lib/Store';
 import { Page } from '../../model/Page';
+import { DisplayCordPoint } from '../../model/Point';
 import { useStore } from '../hooks/useStore';
-import { RectModeEditorController } from './controller/RectModeEditorController';
-import { SelectModeEditorController } from './controller/SelectModeEditorController';
+import { EditorController } from './controllers/EditorController';
 import { EditorControllerContextProvider } from './EditorControllerContext';
 import { EditorMode } from './model/EditorMode';
-import { EditorState } from './model/EditorState';
 import { EditorToolBar } from './view/EditorToolBar';
 import { IndicatorLayer } from './view/IndicatorLayer';
 import { PageView } from './view/PageView';
 
 export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }) => {
-    const [store] = useState(() => new Store<EditorState>(EditorState.create({ page: defaultValue })));
-
-    const { page, camera, mode, selectedEntities, hoveredEntity } = useStore(store);
-
-    const controller = useMemo(() => {
-        switch (mode) {
-            case 'select':
-                return new SelectModeEditorController(store);
-            case 'rect':
-                return new RectModeEditorController(store);
-        }
-    }, [mode, store]);
+    const [controller] = useState(() => new EditorController({ page: defaultValue }));
+    const { page, camera, mode, selectedEntityIds, hover } = useStore(controller.store);
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -32,7 +20,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
             ev.preventDefault();
 
             if (ev.ctrlKey) {
-                controller.onZoom(ev.clientX, ev.clientY, -0.005 * ev.deltaY);
+                controller.onZoom(-0.005 * ev.deltaY);
             } else if (ev.shiftKey) {
                 controller.onScroll(0.5 * ev.deltaY, 0.5 * ev.deltaX);
             } else {
@@ -49,7 +37,32 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
         };
     }, [controller]);
 
+    useEffect(() => {
+        const onMouseMove = (ev: MouseEvent) => {
+            controller.onMouseMove(DisplayCordPoint({ x: ev.clientX, y: ev.clientY }));
+        };
+
+        const onMouseUp = () => controller.onMouseUp();
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        return () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+        };
+    }, [controller]);
+
     const onModeChange = useCallback((mode: EditorMode) => controller.setMode(mode), [controller]);
+
+    const selectedEntities = useMemo(() => {
+        return page.entities.filter((entity) => selectedEntityIds.includes(entity.id));
+    }, [page.entities, selectedEntityIds]);
+
+    const hoveredEntity = useMemo(() => {
+        if (hover?.type !== 'entity') return null;
+
+        return page.entities.find((entity) => entity.id === hover.entityId) ?? null;
+    }, [hover, page.entities]);
 
     return (
         <EditorControllerContextProvider value={controller}>
@@ -59,6 +72,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                     position: absolute;
                     inset: 0;
                 `}
+                onMouseDown={controller.onMouseDown}
             >
                 <PageView page={page} camera={camera} />
                 <IndicatorLayer camera={camera} selectedEntities={selectedEntities} hoveredEntity={hoveredEntity} />
