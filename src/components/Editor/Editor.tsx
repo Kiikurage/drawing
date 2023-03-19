@@ -71,6 +71,10 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                 css={css`
                     position: absolute;
                     inset: 0;
+
+                    & > * {
+                        pointer-events: none;
+                    }
                 `}
                 onMouseDown={controller.onMouseDown}
             >

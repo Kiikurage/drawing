@@ -39,6 +39,8 @@ const ModeButton = styled.button`
     border: none;
     cursor: pointer;
     transition: background-color 160ms;
+    pointer-events: all;
+    user-select: none;
 
     &:hover {
         background: rgba(0, 0, 0, 0.2);

@@ -5,8 +5,6 @@ import { COLOR_SELECTION } from '../../styles';
 import { Camera } from '../model/Camera';
 
 export const EntityBoundingBoxView = ({ camera, entity }: { camera: Camera; entity: Entity }) => {
-    if (entity.type !== 'rect') return null;
-
     const point = Point.toDisplay(camera, entity.point);
     return (
         <div

@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
 import { Entity } from '../../../model/entity/Entity';
-import { RectEntity } from '../../../model/entity/RectEntity';
 import { Camera } from '../model/Camera';
 import { EntityBoundingBoxView } from './EntityBoundingBoxView';
 import { SelectionView } from './SelectionView';
@@ -14,14 +13,9 @@ export const IndicatorLayer = ({
     selectedEntities: Entity[];
     hoveredEntity: Entity | null;
 }) => {
-    const entitiesSet = new Set<RectEntity>();
+    const entitiesSet = new Set<Entity>(selectedEntities);
 
-    for (const entity of selectedEntities) {
-        if (entity.type !== 'rect') continue;
-        entitiesSet.add(entity);
-    }
-
-    if (hoveredEntity !== null && hoveredEntity.type === 'rect') {
+    if (hoveredEntity !== null) {
         entitiesSet.add(hoveredEntity);
     }
 

@@ -10,10 +10,6 @@ export const PageView = ({ page, camera }: { page: Page; camera: Camera }) => {
                 transform-origin: 0 0;
                 width: 100%;
                 height: 100%;
-
-                & > * {
-                    pointer-events: none;
-                }
             `}
             style={{
                 transform: `scale(${camera.scale}) translate(${-camera.point.x}px, ${-camera.point.y}px)`,

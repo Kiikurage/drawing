@@ -105,17 +105,24 @@ export class TransformEntitiesTransaction implements Transaction {
         const scaleY = nextBoundingBox.height / prevBoundingBox.height;
 
         const nextEntities = this.entities.map((entity) => {
-            if (entity.type !== 'rect') return entity;
-
-            return {
+            const nextEntity = {
                 ...entity,
                 point: {
                     x: (entity.point.x - prevBoundingBox.x) * scaleX + nextBoundingBox.x,
                     y: (entity.point.y - prevBoundingBox.y) * scaleY + nextBoundingBox.y,
                 },
-                width: entity.width * scaleX,
-                height: entity.height * scaleY,
+                width: Math.abs(entity.width * scaleX),
+                height: Math.abs(entity.height * scaleY),
             };
+
+            if (scaleX < 0) {
+                nextEntity.point.x -= nextEntity.width;
+            }
+            if (scaleY < 0) {
+                nextEntity.point.y -= nextEntity.height;
+            }
+
+            return nextEntity;
         });
 
         return {

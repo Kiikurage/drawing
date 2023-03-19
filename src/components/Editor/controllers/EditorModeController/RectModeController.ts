@@ -12,11 +12,23 @@ export class RectModeController extends EditorModeController {
         const newEntities = [...this.store.state.page.entities, newEntity];
         this.store.setState({
             page: { entities: newEntities },
-            mode: 'select',
         });
 
         this.editorController.startTransaction(
             new TransformEntitiesTransaction([newEntity], 'resize.bottomRight', this.editorController.currentPoint)
         );
+    };
+
+    onMouseMove = () => {
+        if (this.editorController.transaction !== null) {
+            this.editorController.updateTransaction();
+        }
+    };
+
+    onMouseUp = () => {
+        if (this.editorController.transaction !== null) {
+            this.editorController.completeTransaction();
+            this.store.setState({ mode: 'select' });
+        }
     };
 }
