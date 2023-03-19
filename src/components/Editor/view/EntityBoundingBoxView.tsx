@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import { Entity } from '../../../model/Entity';
+import { COLOR_SELECTION } from '../../styles';
 import { Camera } from '../model/Camera';
 
 export const EntityBoundingBoxView = ({ camera, entity }: { camera: Camera; entity: Entity }) => {
@@ -22,7 +23,7 @@ export const EntityBoundingBoxView = ({ camera, entity }: { camera: Camera; enti
                     width={entity.width * camera.scale}
                     height={entity.height * camera.scale}
                     fill="transparent"
-                    stroke="#4285f4"
+                    stroke={COLOR_SELECTION}
                     strokeWidth={1.5}
                 />
             </svg>

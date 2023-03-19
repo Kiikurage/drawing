@@ -34,7 +34,7 @@ export abstract class EditorController {
     onMouseDown(x: number, y: number) {}
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onEntityMouseDown(entity: Entity) {}
+    onEntityMouseDown(entity: Entity, shiftKey: boolean) {}
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     onEntityMouseOver(entity: Entity) {

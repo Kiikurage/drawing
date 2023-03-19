@@ -34,7 +34,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
             if (ev.ctrlKey) {
                 controller.onZoom(ev.clientX, ev.clientY, -0.005 * ev.deltaY);
             } else if (ev.shiftKey) {
-                controller.onScroll(-0.5 * ev.deltaY, 0.5 * ev.deltaX);
+                controller.onScroll(0.5 * ev.deltaY, 0.5 * ev.deltaX);
             } else {
                 controller.onScroll(0.5 * ev.deltaX, 0.5 * ev.deltaY);
             }

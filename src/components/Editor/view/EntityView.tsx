@@ -37,7 +37,7 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
                 fill={entity.fillColor}
                 onMouseDown={(ev) => {
                     ev.stopPropagation();
-                    controller.onEntityMouseDown(entity);
+                    controller.onEntityMouseDown(entity, ev.shiftKey);
                 }}
                 onMouseOver={(ev) => {
                     ev.stopPropagation();
@@ -65,7 +65,7 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
             `}
             onMouseDown={(ev) => {
                 ev.stopPropagation();
-                controller.onEntityMouseDown(entity);
+                controller.onEntityMouseDown(entity, ev.shiftKey);
             }}
         >
             <span>{entity.value}</span>

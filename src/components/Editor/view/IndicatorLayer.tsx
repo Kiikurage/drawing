@@ -3,6 +3,7 @@ import { Entity } from '../../../model/Entity';
 import { RectEntity } from '../../../model/RectEntity';
 import { Camera } from '../model/Camera';
 import { EntityBoundingBoxView } from './EntityBoundingBoxView';
+import { SelectionView } from './SelectionView';
 
 export const IndicatorLayer = ({
     camera,
@@ -37,6 +38,7 @@ export const IndicatorLayer = ({
             {entities.map((entity, i) => (
                 <EntityBoundingBoxView entity={entity} camera={camera} key={i} />
             ))}
+            {selectedEntities.length > 0 && <SelectionView selectedEntities={selectedEntities} camera={camera} />}
         </div>
     );
 };
