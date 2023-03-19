@@ -14,6 +14,7 @@ export class LineModeController extends EditorModeController {
         });
 
         const newEntities = [...this.store.state.page.entities, newEntity];
+        this.editorController.saveSnapshot();
         this.store.setState({
             page: { entities: newEntities },
         });

@@ -76,7 +76,9 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                         pointer-events: none;
                     }
                 `}
+                tabIndex={-1}
                 onMouseDown={controller.onMouseDown}
+                onKeyDown={controller.onKeyDown}
             >
                 <PageView page={page} camera={camera} />
                 <IndicatorLayer camera={camera} selectedEntities={selectedEntities} hoveredEntity={hoveredEntity} />

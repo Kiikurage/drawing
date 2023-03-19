@@ -10,6 +10,7 @@ export class RectModeController extends EditorModeController {
             height: 1,
         });
         const newEntities = [...this.store.state.page.entities, newEntity];
+        this.editorController.saveSnapshot();
         this.store.setState({
             page: { entities: newEntities },
         });

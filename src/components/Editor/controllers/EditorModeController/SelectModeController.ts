@@ -21,6 +21,7 @@ export class SelectModeController extends EditorModeController {
             const selectedEntities = this.state.page.entities.filter((entity) =>
                 this.state.selectedEntityIds.includes(entity.id)
             );
+            this.editorController.saveSnapshot();
             this.editorController.startTransaction(
                 new TransformEntitiesTransaction(selectedEntities, 'translate', this.editorController.currentPoint)
             );
@@ -30,6 +31,7 @@ export class SelectModeController extends EditorModeController {
             const selectedEntities = this.state.page.entities.filter((entity) =>
                 this.state.selectedEntityIds.includes(entity.id)
             );
+            this.editorController.saveSnapshot();
             this.editorController.startTransaction(
                 new TransformEntitiesTransaction(selectedEntities, hover.handle, this.editorController.currentPoint)
             );
