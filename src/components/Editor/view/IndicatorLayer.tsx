@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import { Entity } from '../../../model/entity/Entity';
 import { Camera } from '../model/Camera';
 import { EntityBoundingBoxView } from './EntityBoundingBoxView';
+import { LineEntityBoundingBoxView } from './LineEntityBoundingBoxView';
 import { SelectionView } from './SelectionView';
 
 export const IndicatorLayer = ({
@@ -29,9 +30,14 @@ export const IndicatorLayer = ({
                 transform-origin: 0 0;
             `}
         >
-            {entities.map((entity, i) => (
-                <EntityBoundingBoxView entity={entity} camera={camera} key={i} />
-            ))}
+            {entities.map((entity, i) => {
+                switch (entity.type) {
+                    case 'line':
+                        return <LineEntityBoundingBoxView entity={entity} camera={camera} key={i} />;
+                    default:
+                        return <EntityBoundingBoxView entity={entity} camera={camera} key={i} />;
+                }
+            })}
             {selectedEntities.length > 0 && <SelectionView selectedEntities={selectedEntities} camera={camera} />}
         </div>
     );

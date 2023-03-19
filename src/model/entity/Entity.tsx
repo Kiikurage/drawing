@@ -9,14 +9,22 @@ export module Entity {
     export function getBoundingBox(entity: Entity): Box {
         switch (entity.type) {
             case 'rect':
+                return RectEntity.getBoundingBox(entity);
             case 'text':
+                return TextEntity.getBoundingBox(entity);
             case 'line':
-                return {
-                    x: Math.min(entity.point.x, entity.point.x + entity.width),
-                    y: Math.min(entity.point.y, entity.point.y + entity.height),
-                    width: Math.abs(entity.width),
-                    height: Math.abs(entity.height),
-                };
+                return LineEntity.getBoundingBox(entity);
+        }
+    }
+
+    export function transform(entity: Entity, prevBoundingBox: Box, nextBoundingBox: Box): Entity {
+        switch (entity.type) {
+            case 'rect':
+                return RectEntity.transform(entity, prevBoundingBox, nextBoundingBox);
+            case 'text':
+                return TextEntity.transform(entity, prevBoundingBox, nextBoundingBox);
+            case 'line':
+                return LineEntity.transform(entity, prevBoundingBox, nextBoundingBox);
         }
     }
 }

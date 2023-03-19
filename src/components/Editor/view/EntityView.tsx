@@ -24,8 +24,8 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
         <svg
             css={css`
                 position: absolute;
-                left: ${entity.point.x - 100}px;
-                top: ${entity.point.y - 100}px;
+                left: ${entity.p1.x - 100}px;
+                top: ${entity.p1.y - 100}px;
             `}
             width={entity.width + 200}
             height={entity.height + 200}
@@ -49,25 +49,22 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
 export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     const controller = useEditorController();
 
-    const { id, point, width, height, strokeColor } = entity;
+    const { id, p1, p2, strokeColor } = entity;
 
-    const left = Math.min(point.x, point.x + width);
-    const top = Math.min(point.y, point.y + height);
+    const { x, y, width, height } = Entity.getBoundingBox(entity);
 
     return (
         <svg
             css={css`
                 position: absolute;
-                left: ${left - 100}px;
-                top: ${top - 100}px;
+                left: ${x - 100}px;
+                top: ${y - 100}px;
             `}
             width={Math.abs(width) + 200}
             height={Math.abs(height) + 200}
         >
             <path
-                d={`M${point.x - left + 100},${point.y - top + 100} L${point.x + width - left + 100},${
-                    point.y + height - top + 100
-                }`}
+                d={`M${p1.x - x + 100},${p1.y - y + 100} L${p2.x - x + 100},${p2.y - y + 100}`}
                 pointerEvents="all"
                 stroke={strokeColor}
                 strokeWidth={4}
@@ -85,8 +82,8 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
         <div
             css={css`
                 position: absolute;
-                left: ${entity.point.x}px;
-                top: ${entity.point.y}px;
+                left: ${entity.p1.x}px;
+                top: ${entity.p1.y}px;
                 user-select: none;
             `}
             onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}

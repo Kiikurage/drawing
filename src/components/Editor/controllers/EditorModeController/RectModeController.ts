@@ -5,7 +5,7 @@ import { EditorModeController } from './EditorModeController';
 export class RectModeController extends EditorModeController {
     onMouseDown = () => {
         const newEntity = RectEntity.create({
-            point: this.editorController.currentPoint,
+            p1: this.editorController.currentPoint,
             width: 1,
             height: 1,
         });

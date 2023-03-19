@@ -5,7 +5,7 @@ import { Size } from './Size';
 export interface Box extends Point, Size {}
 
 export module Box {
-    export function computeBoundingBox(entities: Entity[]) {
+    export function computeBoundingBox(entities: Entity[]): Box {
         let x0 = +Infinity,
             y0 = +Infinity,
             x1 = -Infinity,
