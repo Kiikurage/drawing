@@ -1,4 +1,5 @@
 import { Store } from '../../../lib/Store';
+import { Entity } from '../../../model/entity/Entity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
@@ -127,6 +128,21 @@ export class EditorController {
         if (ev.ctrlKey) keys.push('Control');
 
         switch (Key.serialize(keys)) {
+            case Key.serialize(['Control', 'X']): {
+                ev.preventDefault();
+                this.cut();
+                return;
+            }
+            case Key.serialize(['Control', 'C']): {
+                ev.preventDefault();
+                this.copy();
+                return;
+            }
+            case Key.serialize(['Control', 'V']): {
+                ev.preventDefault();
+                this.paste();
+                return;
+            }
             case Key.serialize(['Control', 'Z']): {
                 ev.preventDefault();
                 this.undo();
@@ -170,5 +186,60 @@ export class EditorController {
         const currentPage = this.store.state.page;
         this.store.setState({ page });
         this.undoStack.push(currentPage);
+    }
+
+    private cut() {
+        const selectedEntities = this.store.state.page.entities.filter((entity) => {
+            return this.store.state.selectedEntityIds.includes(entity.id);
+        });
+        if (selectedEntities.length === 0) return;
+
+        navigator.clipboard.writeText(JSON.stringify(selectedEntities));
+
+        this.saveSnapshot();
+        this.store.setState((prevState) => {
+            return {
+                page: {
+                    entities: prevState.page.entities.filter(
+                        (entity) => !prevState.selectedEntityIds.includes(entity.id)
+                    ),
+                },
+                selectedEntityIds: [],
+            };
+        });
+    }
+
+    private copy() {
+        const selectedEntities = this.store.state.page.entities.filter((entity) => {
+            return this.store.state.selectedEntityIds.includes(entity.id);
+        });
+        if (selectedEntities.length === 0) return;
+
+        navigator.clipboard.writeText(JSON.stringify(selectedEntities));
+    }
+
+    private async paste() {
+        const json = await navigator.clipboard.readText();
+        let entities: Entity[] = [];
+        try {
+            entities = JSON.parse(json) as Entity[];
+        } catch (ignored) {
+            return;
+        }
+        const newEntities = entities.map((entity) => ({
+            ...entity,
+            id: `${Math.random()}`,
+        }));
+
+        this.saveSnapshot();
+        this.store.setState((prevState) => {
+            return {
+                page: {
+                    entities: [...prevState.page.entities, ...newEntities],
+                },
+                selectedEntityIds: newEntities.map((entity) => entity.id),
+                mode: 'select',
+            };
+        });
     }
 }
