@@ -7,7 +7,9 @@ import { COLOR_SELECTION } from '../../styles';
 import { useEditorController } from '../EditorControllerContext';
 import { AnchorPoint } from '../model/AnchorPoint';
 import { Camera } from '../model/Camera';
+import { MoveEntitiesTransaction } from '../model/transaction/MoveEntitiesTransaction';
 import { ResizeEntitiesTransaction } from '../model/transaction/ResizeEntitiesTransaction';
+import { Transaction } from '../model/transaction/Transaction';
 
 export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; selectedEntities: Entity[] }) => {
     const controller = useEditorController();
@@ -15,16 +17,22 @@ export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; se
     const boundingBox = Box.computeBoundingBox(selectedEntities);
 
     const dragStartPointRef = useRef<Point | null>(null);
-    const resizeTransactionRef = useRef<ResizeEntitiesTransaction | null>(null);
+    const transactionRef = useRef<Transaction | null>(null);
 
-    const onMoveHandlerMouseDown = useCallback((ev: ReactMouseEvent) => {
-        // ev.stopPropagation();
-        // ev.preventDefault();
-        // dragStartPointRef.current = { x: ev.screenX, y: ev.screenY };
-        //
-        // if (!(controller instanceof SelectModeEditorController)) return;
-        // resizeTransactionRef.current = controller.onResizeStart(anchorPoint);
-    }, []);
+    const onMoveHandlerMouseDown = useCallback(
+        (ev: ReactMouseEvent) => {
+            ev.stopPropagation();
+            ev.preventDefault();
+            dragStartPointRef.current = { x: ev.screenX, y: ev.screenY };
+
+            const transaction = new MoveEntitiesTransaction(selectedEntities);
+
+            controller.applyTransaction(transaction);
+            transactionRef.current = transaction;
+        },
+        [controller, selectedEntities]
+    );
+
     const onResizeHandlerMouseDown = useCallback(
         (ev: ReactMouseEvent, anchor: AnchorPoint) => {
             ev.stopPropagation();
@@ -34,30 +42,34 @@ export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; se
             const transaction = new ResizeEntitiesTransaction(selectedEntities, anchor);
 
             controller.applyTransaction(transaction);
-            resizeTransactionRef.current = transaction;
+            transactionRef.current = transaction;
         },
         [controller, selectedEntities]
     );
     useEffect(() => {
         const onMouseMove = (ev: MouseEvent) => {
             const dragStartPoint = dragStartPointRef.current;
-            const transaction = resizeTransactionRef.current;
+            const transaction = transactionRef.current;
             if (dragStartPoint === null || transaction === null) return;
 
             const dx = ev.screenX - dragStartPoint.x;
             const dy = ev.screenY - dragStartPoint.y;
 
-            transaction.resize(dx / camera.scale, dy / camera.scale);
+            if (transaction instanceof ResizeEntitiesTransaction) {
+                transaction.resize(dx / camera.scale, dy / camera.scale);
+            } else if (transaction instanceof MoveEntitiesTransaction) {
+                transaction.move(dx / camera.scale, dy / camera.scale);
+            }
             controller.applyTransaction(transaction);
         };
         const onMouseUp = () => {
             const dragStartPoint = dragStartPointRef.current;
-            const transaction = resizeTransactionRef.current;
+            const transaction = transactionRef.current;
             if (dragStartPoint === null || transaction === null) return;
 
             controller.applyTransaction(transaction);
             dragStartPointRef.current = null;
-            resizeTransactionRef.current = null;
+            transactionRef.current = null;
         };
 
         window.addEventListener('mousemove', onMouseMove);
@@ -79,6 +91,9 @@ export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; se
             height={boundingBox.height * camera.scale + 200}
         >
             <rect
+                css={css`
+                    pointer-events: all;
+                `}
                 x="100"
                 y="100"
                 width={boundingBox.width * camera.scale}
