@@ -1,11 +1,12 @@
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
 import { Camera } from './Camera';
+import { EditorMode } from './EditorMode';
 import { HoverState } from './HoverState';
 
 export interface EditorState {
     page: Page;
-    mode: 'select' | 'rect';
+    mode: EditorMode;
     camera: Camera;
 
     hover: HoverState | null;

@@ -8,6 +8,7 @@ import { EventInfo } from '../model/EventInfo';
 import { HoverState } from '../model/HoverState';
 import { Transaction } from '../model/transaction/Transaction';
 import { EditorModeController } from './EditorModeController/EditorModeController';
+import { LineModeController } from './EditorModeController/LineModeController';
 import { RectModeController } from './EditorModeController/RectModeController';
 import { SelectModeController } from './EditorModeController/SelectModeController';
 
@@ -24,6 +25,7 @@ export class EditorController {
         this.modeControllers = {
             rect: new RectModeController(this),
             select: new SelectModeController(this),
+            line: new LineModeController(this),
         };
     }
 

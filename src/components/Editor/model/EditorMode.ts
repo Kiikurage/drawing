@@ -1,1 +1,1 @@
-export type EditorMode = 'select' | 'rect';
+export type EditorMode = 'select' | 'rect' | 'line';

@@ -22,6 +22,9 @@ export const EditorToolBar = ({ mode, onChange }: { mode: EditorMode; onChange: 
             <ModeButton aria-pressed={mode === 'rect'} onClick={() => onChange('rect')}>
                 長方形
             </ModeButton>
+            <ModeButton aria-pressed={mode === 'line'} onClick={() => onChange('line')}>
+                線
+            </ModeButton>
         </div>
     );
 };

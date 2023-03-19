@@ -111,15 +111,21 @@ export class TransformEntitiesTransaction implements Transaction {
                     x: (entity.point.x - prevBoundingBox.x) * scaleX + nextBoundingBox.x,
                     y: (entity.point.y - prevBoundingBox.y) * scaleY + nextBoundingBox.y,
                 },
-                width: Math.abs(entity.width * scaleX),
-                height: Math.abs(entity.height * scaleY),
+                width: entity.width * scaleX,
+                height: entity.height * scaleY,
             };
 
             if (scaleX < 0) {
-                nextEntity.point.x -= nextEntity.width;
+                if (entity.type !== 'line') {
+                    nextEntity.width = -nextEntity.width;
+                    nextEntity.point.x -= nextEntity.width;
+                }
             }
             if (scaleY < 0) {
-                nextEntity.point.y -= nextEntity.height;
+                if (entity.type !== 'line') {
+                    nextEntity.height = -nextEntity.height;
+                    nextEntity.point.y -= nextEntity.height;
+                }
             }
 
             return nextEntity;
