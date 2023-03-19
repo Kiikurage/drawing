@@ -1,11 +1,11 @@
+import { css } from '@emotion/react';
 import { MouseEventHandler, useCallback } from 'react';
+import { Page } from '../../../model/Page';
+import { useEditorController } from '../EditorControllerContext';
 import { Camera } from '../model/Camera';
-import { Page } from '../model/Page';
-import { useEditorController } from './Editor/EditorControllerContext';
 import { EntityView } from './EntityView';
-import { SVGContainer } from './SVGContainer';
 
-export const Preview = ({ page, camera }: { page: Page; camera: Camera }) => {
+export const PageView = ({ page, camera }: { page: Page; camera: Camera }) => {
     const controller = useEditorController();
 
     const onMouseDown: MouseEventHandler = useCallback(
@@ -18,10 +18,18 @@ export const Preview = ({ page, camera }: { page: Page; camera: Camera }) => {
     );
 
     return (
-        <SVGContainer camera={camera} onMouseDown={onMouseDown}>
+        <div
+            onMouseDown={onMouseDown}
+            css={css`
+                transform-origin: 0 0;
+            `}
+            style={{
+                transform: `scale(${camera.scale}) translate(${-camera.x}px, ${-camera.y}px)`,
+            }}
+        >
             {page.entities.map((entity, i) => (
                 <EntityView entity={entity} key={i} />
             ))}
-        </SVGContainer>
+        </div>
     );
 };

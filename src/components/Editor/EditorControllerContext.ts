@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { EditorController } from './EditorController';
+import { EditorController } from './controller/EditorController';
 
 const context = createContext<EditorController>(null as never);
 

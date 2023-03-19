@@ -1,25 +1,21 @@
 import { css } from '@emotion/react';
-import styled from '@emotion/styled';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Store } from '../../lib/Store';
 import { Page } from '../../model/Page';
 import { useStore } from '../hooks/useStore';
-import { Preview } from '../Preview';
+import { RectModeEditorController } from './controller/RectModeEditorController';
+import { SelectModeEditorController } from './controller/SelectModeEditorController';
 import { EditorControllerContextProvider } from './EditorControllerContext';
-import { EditorState } from './EditorState';
-import { IndicatorLayer } from './IndicatorLayer';
-import { RectModeEditorController } from './RectModeEditorController';
-import { SelectModeEditorController } from './SelectModeEditorController';
+import { EditorMode } from './model/EditorMode';
+import { EditorState } from './model/EditorState';
+import { EditorToolBar } from './view/EditorToolBar';
+import { IndicatorLayer } from './view/IndicatorLayer';
+import { PageView } from './view/PageView';
 
-export const Editor = ({ defaultValue }: { defaultValue: Page }) => {
-    const store = useMemo(
-        () => new Store<EditorState>(EditorState.create({ page: defaultValue })),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
+export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }) => {
+    const [store] = useState(() => new Store<EditorState>(EditorState.create({ page: defaultValue })));
+
     const { page, camera, mode, selectedEntities, hoveredEntity } = useStore(store);
-
-    const ref = useRef<HTMLDivElement>(null);
 
     const controller = useMemo(() => {
         switch (mode) {
@@ -30,17 +26,17 @@ export const Editor = ({ defaultValue }: { defaultValue: Page }) => {
         }
     }, [mode, store]);
 
+    const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
         const onWheel = (ev: WheelEvent) => {
             ev.preventDefault();
+
             if (ev.ctrlKey) {
-                const fx = ev.clientX / camera.scale + camera.x;
-                const fy = ev.clientY / camera.scale + camera.y;
-                controller.onZoom(fx, fy, 0.001 * ev.deltaY);
+                controller.onZoom(ev.clientX, ev.clientY, -0.005 * ev.deltaY);
             } else if (ev.shiftKey) {
-                controller.onScroll(ev.deltaY, ev.deltaX);
+                controller.onScroll(-0.5 * ev.deltaY, 0.5 * ev.deltaX);
             } else {
-                controller.onScroll(ev.deltaX, ev.deltaY);
+                controller.onScroll(0.5 * ev.deltaX, 0.5 * ev.deltaY);
             }
         };
 
@@ -51,7 +47,9 @@ export const Editor = ({ defaultValue }: { defaultValue: Page }) => {
         return () => {
             container.removeEventListener('wheel', onWheel);
         };
-    }, [camera.scale, camera.x, camera.y, controller, store]);
+    }, [controller]);
+
+    const onModeChange = useCallback((mode: EditorMode) => controller.setMode(mode), [controller]);
 
     return (
         <EditorControllerContextProvider value={controller}>
@@ -60,10 +58,9 @@ export const Editor = ({ defaultValue }: { defaultValue: Page }) => {
                 css={css`
                     position: absolute;
                     inset: 0;
-                    background: #f3f6fc;
                 `}
             >
-                <Preview page={page} camera={camera} />
+                <PageView page={page} camera={camera} />
                 <IndicatorLayer camera={camera} selectedEntities={selectedEntities} hoveredEntity={hoveredEntity} />
                 <div
                     css={css`
@@ -74,48 +71,9 @@ export const Editor = ({ defaultValue }: { defaultValue: Page }) => {
                         width: 100%;
                     `}
                 >
-                    <div
-                        css={css`
-                            display: flex;
-                            justify-content: center;
-                            gap: 8px;
-                            background: #fff;
-                            border-radius: 8px;
-                            padding: 8px 16px;
-                            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-                        `}
-                    >
-                        <ModeButton aria-pressed={mode === 'select'} onClick={() => store.setState({ mode: 'select' })}>
-                            選択
-                        </ModeButton>
-                        <ModeButton aria-pressed={mode === 'rect'} onClick={() => store.setState({ mode: 'rect' })}>
-                            長方形
-                        </ModeButton>
-                    </div>
+                    <EditorToolBar mode={mode} onChange={onModeChange} />
                 </div>
             </div>
         </EditorControllerContextProvider>
     );
 };
-
-const ModeButton = styled.button`
-    width: 64px;
-    height: 64px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    background: #f0f0f0;
-    border: none;
-    cursor: pointer;
-
-    &:hover {
-        background: #e8e8e8;
-    }
-
-    &[aria-pressed='true'] {
-        color: #fff;
-        background: #666;
-    }
-`;

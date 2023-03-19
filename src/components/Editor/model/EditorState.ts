@@ -1,7 +1,7 @@
-import { Camera } from '../../model/Camera';
-import { Entity } from '../../model/Entity';
-import { Page } from '../../model/Page';
-import { Patch } from '../../model/Patch';
+import { Entity } from '../../../model/Entity';
+import { Page } from '../../../model/Page';
+import { Patch } from '../../../model/Patch';
+import { Camera } from './Camera';
 
 export interface EditorState {
     page: Page;

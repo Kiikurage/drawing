@@ -1,23 +1,31 @@
-import { Store } from '../../lib/Store';
-import { Camera } from '../../model/Camera';
-import { Entity } from '../../model/Entity';
-import { EditorState } from './EditorState';
+import { Store } from '../../../lib/Store';
+import { Entity } from '../../../model/Entity';
+import { Camera } from '../model/Camera';
+import { EditorMode } from '../model/EditorMode';
+import { EditorState } from '../model/EditorState';
 
 export abstract class EditorController {
     constructor(public readonly store: Store<EditorState>) {}
 
-    onZoom(fx: number, fy: number, diff: number) {
+    setMode(mode: EditorMode) {
+        this.store.setState({ mode });
+    }
+
+    onZoom(fxInDisplay: number, fyInDisplay: number, diff: number) {
         this.store.setState(({ camera }) => {
-            const newScale = Math.max(0.1, Math.min(camera.scale - diff, 2));
+            const fx = fxInDisplay / camera.scale + camera.x;
+            const fy = fyInDisplay / camera.scale + camera.y;
+            const newScale = Math.max(0.1, Math.min(camera.scale + diff, 5));
+
             return { camera: Camera.setScale(camera, fx, fy, newScale) };
         });
     }
 
-    onScroll(dx: number, dy: number) {
+    onScroll(dxInDisplay: number, dyInDisplay: number) {
         this.store.setState(({ camera }) => ({
             camera: {
-                x: camera.x + dx,
-                y: camera.y + dy,
+                x: camera.x + dxInDisplay / camera.scale,
+                y: camera.y + dyInDisplay / camera.scale,
             },
         }));
     }

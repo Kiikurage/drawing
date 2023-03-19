@@ -1,4 +1,4 @@
-import { Entity } from '../../model/Entity';
+import { Entity } from '../../../model/Entity';
 import { EditorController } from './EditorController';
 
 export class SelectModeEditorController extends EditorController {
