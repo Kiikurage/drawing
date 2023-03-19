@@ -1,1 +1,1 @@
-export type AnchorPoint = 'topLeft' | 'top' | 'topRight' | 'Right' | 'bottomRight' | 'bottom' | 'bottomLeft' | 'Left';
+export type AnchorPoint = 'topLeft' | 'top' | 'topRight' | 'right' | 'bottomRight' | 'bottom' | 'bottomLeft' | 'left';

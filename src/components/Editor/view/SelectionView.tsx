@@ -92,6 +92,7 @@ export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; se
         >
             <rect
                 css={css`
+                    cursor: move;
                     pointer-events: all;
                 `}
                 x="100"
@@ -105,6 +106,7 @@ export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; se
             />
             <rect
                 css={css`
+                    cursor: nwse-resize;
                     pointer-events: all;
                 `}
                 x="96"
@@ -118,6 +120,20 @@ export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; se
             />
             <rect
                 css={css`
+                    cursor: ns-resize;
+                    pointer-events: all;
+                `}
+                x="105"
+                y="96"
+                width={boundingBox.width * camera.scale - 8}
+                height="9"
+                fill="transparent"
+                strokeWidth={1.5}
+                onMouseDown={(ev) => onResizeHandlerMouseDown(ev, 'bottom')}
+            />
+            <rect
+                css={css`
+                    cursor: nesw-resize;
                     pointer-events: all;
                 `}
                 x={96 + boundingBox.width * camera.scale}
@@ -131,6 +147,33 @@ export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; se
             />
             <rect
                 css={css`
+                    cursor: ew-resize;
+                    pointer-events: all;
+                `}
+                x="96"
+                y="105"
+                width="9"
+                height={boundingBox.height * camera.scale - 8}
+                fill="transparent"
+                strokeWidth={1.5}
+                onMouseDown={(ev) => onResizeHandlerMouseDown(ev, 'right')}
+            />
+            <rect
+                css={css`
+                    cursor: ew-resize;
+                    pointer-events: all;
+                `}
+                x={96 + boundingBox.width * camera.scale}
+                y="105"
+                width="9"
+                height={boundingBox.height * camera.scale - 8}
+                fill="transparent"
+                strokeWidth={1.5}
+                onMouseDown={(ev) => onResizeHandlerMouseDown(ev, 'left')}
+            />
+            <rect
+                css={css`
+                    cursor: nesw-resize;
                     pointer-events: all;
                 `}
                 x="96"
@@ -144,6 +187,20 @@ export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; se
             />
             <rect
                 css={css`
+                    cursor: ns-resize;
+                    pointer-events: all;
+                `}
+                x="105"
+                y={96 + boundingBox.height * camera.scale}
+                width={boundingBox.width * camera.scale - 8}
+                height="9"
+                fill="transparent"
+                strokeWidth={1.5}
+                onMouseDown={(ev) => onResizeHandlerMouseDown(ev, 'top')}
+            />
+            <rect
+                css={css`
+                    cursor: nwse-resize;
                     pointer-events: all;
                 `}
                 x={96 + boundingBox.width * camera.scale}

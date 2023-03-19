@@ -29,6 +29,12 @@ export class ResizeEntitiesTransaction implements Transaction {
                         height: prevBoundingBox.height + diffY,
                     };
                 }
+                case 'top': {
+                    return {
+                        ...prevBoundingBox,
+                        height: prevBoundingBox.height + diffY,
+                    };
+                }
                 case 'topRight': {
                     return {
                         ...prevBoundingBox,
@@ -37,11 +43,31 @@ export class ResizeEntitiesTransaction implements Transaction {
                         height: prevBoundingBox.height + diffY,
                     };
                 }
+                case 'left': {
+                    return {
+                        ...prevBoundingBox,
+                        width: prevBoundingBox.width + diffX,
+                    };
+                }
+                case 'right': {
+                    return {
+                        ...prevBoundingBox,
+                        x: prevBoundingBox.x + diffX,
+                        width: prevBoundingBox.width - diffX,
+                    };
+                }
                 case 'bottomLeft': {
                     return {
                         ...prevBoundingBox,
                         y: prevBoundingBox.y + diffY,
                         width: prevBoundingBox.width + diffX,
+                        height: prevBoundingBox.height - diffY,
+                    };
+                }
+                case 'bottom': {
+                    return {
+                        ...prevBoundingBox,
+                        y: prevBoundingBox.y + diffY,
                         height: prevBoundingBox.height - diffY,
                     };
                 }
