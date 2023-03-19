@@ -1,4 +1,4 @@
-import { ModelCordPoint } from '../../../model/Point';
+import { ModelCordPoint, Point } from '../../../model/Point';
 
 export interface Camera {
     point: ModelCordPoint;
@@ -8,7 +8,7 @@ export interface Camera {
 export module Camera {
     export function create() {
         return {
-            point: ModelCordPoint({ x: 0, y: 0 }),
+            point: Point.model({ x: 0, y: 0 }),
             // [ディスプレイ座標系/モデル座標系]
             scale: 1,
         };
@@ -31,6 +31,6 @@ export module Camera {
         const nextX = point.x - (prevScale / nextScale) * (point.x - prevX);
         const nextY = point.y - (prevScale / nextScale) * (point.y - prevY);
 
-        return { scale: nextScale, point: ModelCordPoint({ x: nextX, y: nextY }) };
+        return { scale: nextScale, point: Point.model({ x: nextX, y: nextY }) };
     }
 }

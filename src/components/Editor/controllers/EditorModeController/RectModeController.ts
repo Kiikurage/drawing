@@ -1,13 +1,13 @@
 import { RectEntity } from '../../../../model/entity/RectEntity';
-import { TransformEntitiesTransaction } from '../../model/transaction/TransformEntitiesTransaction';
+import { Size } from '../../../../model/Size';
+import { TransformSession } from '../../model/session/TransformSession';
 import { EditorModeController } from './EditorModeController';
 
 export class RectModeController extends EditorModeController {
     onMouseDown = () => {
         const newEntity = RectEntity.create({
             p1: this.editorController.currentPoint,
-            width: 1,
-            height: 1,
+            size: Size.model({ width: 1, height: 1 }),
         });
         const newEntities = [...this.store.state.page.entities, newEntity];
         this.editorController.saveSnapshot();
@@ -16,7 +16,7 @@ export class RectModeController extends EditorModeController {
         });
 
         this.editorController.startTransaction(
-            new TransformEntitiesTransaction([newEntity], 'resize.bottomRight', this.editorController.currentPoint)
+            new TransformSession([newEntity], 'resize.bottomRight', this.editorController.currentPoint)
         );
     };
 

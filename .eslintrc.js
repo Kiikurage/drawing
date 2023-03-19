@@ -10,6 +10,8 @@ module.exports = {
     plugins: ['@typescript-eslint'],
     root: true,
     rules: {
+        'no-inner-declarations': 'off',
+        'react/display-name': 'off',
         'react/no-unknown-property': ['error', { ignore: ['css'] }],
         'react/react-in-jsx-scope': 'off',
         '@typescript-eslint/prefer-namespace-keyword': 'off',

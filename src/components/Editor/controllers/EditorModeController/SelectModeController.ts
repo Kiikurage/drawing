@@ -1,5 +1,5 @@
 import { EventInfo } from '../../model/EventInfo';
-import { TransformEntitiesTransaction } from '../../model/transaction/TransformEntitiesTransaction';
+import { TransformSession } from '../../model/session/TransformSession';
 import { EditorModeController } from './EditorModeController';
 
 export class SelectModeController extends EditorModeController {
@@ -11,9 +11,9 @@ export class SelectModeController extends EditorModeController {
 
         if (hover.type === 'entity') {
             if (ev.shiftKey) {
-                this.store.setState((prevState) => ({
-                    selectedEntityIds: [...prevState.selectedEntityIds, hover.entityId],
-                }));
+                this.store.setState({
+                    selectedEntityIds: [...this.state.selectedEntityIds, hover.entityId],
+                });
             } else {
                 this.store.setState({ selectedEntityIds: [hover.entityId] });
             }
@@ -23,7 +23,7 @@ export class SelectModeController extends EditorModeController {
             );
             this.editorController.saveSnapshot();
             this.editorController.startTransaction(
-                new TransformEntitiesTransaction(selectedEntities, 'translate', this.editorController.currentPoint)
+                new TransformSession(selectedEntities, 'translate', this.editorController.currentPoint)
             );
         }
 
@@ -33,7 +33,7 @@ export class SelectModeController extends EditorModeController {
             );
             this.editorController.saveSnapshot();
             this.editorController.startTransaction(
-                new TransformEntitiesTransaction(selectedEntities, hover.handle, this.editorController.currentPoint)
+                new TransformSession(selectedEntities, hover.handle, this.editorController.currentPoint)
             );
         }
 

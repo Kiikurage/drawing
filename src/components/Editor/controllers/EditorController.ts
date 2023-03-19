@@ -3,13 +3,14 @@ import { Entity } from '../../../model/entity/Entity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
+import { DisplayCordSize, ModelCordSize, Size } from '../../../model/Size';
 import { Camera } from '../model/Camera';
 import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
 import { EventInfo, KeyboardEventInfo } from '../model/EventInfo';
 import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
-import { Transaction } from '../model/transaction/Transaction';
+import { Session } from '../model/session/Session';
 import { EditorModeController } from './EditorModeController/EditorModeController';
 import { LineModeController } from './EditorModeController/LineModeController';
 import { RectModeController } from './EditorModeController/RectModeController';
@@ -20,11 +21,13 @@ import { SelectModeController } from './EditorModeController/SelectModeControlle
  */
 export class EditorController {
     readonly store: Store<EditorState>;
-    transaction: Transaction | null = null;
+    transaction: Session | null = null;
     readonly undoStack: Page[] = [];
     readonly redoStack: Page[] = [];
 
     private modeControllers: Record<EditorMode, EditorModeController>;
+
+    private _currentPoint = Point.display({ x: 0, y: 0 });
 
     constructor(initialData: Patch<EditorState>) {
         this.store = new Store(EditorState.create(initialData));
@@ -34,8 +37,6 @@ export class EditorController {
             line: new LineModeController(this),
         };
     }
-
-    private _currentPoint = DisplayCordPoint({ x: 0, y: 0 });
 
     get currentPoint(): ModelCordPoint {
         return this.toModelPoint(this._currentPoint);
@@ -57,7 +58,7 @@ export class EditorController {
 
     // Transaction
 
-    startTransaction(transaction: Transaction) {
+    startTransaction(transaction: Session) {
         if (this.transaction !== null) {
             console.warn('Another transaction on going.');
             console.dir(this.transaction);
@@ -92,11 +93,8 @@ export class EditorController {
         this.modeController.onZoom?.(diff);
     };
 
-    onScroll = (dxInDisplay: number, dyInDisplay: number) => {
-        const { scale } = this.store.state.camera;
-        const dx = dxInDisplay / scale;
-        const dy = dyInDisplay / scale;
-        this.modeController.onScroll?.(dx, dy);
+    onScroll = (diff: DisplayCordSize) => {
+        this.modeController.onScroll?.(this.toModelSize(diff));
     };
 
     onMouseDown = (info: EventInfo) => this.modeController.onMouseDown?.(info);
@@ -128,6 +126,26 @@ export class EditorController {
         if (ev.ctrlKey) keys.push('Control');
 
         switch (Key.serialize(keys)) {
+            case Key.serialize(['Control', 'A']): {
+                this.selectAll();
+                return;
+            }
+            case Key.serialize(['V']): {
+                this.setMode('select');
+                return;
+            }
+            case Key.serialize(['R']): {
+                this.setMode('rect');
+                return;
+            }
+            case Key.serialize(['L']): {
+                this.setMode('line');
+                return;
+            }
+            case Key.serialize(['A']): {
+                this.setMode('line');
+                return;
+            }
             case Key.serialize(['Control', 'X']): {
                 ev.preventDefault();
                 this.cut();
@@ -162,15 +180,7 @@ export class EditorController {
         this.redoStack.length = 0;
     }
 
-    private toModelPoint(point: DisplayCordPoint): ModelCordPoint {
-        return Point.toModel(this.camera, point);
-    }
-
-    private toDisplayPoint(point: ModelCordPoint): DisplayCordPoint {
-        return Point.toDisplay(this.camera, point);
-    }
-
-    private undo() {
+    undo() {
         const page = this.undoStack.pop();
         if (page === undefined) return;
 
@@ -179,7 +189,7 @@ export class EditorController {
         this.redoStack.push(currentPage);
     }
 
-    private redo() {
+    redo() {
         const page = this.redoStack.pop();
         if (page === undefined) return;
 
@@ -188,7 +198,7 @@ export class EditorController {
         this.undoStack.push(currentPage);
     }
 
-    private cut() {
+    cut() {
         const selectedEntities = this.store.state.page.entities.filter((entity) => {
             return this.store.state.selectedEntityIds.includes(entity.id);
         });
@@ -197,19 +207,17 @@ export class EditorController {
         navigator.clipboard.writeText(JSON.stringify(selectedEntities));
 
         this.saveSnapshot();
-        this.store.setState((prevState) => {
-            return {
-                page: {
-                    entities: prevState.page.entities.filter(
-                        (entity) => !prevState.selectedEntityIds.includes(entity.id)
-                    ),
-                },
-                selectedEntityIds: [],
-            };
+        this.store.setState({
+            page: {
+                entities: this.store.state.page.entities.filter(
+                    (entity) => !this.store.state.selectedEntityIds.includes(entity.id)
+                ),
+            },
+            selectedEntityIds: [],
         });
     }
 
-    private copy() {
+    copy() {
         const selectedEntities = this.store.state.page.entities.filter((entity) => {
             return this.store.state.selectedEntityIds.includes(entity.id);
         });
@@ -218,7 +226,7 @@ export class EditorController {
         navigator.clipboard.writeText(JSON.stringify(selectedEntities));
     }
 
-    private async paste() {
+    async paste() {
         const json = await navigator.clipboard.readText();
         let entities: Entity[] = [];
         try {
@@ -226,20 +234,29 @@ export class EditorController {
         } catch (ignored) {
             return;
         }
-        const newEntities = entities.map((entity) => ({
-            ...entity,
-            id: `${Math.random()}`,
-        }));
+        const newEntities = entities.map((entity) => Patch.apply(entity, { id: `${Math.random()}` }));
 
         this.saveSnapshot();
-        this.store.setState((prevState) => {
-            return {
-                page: {
-                    entities: [...prevState.page.entities, ...newEntities],
-                },
-                selectedEntityIds: newEntities.map((entity) => entity.id),
-                mode: 'select',
-            };
+        this.store.setState({
+            page: {
+                entities: [...this.store.state.page.entities, ...newEntities],
+            },
+            selectedEntityIds: newEntities.map((entity) => entity.id),
+            mode: 'select',
         });
+    }
+
+    selectAll() {
+        this.store.setState({
+            selectedEntityIds: this.store.state.page.entities.map((entity) => entity.id),
+        });
+    }
+
+    private toModelPoint(point: DisplayCordPoint): ModelCordPoint {
+        return Point.toModel(this.camera, point);
+    }
+
+    private toModelSize(size: DisplayCordSize): ModelCordSize {
+        return Size.toModel(this.camera, size);
     }
 }

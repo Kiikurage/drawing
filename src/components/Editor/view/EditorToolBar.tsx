@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { COLOR_SELECTION } from '../../styles';
 import { EditorMode } from '../model/EditorMode';
 
 export const EditorToolBar = ({ mode, onChange }: { mode: EditorMode; onChange: (mode: EditorMode) => void }) => {
@@ -51,6 +52,6 @@ const ModeButton = styled.button`
 
     &[aria-pressed='true'] {
         color: #fff;
-        background: #666;
+        background: ${COLOR_SELECTION};
     }
 `;

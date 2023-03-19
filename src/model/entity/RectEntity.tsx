@@ -1,60 +1,70 @@
-import { Box } from '../Box';
-import { ModelCordPoint } from '../Point';
+import { ModelCordBox } from '../Box';
+import { Patch } from '../Patch';
+import { ModelCordPoint, Point } from '../Point';
+import { ModelCordSize, Size } from '../Size';
+import { EntityDelegates } from './Entity';
 
 export interface RectEntity {
     id: string;
     type: 'rect';
     p1: ModelCordPoint;
-    width: number;
-    height: number;
+
+    size: ModelCordSize;
     strokeColor: string;
     fillColor: string;
 }
 
 export module RectEntity {
-    export function create(data: Partial<Omit<RectEntity, 'type'>>): RectEntity {
-        return {
-            id: `${performance.now()}`,
-            type: 'rect',
-            p1: ModelCordPoint({ x: 0, y: 0 }),
-            width: 100,
-            height: 100,
-            strokeColor: '#000',
-            fillColor: 'transparent',
-            ...data,
-        };
+    export function create(data: Patch<Omit<RectEntity, 'type' | 'id'>>): RectEntity {
+        return Patch.apply<RectEntity>(
+            {
+                id: `${performance.now()}`,
+                type: 'rect',
+                p1: Point.model({ x: 0, y: 0 }),
+                size: Size.model({ width: 100, height: 100 }),
+                strokeColor: '#000',
+                fillColor: 'transparent',
+            },
+            data
+        );
     }
+}
 
-    export function getBoundingBox(entity: RectEntity): Box {
+export const RectEntityDelegate: EntityDelegates<RectEntity> = {
+    getBoundingBox(entity: RectEntity): ModelCordBox {
         return {
-            x: Math.min(entity.p1.x, entity.p1.x + entity.width),
-            y: Math.min(entity.p1.y, entity.p1.y + entity.height),
-            width: Math.abs(entity.width),
-            height: Math.abs(entity.height),
-        };
-    }
-
-    export function transform(entity: RectEntity, prevBoundingBox: Box, nextBoundingBox: Box): RectEntity {
-        const scaleX = nextBoundingBox.width / prevBoundingBox.width;
-        const scaleY = nextBoundingBox.height / prevBoundingBox.height;
-
-        const nextEntity: RectEntity = {
-            ...entity,
-            p1: ModelCordPoint({
-                x: (entity.p1.x - prevBoundingBox.x) * scaleX + nextBoundingBox.x,
-                y: (entity.p1.y - prevBoundingBox.y) * scaleY + nextBoundingBox.y,
+            point: Point.model({
+                x: Math.min(entity.p1.x, entity.p1.x + entity.size.width),
+                y: Math.min(entity.p1.y, entity.p1.y + entity.size.height),
             }),
-            width: Math.abs(entity.width * scaleX),
-            height: Math.abs(entity.height * scaleY),
+            size: Size.model({
+                width: Math.abs(entity.size.width),
+                height: Math.abs(entity.size.height),
+            }),
         };
+    },
+    transform(entity: RectEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): RectEntity {
+        const scaleX = nextBoundingBox.size.width / prevBoundingBox.size.width;
+        const scaleY = nextBoundingBox.size.height / prevBoundingBox.size.height;
+
+        const nextEntity = Patch.apply(entity, {
+            p1: {
+                x: (entity.p1.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
+                y: (entity.p1.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y,
+            },
+            size: {
+                width: Math.abs(entity.size.width * scaleX),
+                height: Math.abs(entity.size.height * scaleY),
+            },
+        });
 
         if (scaleX < 0) {
-            nextEntity.p1.x -= nextEntity.width;
+            nextEntity.p1.x -= nextEntity.size.width;
         }
         if (scaleY < 0) {
-            nextEntity.p1.y -= nextEntity.height;
+            nextEntity.p1.y -= nextEntity.size.height;
         }
 
         return nextEntity;
-    }
-}
+    },
+};

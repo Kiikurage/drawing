@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { Page } from '../../../model/Page';
 import { Camera } from '../model/Camera';
-import { EntityView } from './EntityView';
+import { EntityView } from './EntityView/EntityView';
 
 export const PageView = ({ page, camera }: { page: Page; camera: Camera }) => {
     return (

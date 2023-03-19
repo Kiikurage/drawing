@@ -1,4 +1,5 @@
-import { ModelCordPoint } from '../../../../model/Point';
+import { ModelCordPoint, Point } from '../../../../model/Point';
+import { ModelCordSize } from '../../../../model/Size';
 import { Camera } from '../../model/Camera';
 import { EventInfo } from '../../model/EventInfo';
 import { HoverState } from '../../model/HoverState';
@@ -27,21 +28,21 @@ export abstract class EditorModeController {
 
     // Event handler
     onZoom = (diff: number) => {
-        this.store.setState(({ camera }) => {
-            const newScale = Math.max(0.1, Math.min(camera.scale + diff, 5));
+        const newScale = Math.max(0.1, Math.min(this.state.camera.scale + diff, 5));
 
-            return { camera: Camera.setScale(camera, this.editorController.currentPoint, newScale) };
+        this.store.setState({
+            camera: Camera.setScale(this.state.camera, this.editorController.currentPoint, newScale),
         });
     };
 
-    onScroll = (dx: number, dy: number) => {
-        this.store.setState(({ camera }) => ({
+    onScroll = (diff: ModelCordSize) => {
+        this.store.setState({
             camera: {
-                point: ModelCordPoint({
-                    x: camera.point.x + dx,
-                    y: camera.point.y + dy,
+                point: Point.model({
+                    x: this.state.camera.point.x + diff.width,
+                    y: this.state.camera.point.y + diff.height,
                 }),
             },
-        }));
+        });
     };
 }

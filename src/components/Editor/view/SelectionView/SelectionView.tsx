@@ -1,5 +1,5 @@
-import { Entity } from '../../../model/entity/Entity';
-import { Camera } from '../model/Camera';
+import { Entity } from '../../../../model/entity/Entity';
+import { Camera } from '../../model/Camera';
 import { LineSelectionView } from './LineSelectionView';
 import { RectSelectionView } from './RectSelectionView';
 

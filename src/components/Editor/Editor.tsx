@@ -1,7 +1,8 @@
 import { css } from '@emotion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Page } from '../../model/Page';
-import { DisplayCordPoint } from '../../model/Point';
+import { Point } from '../../model/Point';
+import { Size } from '../../model/Size';
 import { useStore } from '../hooks/useStore';
 import { EditorController } from './controllers/EditorController';
 import { EditorControllerContextProvider } from './EditorControllerContext';
@@ -22,9 +23,9 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
             if (ev.ctrlKey) {
                 controller.onZoom(-0.005 * ev.deltaY);
             } else if (ev.shiftKey) {
-                controller.onScroll(0.5 * ev.deltaY, 0.5 * ev.deltaX);
+                controller.onScroll(Size.display({ width: ev.deltaY, height: ev.deltaX }));
             } else {
-                controller.onScroll(0.5 * ev.deltaX, 0.5 * ev.deltaY);
+                controller.onScroll(Size.display({ width: ev.deltaX, height: ev.deltaY }));
             }
         };
 
@@ -39,7 +40,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
 
     useEffect(() => {
         const onMouseMove = (ev: MouseEvent) => {
-            controller.onMouseMove(DisplayCordPoint({ x: ev.clientX, y: ev.clientY }));
+            controller.onMouseMove(Point.display({ x: ev.clientX, y: ev.clientY }));
         };
 
         const onMouseUp = () => controller.onMouseUp();

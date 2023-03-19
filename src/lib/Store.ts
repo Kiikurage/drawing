@@ -13,10 +13,7 @@ export class Store<T> {
         return this._state;
     }
 
-    setState(patch: Patch<T> | ((prevState: T) => Patch<T>)) {
-        if (patch instanceof Function) {
-            patch = patch(this.state);
-        }
+    setState(patch: Patch<T>) {
         this._state = Patch.apply(this.state, patch);
         this.listeners.forEach((listener) => listener(this.state));
     }
