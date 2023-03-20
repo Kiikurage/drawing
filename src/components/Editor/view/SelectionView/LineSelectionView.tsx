@@ -26,7 +26,7 @@ export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: 
                 pointerEvents="all"
                 stroke={COLOR_SELECTION}
                 strokeWidth={1.5}
-                onMouseDown={() => controller.onHover(TransformHandleHoverState.TRANSLATE)}
+                onMouseOver={() => controller.onHover(TransformHandleHoverState.TRANSLATE)}
                 onMouseLeave={() => controller.onUnhover()}
             />
             <ResizeHandle cursor="move" x={p1.x} y={p1.y} hover={getHoverState(entity.p1, entity.p2)} />

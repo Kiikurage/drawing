@@ -7,13 +7,13 @@ import { useStore } from '../hooks/useStore';
 import { EditorController } from './controllers/EditorController';
 import { EditorControllerContextProvider } from './EditorControllerContext';
 import { EditorMode } from './model/EditorMode';
-import { EditorToolBar } from './view/EditorToolBar';
 import { IndicatorLayer } from './view/IndicatorLayer';
 import { PageView } from './view/PageView';
+import { ToolBar } from './view/ToolBar';
 
 export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }) => {
     const [controller] = useState(() => new EditorController({ page: defaultValue }));
-    const { page, camera, mode, selectedEntityIds, hover } = useStore(controller.store);
+    const { page, camera, mode, selectedEntityIds, hover, contextMenu } = useStore(controller.store);
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -81,9 +81,15 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                 tabIndex={-1}
                 onMouseDown={controller.onMouseDown}
                 onKeyDown={controller.onKeyDown}
+                onContextMenu={(ev) => ev.preventDefault()}
             >
                 <PageView page={page} camera={camera} />
-                <IndicatorLayer camera={camera} selectedEntities={selectedEntities} hoveredEntity={hoveredEntity} />
+                <IndicatorLayer
+                    camera={camera}
+                    selectedEntities={selectedEntities}
+                    hoveredEntity={hoveredEntity}
+                    contextMenu={contextMenu}
+                />
                 <div
                     css={css`
                         position: absolute;
@@ -93,7 +99,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                         width: 100%;
                     `}
                 >
-                    <EditorToolBar mode={mode} onChange={onModeChange} />
+                    <ToolBar mode={mode} onChange={onModeChange} />
                 </div>
             </div>
         </EditorControllerContextProvider>

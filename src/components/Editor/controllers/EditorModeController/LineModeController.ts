@@ -19,20 +19,20 @@ export class LineModeController extends EditorModeController {
             page: { entities: newEntities },
         });
 
-        this.editorController.startTransaction(
+        this.editorController.startSession(
             new TransformSession([newEntity], 'resize.bottomRight', this.editorController.currentPoint)
         );
     };
 
     onMouseMove = () => {
-        if (this.editorController.transaction !== null) {
-            this.editorController.updateTransaction();
+        if (this.editorController.session !== null) {
+            this.editorController.updateSession();
         }
     };
 
     onMouseUp = () => {
-        if (this.editorController.transaction !== null) {
-            this.editorController.completeTransaction();
+        if (this.editorController.session !== null) {
+            this.editorController.completeSession();
             this.store.setState({ mode: 'select' });
         }
     };

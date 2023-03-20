@@ -3,16 +3,16 @@ import { Entity } from '../../../../model/entity/Entity';
 import { Patch } from '../../../../model/Patch';
 import { ModelCordPoint } from '../../../../model/Point';
 import { EditorController } from '../../controllers/EditorController';
-import { TransformHandle } from '../TransformHandle';
+import { TransformType } from '../TransformType';
 import { Session } from './Session';
 
 export class TransformSession implements Session {
     readonly type = 'Transform';
     public entities: Entity[];
-    public handle: TransformHandle;
+    public handle: TransformType;
     public originPoint: ModelCordPoint;
 
-    constructor(entities: Entity[], handle: TransformHandle, originPoint: ModelCordPoint) {
+    constructor(entities: Entity[], handle: TransformType, originPoint: ModelCordPoint) {
         this.entities = entities;
         this.handle = handle;
         this.originPoint = originPoint;
@@ -52,7 +52,7 @@ export class TransformSession implements Session {
         prevBoundingBox: ModelCordBox,
         prevPoint: ModelCordPoint,
         nextPoint: ModelCordPoint,
-        handle: TransformHandle
+        handle: TransformType
     ): ModelCordBox {
         const diffX = nextPoint.x - prevPoint.x;
         const diffY = nextPoint.y - prevPoint.y;

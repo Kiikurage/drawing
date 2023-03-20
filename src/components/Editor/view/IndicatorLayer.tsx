@@ -5,17 +5,21 @@ import { Entity } from '../../../model/entity/Entity';
 import { Point } from '../../../model/Point';
 import { Size } from '../../../model/Size';
 import { Camera } from '../model/Camera';
+import { ContextMenuState } from '../model/ContextMenuState';
 import { EntityBoundingBoxView } from './BoundingBoxView/EntityBoundingBoxView';
+import { ContextMenuPopup } from './ContextMenuPopup';
 import { SelectionView } from './SelectionView/SelectionView';
 
 export const IndicatorLayer = ({
     camera,
     selectedEntities,
     hoveredEntity,
+    contextMenu,
 }: {
     camera: Camera;
     selectedEntities: Entity[];
     hoveredEntity: Entity | null;
+    contextMenu: ContextMenuState;
 }) => {
     const entitiesSet = new Set<Entity>(selectedEntities);
 
@@ -27,7 +31,12 @@ export const IndicatorLayer = ({
     const visibleEntities = useMemo(() => computeVisibleEntities(entities, camera), [camera, entities]);
 
     return (
-        <div>
+        <div
+            css={css`
+                position: absolute;
+                inset: 0;
+            `}
+        >
             <svg
                 css={css`
                     position: absolute;
@@ -42,6 +51,7 @@ export const IndicatorLayer = ({
                 ))}
                 <SelectionView selectedEntities={selectedEntities} camera={camera} />
             </svg>
+            <ContextMenuPopup camera={camera} state={contextMenu} />
         </div>
     );
 };

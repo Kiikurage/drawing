@@ -24,7 +24,7 @@ export const RectSelectionView = ({ camera, selectedEntities }: { camera: Camera
                 fill="none"
                 stroke={COLOR_SELECTION}
                 strokeWidth={1.5}
-                onMouseDown={() => controller.onHover(TransformHandleHoverState.TRANSLATE)}
+                onMouseOver={() => controller.onHover(TransformHandleHoverState.TRANSLATE)}
                 onMouseLeave={() => controller.onUnhover()}
             />
             <InvisibleResizeHandle cursor="ns-resize" width={width} hover={TransformHandleHoverState.RESIZE_TOP} />

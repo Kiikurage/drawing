@@ -1,8 +1,8 @@
 import { ModelCordPoint, Point } from '../../../../model/Point';
 import { ModelCordSize } from '../../../../model/Size';
 import { Camera } from '../../model/Camera';
-import { EventInfo } from '../../model/EventInfo';
 import { HoverState } from '../../model/HoverState';
+import { MouseEventInfo } from '../../model/MouseEventInfo';
 import { EditorController } from '../EditorController';
 
 export abstract class EditorModeController {
@@ -10,7 +10,7 @@ export abstract class EditorModeController {
 
     onBeforeDeactivate?: () => void;
 
-    onMouseDown?: (info: EventInfo) => void;
+    onMouseDown?: (info: MouseEventInfo) => void;
     onMouseMove?: (prevPoint: ModelCordPoint, nextPoint: ModelCordPoint) => void;
     onMouseUp?: () => void;
     onHover?: (state: HoverState) => void;

@@ -1,4 +1,4 @@
-export type TransformHandle =
+export type TransformType =
     | 'resize.topLeft'
     | 'resize.top'
     | 'resize.topRight'

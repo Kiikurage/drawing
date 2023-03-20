@@ -1,3 +1,4 @@
+import { lighten } from 'polished';
 import { Store } from '../../../lib/Store';
 import { uuid } from '../../../lib/uuid';
 import { Entity } from '../../../model/entity/Entity';
@@ -8,9 +9,9 @@ import { DisplayCordSize, ModelCordSize, Size } from '../../../model/Size';
 import { Camera } from '../model/Camera';
 import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
-import { EventInfo, KeyboardEventInfo } from '../model/EventInfo';
 import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
+import { KeyboardEventInfo, MouseEventInfo } from '../model/MouseEventInfo';
 import { Session } from '../model/session/Session';
 import { EditorModeController } from './EditorModeController/EditorModeController';
 import { LineModeController } from './EditorModeController/LineModeController';
@@ -22,7 +23,7 @@ import { SelectModeController } from './EditorModeController/SelectModeControlle
  */
 export class EditorController {
     readonly store: Store<EditorState>;
-    transaction: Session | null = null;
+    session: Session | null = null;
     readonly undoStack: Page[] = [];
     readonly redoStack: Page[] = [];
 
@@ -51,27 +52,33 @@ export class EditorController {
         return this.store.state.camera;
     }
 
+    get selectedEntities(): Entity[] {
+        return this.store.state.page.entities.filter((entity) =>
+            this.store.state.selectedEntityIds.includes(entity.id)
+        );
+    }
+
     setMode(mode: EditorMode) {
         this.modeController.onBeforeDeactivate?.();
         this.store.setState({ mode });
         this.modeController.onAfterActivate?.();
     }
 
-    // Transaction
+    // Session
 
-    startTransaction(transaction: Session) {
-        if (this.transaction !== null) {
-            console.warn('Another transaction on going.');
-            console.dir(this.transaction);
+    startSession(session: Session) {
+        if (this.session !== null) {
+            console.warn('Another session on going.');
+            console.dir(this.session);
             return;
         }
 
-        this.transaction = transaction;
-        this.updateTransaction();
+        this.session = session;
+        this.updateSession();
     }
 
-    updateTransaction() {
-        const transaction = this.transaction;
+    updateSession() {
+        const transaction = this.session;
         if (transaction === null) {
             console.warn('No transaction on going.');
             return;
@@ -79,13 +86,13 @@ export class EditorController {
         this.store.setState(transaction.update(this));
     }
 
-    completeTransaction() {
-        const transaction = this.transaction;
+    completeSession() {
+        const transaction = this.session;
         if (transaction === null) {
             console.warn('No transaction on going.');
             return;
         }
-        this.transaction = null;
+        this.session = null;
     }
 
     // Event handlers
@@ -98,7 +105,7 @@ export class EditorController {
         this.modeController.onScroll?.(this.toModelSize(diff));
     };
 
-    onMouseDown = (info: EventInfo) => this.modeController.onMouseDown?.(info);
+    onMouseDown = (info: MouseEventInfo) => this.modeController.onMouseDown?.(info);
 
     onMouseMove = (point: DisplayCordPoint) => {
         const prevPoint = this.currentPoint;
@@ -268,6 +275,24 @@ export class EditorController {
                 ),
             },
             selectedEntityIds: [],
+        });
+    }
+
+    setColor(color: string) {
+        this.store.setState({
+            page: {
+                entities: this.store.state.page.entities.map((entity) => {
+                    if (this.store.state.selectedEntityIds.includes(entity.id)) {
+                        return {
+                            ...entity,
+                            strokeColor: color,
+                            fillColor: lighten(0.3, color),
+                        };
+                    } else {
+                        return entity;
+                    }
+                }),
+            },
         });
     }
 
