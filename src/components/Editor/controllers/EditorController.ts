@@ -1,5 +1,6 @@
-import { getDatabase, ref, set } from 'firebase/database';
+import { onValue, ref, set } from 'firebase/database';
 import { lighten } from 'polished';
+import { getDatabase } from '../../../firebaseConfig';
 import { Store } from '../../../lib/Store';
 import { uuid } from '../../../lib/uuid';
 import { Entity } from '../../../model/entity/Entity';
@@ -34,12 +35,32 @@ export class EditorController {
 
     constructor(initialData: Patch<EditorState>) {
         this.store = new Store(EditorState.create(initialData));
+        this.initializeDBConnection();
         this.modeControllers = {
             rect: new RectModeController(this),
             select: new SelectModeController(this),
             line: new LineModeController(this),
         };
     }
+
+    private initializeDBConnection() {
+        const page = this.store.state.page;
+        const db = getDatabase();
+        const pageRef = ref(db, `page/${page.id}`);
+        onValue(pageRef, (snapshot) => {
+            this.onPageUpdated(snapshot.val() as Page);
+        });
+    }
+
+    onPageUpdated = (nextPage: Page) => {
+        if (this.session === null) {
+            this.completeSession();
+        }
+        this.store.setState({
+            page: nextPage,
+            selectedEntityIds: [],
+        });
+    };
 
     get currentPoint(): ModelCordPoint {
         return this.toModelPoint(this._currentPoint);
@@ -212,6 +233,8 @@ export class EditorController {
         const currentPage = this.store.state.page;
         this.store.setState({ page });
         this.redoStack.push(currentPage);
+
+        this.syncToDB();
     }
 
     redo() {
@@ -221,6 +244,8 @@ export class EditorController {
         const currentPage = this.store.state.page;
         this.store.setState({ page });
         this.undoStack.push(currentPage);
+
+        this.syncToDB();
     }
 
     cut() {
@@ -288,6 +313,7 @@ export class EditorController {
             },
             selectedEntityIds: [],
         });
+        this.syncToDB();
     }
 
     setColor(color: string) {
