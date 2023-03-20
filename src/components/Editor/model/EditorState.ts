@@ -18,7 +18,7 @@ export module EditorState {
     export function create(initialData: Patch<EditorState> = {}) {
         return Patch.apply(
             {
-                page: { entities: [] },
+                page: Page.create(),
                 mode: 'select',
                 camera: Camera.create(),
                 hover: null,

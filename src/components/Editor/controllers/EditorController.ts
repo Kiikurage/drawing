@@ -1,3 +1,4 @@
+import { getDatabase, ref, set } from 'firebase/database';
 import { lighten } from 'polished';
 import { Store } from '../../../lib/Store';
 import { uuid } from '../../../lib/uuid';
@@ -93,6 +94,7 @@ export class EditorController {
             return;
         }
         this.session = null;
+        this.syncToDB();
     }
 
     // Event handlers
@@ -195,6 +197,14 @@ export class EditorController {
         this.redoStack.length = 0;
     }
 
+    private syncToDB() {
+        const page = this.store.state.page;
+
+        const db = getDatabase();
+        const pageRef = ref(db, `page/${page.id}`);
+        set(pageRef, page);
+    }
+
     undo() {
         const page = this.undoStack.pop();
         if (page === undefined) return;
@@ -230,6 +240,7 @@ export class EditorController {
             },
             selectedEntityIds: [],
         });
+        this.syncToDB();
     }
 
     copy() {
@@ -259,6 +270,7 @@ export class EditorController {
             selectedEntityIds: newEntities.map((entity) => entity.id),
             mode: 'select',
         });
+        this.syncToDB();
     }
 
     selectAll() {
@@ -279,6 +291,7 @@ export class EditorController {
     }
 
     setColor(color: string) {
+        this.saveSnapshot();
         this.store.setState({
             page: {
                 entities: this.store.state.page.entities.map((entity) => {
@@ -294,6 +307,7 @@ export class EditorController {
                 }),
             },
         });
+        this.syncToDB();
     }
 
     private toModelPoint(point: DisplayCordPoint): ModelCordPoint {
