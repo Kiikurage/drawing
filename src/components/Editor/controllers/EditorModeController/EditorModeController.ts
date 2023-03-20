@@ -38,10 +38,7 @@ export abstract class EditorModeController {
     onScroll = (diff: ModelCordSize) => {
         this.store.setState({
             camera: {
-                point: Point.model({
-                    x: this.state.camera.point.x + diff.width,
-                    y: this.state.camera.point.y + diff.height,
-                }),
+                point: Point.model(this.state.camera.point.x + diff.width, this.state.camera.point.y + diff.height),
             },
         });
     };

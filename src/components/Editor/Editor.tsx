@@ -13,7 +13,7 @@ import { ToolBar } from './view/ToolBar';
 
 export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }) => {
     const [controller] = useState(() => new EditorController({ page: defaultValue }));
-    const { page, camera, mode, selectedEntityIds, hover, contextMenu } = useStore(controller.store);
+    const { page, camera, mode, selectedEntityIds, hover, selectingRange, contextMenu } = useStore(controller.store);
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -23,9 +23,9 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
             if (ev.ctrlKey) {
                 controller.onZoom(-0.005 * ev.deltaY);
             } else if (ev.shiftKey) {
-                controller.onScroll(Size.display({ width: ev.deltaY, height: ev.deltaX }));
+                controller.onScroll(Size.display(ev.deltaY, ev.deltaX));
             } else {
-                controller.onScroll(Size.display({ width: ev.deltaX, height: ev.deltaY }));
+                controller.onScroll(Size.display(ev.deltaX, ev.deltaY));
             }
         };
 
@@ -40,7 +40,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
 
     useEffect(() => {
         const onMouseMove = (ev: MouseEvent) => {
-            controller.onMouseMove(Point.display({ x: ev.clientX, y: ev.clientY }));
+            controller.onMouseMove(Point.display(ev.clientX, ev.clientY));
         };
 
         const onMouseUp = () => controller.onMouseUp();
@@ -89,6 +89,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                     selectedEntities={selectedEntities}
                     hoveredEntity={hoveredEntity}
                     contextMenu={contextMenu}
+                    selectingRange={selectingRange}
                 />
                 <div
                     css={css`

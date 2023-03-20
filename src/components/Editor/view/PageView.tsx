@@ -31,8 +31,8 @@ export const PageView = ({ page, camera }: { page: Page; camera: Camera }) => {
 
 function computeVisibleEntities(entities: Entity[], camera: Camera): Entity[] {
     const box1: ModelCordBox = Box.toModel(camera, {
-        point: Point.display({ x: 0, y: 0 }),
-        size: Size.display({ width: window.innerWidth, height: window.innerHeight }),
+        point: Point.display(0, 0),
+        size: Size.display(window.innerWidth, window.innerHeight),
     });
 
     return entities.filter((entity) => {

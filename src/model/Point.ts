@@ -1,26 +1,20 @@
 import { Camera } from '../components/Editor/model/Camera';
 
 export module Point {
-    export function model(size: { [displayCordPoint]?: never; x: number; y: number }): ModelCordPoint {
-        return size as ModelCordPoint;
+    export function model(x: number, y: number): ModelCordPoint {
+        return { x, y } as ModelCordPoint;
     }
 
-    export function display(size: { [modelCordPoint]?: never; x: number; y: number }): DisplayCordPoint {
-        return size as DisplayCordPoint;
+    export function display(x: number, y: number): DisplayCordPoint {
+        return { x, y } as DisplayCordPoint;
     }
 
     export function toModel(camera: Camera, point: DisplayCordPoint): ModelCordPoint {
-        return model({
-            x: point.x / camera.scale + camera.point.x,
-            y: point.y / camera.scale + camera.point.y,
-        });
+        return model(point.x / camera.scale + camera.point.x, point.y / camera.scale + camera.point.y);
     }
 
     export function toDisplay(camera: Camera, point: ModelCordPoint): DisplayCordPoint {
-        return display({
-            x: (point.x - camera.point.x) * camera.scale,
-            y: (point.y - camera.point.y) * camera.scale,
-        });
+        return display((point.x - camera.point.x) * camera.scale, (point.y - camera.point.y) * camera.scale);
     }
 }
 

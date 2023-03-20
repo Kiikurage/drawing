@@ -7,7 +7,7 @@ export class RectModeController extends EditorModeController {
     onMouseDown = () => {
         const newEntity = RectEntity.create({
             p1: this.editorController.currentPoint,
-            size: Size.model({ width: 1, height: 1 }),
+            size: Size.model(1, 1),
         });
         const newEntities = [...this.store.state.page.entities, newEntity];
         this.editorController.saveSnapshot();

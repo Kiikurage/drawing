@@ -44,7 +44,7 @@ export module Entity {
         const width = x1 - x0;
         const height = y1 - y0;
 
-        return { point: Point.model({ x: x0, y: y0 }), size: Size.model({ width, height }) };
+        return { point: Point.model(x0, y0), size: Size.model(width, height) };
     }
 
     export function transform(entity: Entity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Entity {

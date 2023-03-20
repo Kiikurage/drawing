@@ -1,5 +1,6 @@
 import { MouseEventButton, MouseEventInfo } from '../../model/MouseEventInfo';
 import { ScrollSession } from '../../model/session/ScrollSession';
+import { SelectRangeSession } from '../../model/session/SelectRangeSession';
 import { TransformSession } from '../../model/session/TransformSession';
 import { TransformType } from '../../model/TransformType';
 import { EditorModeController } from './EditorModeController';
@@ -13,6 +14,7 @@ export class SelectModeController extends EditorModeController {
             case MouseEventButton.PRIMARY: {
                 if (hover === null) {
                     this.store.setState({ selectedEntityIds: [] });
+                    this.editorController.startSession(new SelectRangeSession(this.editorController.currentPoint));
                     return;
                 }
 

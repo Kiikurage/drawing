@@ -6,8 +6,10 @@ import { Point } from '../../../model/Point';
 import { Size } from '../../../model/Size';
 import { Camera } from '../model/Camera';
 import { ContextMenuState } from '../model/ContextMenuState';
+import { SelectingRangeState } from '../model/SelectingRangeState';
 import { EntityBoundingBoxView } from './BoundingBoxView/EntityBoundingBoxView';
 import { ContextMenuPopup } from './ContextMenuPopup';
+import { SelectingRangeView } from './SelectingRangeView';
 import { SelectionView } from './SelectionView/SelectionView';
 
 export const IndicatorLayer = ({
@@ -15,11 +17,13 @@ export const IndicatorLayer = ({
     selectedEntities,
     hoveredEntity,
     contextMenu,
+    selectingRange,
 }: {
     camera: Camera;
     selectedEntities: Entity[];
     hoveredEntity: Entity | null;
     contextMenu: ContextMenuState;
+    selectingRange: SelectingRangeState;
 }) => {
     const entitiesSet = new Set<Entity>(selectedEntities);
 
@@ -46,10 +50,11 @@ export const IndicatorLayer = ({
                 width="100%"
                 height="100%"
             >
-                {visibleEntities.map((entity, i) => (
-                    <EntityBoundingBoxView entity={entity} camera={camera} key={i} />
+                {visibleEntities.map((entity) => (
+                    <EntityBoundingBoxView entity={entity} camera={camera} key={entity.id} />
                 ))}
                 <SelectionView selectedEntities={selectedEntities} camera={camera} />
+                <SelectingRangeView selectingRange={selectingRange} camera={camera} />
             </svg>
             <ContextMenuPopup camera={camera} state={contextMenu} />
         </div>
@@ -58,8 +63,8 @@ export const IndicatorLayer = ({
 
 function computeVisibleEntities(entities: Entity[], camera: Camera): Entity[] {
     const box1: ModelCordBox = Box.toModel(camera, {
-        point: Point.display({ x: 0, y: 0 }),
-        size: Size.display({ width: window.innerWidth, height: window.innerHeight }),
+        point: Point.display(0, 0),
+        size: Size.display(window.innerWidth, window.innerHeight),
     });
 
     return entities.filter((entity) => {

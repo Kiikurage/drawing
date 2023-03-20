@@ -3,6 +3,20 @@ import { DisplayCordPoint, ModelCordPoint, Point } from './Point';
 import { DisplayCordSize, ModelCordSize, Size } from './Size';
 
 export module Box {
+    export function model(x: number, y: number, width: number, height: number): ModelCordBox {
+        return {
+            point: Point.model(x, y),
+            size: Size.model(width, height),
+        };
+    }
+
+    export function display(x: number, y: number, width: number, height: number): DisplayCordBox {
+        return {
+            point: Point.display(x, y),
+            size: Size.display(width, height),
+        };
+    }
+
     export function toModel(camera: Camera, box: DisplayCordBox): ModelCordBox {
         return {
             point: Point.toModel(camera, box.point),

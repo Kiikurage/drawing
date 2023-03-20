@@ -19,8 +19,8 @@ export module LineEntity {
             {
                 id: uuid(),
                 type: 'line',
-                p1: Point.model({ x: 0, y: 0 }),
-                p2: Point.model({ x: 100, y: 100 }),
+                p1: Point.model(0, 0),
+                p2: Point.model(100, 100),
                 strokeColor: '#000',
             },
             data
@@ -31,14 +31,8 @@ export module LineEntity {
 export const LineEntityDelegate: EntityDelegates<LineEntity> = {
     getBoundingBox(entity: LineEntity): ModelCordBox {
         return {
-            point: Point.model({
-                x: Math.min(entity.p1.x, entity.p2.x),
-                y: Math.min(entity.p1.y, entity.p2.y),
-            }),
-            size: Size.model({
-                width: Math.abs(entity.p1.x - entity.p2.x),
-                height: Math.abs(entity.p1.y - entity.p2.y),
-            }),
+            point: Point.model(Math.min(entity.p1.x, entity.p2.x), Math.min(entity.p1.y, entity.p2.y)),
+            size: Size.model(Math.abs(entity.p1.x - entity.p2.x), Math.abs(entity.p1.y - entity.p2.y)),
         };
     },
     transform(entity: LineEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): LineEntity {
@@ -46,14 +40,14 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
         const scaleY = nextBoundingBox.size.height / prevBoundingBox.size.height;
 
         return Patch.apply(entity, {
-            p1: Point.model({
-                x: (entity.p1.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
-                y: (entity.p1.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y,
-            }),
-            p2: Point.model({
-                x: (entity.p2.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
-                y: (entity.p2.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y,
-            }),
+            p1: Point.model(
+                (entity.p1.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
+                (entity.p1.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y
+            ),
+            p2: Point.model(
+                (entity.p2.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
+                (entity.p2.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y
+            ),
         });
     },
 };

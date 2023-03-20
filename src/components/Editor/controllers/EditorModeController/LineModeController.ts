@@ -7,10 +7,7 @@ export class LineModeController extends EditorModeController {
     onMouseDown = () => {
         const newEntity = LineEntity.create({
             p1: this.editorController.currentPoint,
-            p2: Point.model({
-                x: this.editorController.currentPoint.x + 1,
-                y: this.editorController.currentPoint.y + 1,
-            }),
+            p2: Point.model(this.editorController.currentPoint.x + 1, this.editorController.currentPoint.y + 1),
         });
 
         const newEntities = [...this.store.state.page.entities, newEntity];

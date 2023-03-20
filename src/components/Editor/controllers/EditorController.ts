@@ -32,7 +32,7 @@ export class EditorController {
 
     private modeControllers: Record<EditorMode, EditorModeController>;
 
-    private _currentPoint = Point.display({ x: 0, y: 0 });
+    private _currentPoint = Point.display(0, 0);
 
     constructor(initialData: Patch<EditorState>) {
         this.store = new Store(EditorState.create(initialData));
@@ -99,24 +99,25 @@ export class EditorController {
         }
 
         this.session = session;
-        this.updateSession();
+        this.store.setState(session.start(this));
     }
 
     updateSession() {
-        const transaction = this.session;
-        if (transaction === null) {
-            console.warn('No transaction on going.');
+        const session = this.session;
+        if (session === null) {
+            console.warn('No session on going.');
             return;
         }
-        this.store.setState(transaction.update(this));
+        this.store.setState(session.update(this));
     }
 
     completeSession() {
-        const transaction = this.session;
-        if (transaction === null) {
-            console.warn('No transaction on going.');
+        const session = this.session;
+        if (session === null) {
+            console.warn('No session on going.');
             return;
         }
+        this.store.setState(session.complete(this));
         this.session = null;
         this.syncToDB();
     }

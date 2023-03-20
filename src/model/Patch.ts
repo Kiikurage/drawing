@@ -3,7 +3,7 @@ export type Patch<T> = {
 };
 
 export module Patch {
-    export function apply<T>(prevState: T, patch: Patch<T>): T {
+    export function apply<T extends object>(prevState: T, patch: Patch<T>): T {
         const entries = Object.entries(patch) as [keyof T, T[keyof T]][];
         if (entries.length === 0) return prevState;
 
@@ -13,7 +13,8 @@ export module Patch {
             if (prevState[key] === null) {
                 nextState[key] = value;
             } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-                nextState[key] = Patch.apply(prevState[key], value);
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                nextState[key] = Patch.apply(prevState[key] as any, value);
             } else {
                 nextState[key] = value;
             }

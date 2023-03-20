@@ -20,8 +20,8 @@ export module TextEntity {
             {
                 id: uuid(),
                 type: 'text' as const,
-                p1: Point.model({ x: 0, y: 0 }),
-                size: Size.model({ width: 100, height: 100 }),
+                p1: Point.model(0, 0),
+                size: Size.model(100, 100),
                 value: 'Hello World!',
             },
             data
@@ -32,14 +32,11 @@ export module TextEntity {
 export const TextEntityDelegate: EntityDelegates<TextEntity> = {
     getBoundingBox(entity: TextEntity): ModelCordBox {
         return {
-            point: Point.model({
-                x: Math.min(entity.p1.x, entity.p1.x + entity.size.width),
-                y: Math.min(entity.p1.y, entity.p1.y + entity.size.height),
-            }),
-            size: Size.model({
-                width: Math.abs(entity.size.width),
-                height: Math.abs(entity.size.height),
-            }),
+            point: Point.model(
+                Math.min(entity.p1.x, entity.p1.x + entity.size.width),
+                Math.min(entity.p1.y, entity.p1.y + entity.size.height)
+            ),
+            size: Size.model(Math.abs(entity.size.width), Math.abs(entity.size.height)),
         };
     },
     transform(entity: TextEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): TextEntity {

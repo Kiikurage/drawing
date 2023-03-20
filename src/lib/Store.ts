@@ -1,6 +1,6 @@
 import { Patch } from '../model/Patch';
 
-export class Store<T> {
+export class Store<T extends object> {
     private listeners = new Set<(newState: T) => void>();
 
     constructor(initialState: T) {

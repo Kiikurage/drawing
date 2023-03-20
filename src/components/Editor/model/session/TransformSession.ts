@@ -6,13 +6,14 @@ import { EditorController } from '../../controllers/EditorController';
 import { TransformType } from '../TransformType';
 import { Session } from './Session';
 
-export class TransformSession implements Session {
+export class TransformSession extends Session {
     readonly type = 'Transform';
     public entities: Entity[];
     public handle: TransformType;
     public originPoint: ModelCordPoint;
 
     constructor(entities: Entity[], handle: TransformType, originPoint: ModelCordPoint) {
+        super();
         this.entities = entities;
         this.handle = handle;
         this.originPoint = originPoint;
