@@ -72,6 +72,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                 css={css`
                     position: absolute;
                     inset: 0;
+                    outline: none;
 
                     & > * {
                         pointer-events: none;

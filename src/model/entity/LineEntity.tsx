@@ -1,3 +1,4 @@
+import { uuid } from '../../lib/uuid';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -16,7 +17,7 @@ export module LineEntity {
     export function create(data: Patch<Omit<LineEntity, 'type' | 'id'>>): LineEntity {
         return Patch.apply<LineEntity>(
             {
-                id: `${performance.now()}`,
+                id: uuid(),
                 type: 'line',
                 p1: Point.model({ x: 0, y: 0 }),
                 p2: Point.model({ x: 100, y: 100 }),

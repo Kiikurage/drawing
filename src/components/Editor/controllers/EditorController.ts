@@ -1,4 +1,5 @@
 import { Store } from '../../../lib/Store';
+import { uuid } from '../../../lib/uuid';
 import { Entity } from '../../../model/entity/Entity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
@@ -126,10 +127,6 @@ export class EditorController {
         if (ev.ctrlKey) keys.push('Control');
 
         switch (Key.serialize(keys)) {
-            case Key.serialize(['Control', 'A']): {
-                this.selectAll();
-                return;
-            }
             case Key.serialize(['V']): {
                 this.setMode('select');
                 return;
@@ -144,6 +141,17 @@ export class EditorController {
             }
             case Key.serialize(['A']): {
                 this.setMode('line');
+                return;
+            }
+            case Key.serialize(['Delete']):
+            case Key.serialize(['Backspace']): {
+                ev.preventDefault();
+                this.deleteSelectedEntity();
+                return;
+            }
+            case Key.serialize(['Control', 'A']): {
+                ev.preventDefault();
+                this.selectAll();
                 return;
             }
             case Key.serialize(['Control', 'X']): {
@@ -234,7 +242,7 @@ export class EditorController {
         } catch (ignored) {
             return;
         }
-        const newEntities = entities.map((entity) => Patch.apply(entity, { id: `${Math.random()}` }));
+        const newEntities = entities.map((entity) => Patch.apply(entity, { id: uuid() }));
 
         this.saveSnapshot();
         this.store.setState({
@@ -249,6 +257,17 @@ export class EditorController {
     selectAll() {
         this.store.setState({
             selectedEntityIds: this.store.state.page.entities.map((entity) => entity.id),
+        });
+    }
+
+    deleteSelectedEntity() {
+        this.store.setState({
+            page: {
+                entities: this.store.state.page.entities.filter(
+                    (entity) => !this.store.state.selectedEntityIds.includes(entity.id)
+                ),
+            },
+            selectedEntityIds: [],
         });
     }
 

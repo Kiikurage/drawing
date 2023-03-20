@@ -9,24 +9,28 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
         <svg
             css={css`
                 position: absolute;
-                left: ${entity.p1.x - 100}px;
-                top: ${entity.p1.y - 100}px;
             `}
-            width={entity.size.width + 200}
-            height={entity.size.height + 200}
+            style={{
+                left: entity.p1.x - 10,
+                top: entity.p1.y - 10,
+            }}
+            width={entity.size.width + 20}
+            height={entity.size.height + 20}
         >
-            <rect
-                pointerEvents="all"
-                x={100}
-                y={100}
-                width={entity.size.width}
-                height={entity.size.height}
-                stroke={entity.strokeColor}
-                strokeWidth={4}
-                fill={entity.fillColor}
-                onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
-                onMouseLeave={() => controller.onUnhover()}
-            />
+            <g transform="translate(10,10)">
+                <rect
+                    pointerEvents="all"
+                    x={0}
+                    y={0}
+                    width={entity.size.width}
+                    height={entity.size.height}
+                    stroke={entity.strokeColor}
+                    strokeWidth={4}
+                    fill={entity.fillColor}
+                    onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
+                    onMouseLeave={() => controller.onUnhover()}
+                />
+            </g>
         </svg>
     );
 };

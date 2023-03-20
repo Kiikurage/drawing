@@ -1,3 +1,4 @@
+import { uuid } from '../../lib/uuid';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -17,7 +18,7 @@ export module TextEntity {
     export function create(data: Patch<Omit<TextEntity, 'type' | 'id'>>): TextEntity {
         return Patch.apply<TextEntity>(
             {
-                id: `${performance.now()}`,
+                id: uuid(),
                 type: 'text' as const,
                 p1: Point.model({ x: 0, y: 0 }),
                 size: Size.model({ width: 100, height: 100 }),

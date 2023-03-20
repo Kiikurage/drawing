@@ -39,7 +39,7 @@ const ModeButton = styled.button`
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    background: transparent;
+    background: none;
     border: none;
     cursor: pointer;
     transition: background-color 160ms;

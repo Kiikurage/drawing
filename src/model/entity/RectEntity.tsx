@@ -1,3 +1,4 @@
+import { uuid } from '../../lib/uuid';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -18,12 +19,12 @@ export module RectEntity {
     export function create(data: Patch<Omit<RectEntity, 'type' | 'id'>>): RectEntity {
         return Patch.apply<RectEntity>(
             {
-                id: `${performance.now()}`,
+                id: uuid(),
                 type: 'rect',
                 p1: Point.model({ x: 0, y: 0 }),
                 size: Size.model({ width: 100, height: 100 }),
                 strokeColor: '#000',
-                fillColor: 'transparent',
+                fillColor: 'none',
             },
             data
         );
