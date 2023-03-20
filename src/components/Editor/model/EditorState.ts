@@ -16,7 +16,7 @@ export interface EditorState {
 
 export module EditorState {
     export function create(initialData: Patch<EditorState> = {}) {
-        return Patch.apply(
+        return Patch.apply<EditorState>(
             {
                 page: Page.create(),
                 mode: 'select',

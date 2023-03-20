@@ -1,7 +1,8 @@
 import { css } from '@emotion/react';
+import { signInAnonymously } from 'firebase/auth';
 import { get, ref } from 'firebase/database';
 import { useEffect, useState } from 'react';
-import { getDatabase } from '../firebaseConfig';
+import { getAuth, getDatabase } from '../firebaseConfig';
 import { Page } from '../model/Page';
 import { Editor } from './Editor/Editor';
 
@@ -33,7 +34,10 @@ export const App = () => {
     const [initialPage, setInitialPage] = useState<Page | null>(null);
 
     useEffect(() => {
-        loadOrCreateInitialPage().then((page) => setInitialPage(page));
+        (async () => {
+            await signInAnonymously(getAuth());
+            loadOrCreateInitialPage().then((page) => setInitialPage(page));
+        })();
     }, []);
 
     return (

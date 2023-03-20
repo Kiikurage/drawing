@@ -1,6 +1,7 @@
-import { onValue, ref, set } from 'firebase/database';
+import { signInAnonymously } from 'firebase/auth';
+import { get, onValue, ref, set } from 'firebase/database';
 import { lighten } from 'polished';
-import { getDatabase } from '../../../firebaseConfig';
+import { getAuth, getDatabase } from '../../../firebaseConfig';
 import { Store } from '../../../lib/Store';
 import { uuid } from '../../../lib/uuid';
 import { Entity } from '../../../model/entity/Entity';
@@ -48,7 +49,9 @@ export class EditorController {
         const db = getDatabase();
         const pageRef = ref(db, `page/${page.id}`);
         onValue(pageRef, (snapshot) => {
-            this.onPageUpdated(snapshot.val() as Page);
+            const nextPage = snapshot.val() as Page | null;
+            if (nextPage === null) return;
+            this.onPageUpdated(nextPage);
         });
     }
 
@@ -218,12 +221,22 @@ export class EditorController {
         this.redoStack.length = 0;
     }
 
-    private syncToDB() {
+    private async syncToDB() {
         const page = this.store.state.page;
 
         const db = getDatabase();
         const pageRef = ref(db, `page/${page.id}`);
         set(pageRef, page);
+
+        const auth = getAuth();
+        const { user } = await signInAnonymously(auth);
+
+        const historyRef = ref(db, `history/${user.uid}`);
+        const prevHistory = (await get(historyRef)).val() as string[] | null;
+        if (!prevHistory?.includes(page.id)) {
+            const nextHistory = [...(prevHistory ?? []), page.id];
+            set(historyRef, nextHistory);
+        }
     }
 
     undo() {
