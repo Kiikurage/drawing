@@ -7,34 +7,35 @@ import { EditorModeController } from './EditorModeController';
 
 export class SelectModeController extends EditorModeController {
     onMouseDown = (ev: MouseEventInfo) => {
-        this.store.setState({ contextMenu: { p1: null } });
+        this.store.setState({ contextMenu: { open: false } });
         const { hover } = this.state;
 
         switch (ev.button) {
             case MouseEventButton.PRIMARY: {
-                if (hover === null) {
-                    this.store.setState({ selectedEntityIds: [] });
-                    this.editorController.startSession(new SelectRangeSession(this.editorController.currentPoint));
-                    return;
-                }
-
-                if (hover.type === 'entity') {
-                    if (ev.shiftKey) {
-                        this.store.setState({
-                            selectedEntityIds: [...this.state.selectedEntityIds, hover.entityId],
-                        });
-                    } else {
-                        this.store.setState({ selectedEntityIds: [hover.entityId] });
+                switch (hover.type) {
+                    case 'idle': {
+                        this.store.setState({ selectedEntityIds: [] });
+                        this.editorController.startSession(new SelectRangeSession(this.editorController.currentPoint));
+                        return;
                     }
-                    this.startTransformSelectedEntities('translate');
-                    return;
-                }
 
-                if (hover.type === 'transformHandle') {
-                    this.startTransformSelectedEntities(hover.transformType);
-                    return;
-                }
+                    case 'entity': {
+                        if (ev.shiftKey) {
+                            this.store.setState({
+                                selectedEntityIds: [...this.state.selectedEntityIds, hover.entityId],
+                            });
+                        } else {
+                            this.store.setState({ selectedEntityIds: [hover.entityId] });
+                        }
+                        this.startTransformSelectedEntities('translate');
+                        return;
+                    }
 
+                    case 'transformHandle': {
+                        this.startTransformSelectedEntities(hover.transformType);
+                        return;
+                    }
+                }
                 return;
             }
 
@@ -46,30 +47,25 @@ export class SelectModeController extends EditorModeController {
             }
 
             case MouseEventButton.SECONDARY: {
-                if (hover === null) {
-                    this.store.setState({ selectedEntityIds: [] });
-                    return;
-                }
+                switch (hover.type) {
+                    case 'idle': {
+                        return;
+                    }
 
-                if (hover.type === 'entity') {
-                    if (ev.shiftKey) {
+                    case 'entity': {
                         this.store.setState({
-                            selectedEntityIds: [...this.state.selectedEntityIds, hover.entityId],
-                        });
-                    } else {
-                        this.store.setState({
-                            contextMenu: { p1: this.editorController.currentPoint },
+                            contextMenu: { open: true, point: this.editorController.currentPoint },
                             selectedEntityIds: [hover.entityId],
                         });
+                        return;
                     }
-                    return;
-                }
 
-                if (hover.type === 'transformHandle') {
-                    this.store.setState({
-                        contextMenu: { p1: this.editorController.currentPoint },
-                    });
-                    return;
+                    case 'transformHandle': {
+                        this.store.setState({
+                            contextMenu: { open: true, point: this.editorController.currentPoint },
+                        });
+                        return;
+                    }
                 }
             }
         }
@@ -88,13 +84,17 @@ export class SelectModeController extends EditorModeController {
     };
 
     onBeforeDeactivate = () => {
-        this.store.setState({ selectedEntityIds: [], contextMenu: { p1: null } });
+        this.store.setState({ selectedEntityIds: [], contextMenu: { open: false } });
     };
 
     private startTransformSelectedEntities(type: TransformType) {
         this.editorController.saveSnapshot();
         this.editorController.startSession(
-            new TransformSession(this.editorController.selectedEntities, type, this.editorController.currentPoint)
+            new TransformSession(
+                this.editorController.computeSelectedEntities(),
+                type,
+                this.editorController.currentPoint
+            )
         );
     }
 }

@@ -4,7 +4,7 @@ import { Patch } from './Patch';
 
 export interface Page {
     id: string;
-    entities: Entity[];
+    entities: Record<string, Entity>;
 }
 
 export module Page {
@@ -12,7 +12,7 @@ export module Page {
         return Patch.apply<Page>(
             {
                 id: uuid(),
-                entities: [],
+                entities: {},
             },
             data
         );

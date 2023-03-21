@@ -10,14 +10,19 @@ export class LineModeController extends EditorModeController {
             p2: Point.model(this.editorController.currentPoint.x + 1, this.editorController.currentPoint.y + 1),
         });
 
-        const newEntities = [...this.store.state.page.entities, newEntity];
         this.editorController.saveSnapshot();
         this.store.setState({
-            page: { entities: newEntities },
+            page: { entities: { [newEntity.id]: newEntity } },
         });
 
         this.editorController.startSession(
-            new TransformSession([newEntity], 'resize.bottomRight', this.editorController.currentPoint)
+            new TransformSession(
+                {
+                    [newEntity.id]: newEntity,
+                },
+                'resize.bottomRight',
+                this.editorController.currentPoint
+            )
         );
     };
 

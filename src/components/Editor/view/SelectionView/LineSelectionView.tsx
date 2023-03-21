@@ -5,7 +5,7 @@ import { ModelCordPoint, Point } from '../../../../model/Point';
 import { COLOR_SELECTION } from '../../../styles';
 import { useEditorController } from '../../EditorControllerContext';
 import { Camera } from '../../model/Camera';
-import { TransformHandleHoverState } from '../../model/HoverState';
+import { HoverState } from '../../model/HoverState';
 import { ResizeHandle } from './ResizeHandle';
 
 export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: LineEntity }) => {
@@ -26,7 +26,7 @@ export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: 
                 pointerEvents="all"
                 stroke={COLOR_SELECTION}
                 strokeWidth={1.5}
-                onMouseOver={() => controller.onHover(TransformHandleHoverState.TRANSLATE)}
+                onMouseOver={() => controller.onHover(HoverState.TRANSLATE_HANDLE)}
                 onMouseLeave={() => controller.onUnhover()}
             />
             <ResizeHandle cursor="move" x={p1.x} y={p1.y} hover={getHoverState(entity.p1, entity.p2)} />
@@ -35,18 +35,18 @@ export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: 
     );
 };
 
-function getHoverState(targetPoint: ModelCordPoint, anchorPoint: ModelCordPoint): TransformHandleHoverState {
+function getHoverState(targetPoint: ModelCordPoint, anchorPoint: ModelCordPoint): HoverState {
     if (targetPoint.x < anchorPoint.x) {
         if (targetPoint.y < anchorPoint.y) {
-            return TransformHandleHoverState.RESIZE_TOP_LEFT;
+            return HoverState.RESIZE_HANDLE_TOP_LEFT;
         } else {
-            return TransformHandleHoverState.RESIZE_BOTTOM_LEFT;
+            return HoverState.RESIZE_HANDLE_BOTTOM_LEFT;
         }
     } else {
         if (targetPoint.y < anchorPoint.y) {
-            return TransformHandleHoverState.RESIZE_TOP_RIGHT;
+            return HoverState.RESIZE_HANDLE_TOP_RIGHT;
         } else {
-            return TransformHandleHoverState.RESIZE_BOTTOM_RIGHT;
+            return HoverState.RESIZE_HANDLE_BOTTOM_RIGHT;
         }
     }
 }

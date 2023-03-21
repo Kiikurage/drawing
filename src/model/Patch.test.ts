@@ -74,4 +74,13 @@ describe('Patch', () => {
         expect(nextState).toEqual({ x: [4, 5] });
         expect(prevState).toEqual({ x: [1, 2, 3] });
     });
+
+    it('パッチ内容がundefinedなら代わりにそのフィールドを消す', () => {
+        const prevState = { x: 1, y: 2 };
+        const patch = { x: 3, y: undefined };
+        const nextState = Patch.apply(prevState, patch);
+
+        expect(nextState).toEqual({ x: 3 });
+        expect(prevState).toEqual({ x: 1, y: 2 });
+    });
 });

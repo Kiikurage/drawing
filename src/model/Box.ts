@@ -3,6 +3,17 @@ import { DisplayCordPoint, ModelCordPoint, Point } from './Point';
 import { DisplayCordSize, ModelCordSize, Size } from './Size';
 
 export module Box {
+    export function isOverlap(box1: DisplayCordBox, box2: DisplayCordBox): boolean;
+    export function isOverlap(box1: ModelCordBox, box2: ModelCordBox): boolean;
+    export function isOverlap(box1: ModelCordBox | DisplayCordBox, box2: ModelCordBox | DisplayCordBox): boolean {
+        return (
+            box1.point.x < box2.point.x + box2.size.width &&
+            box2.point.x < box1.point.x + box1.size.width &&
+            box1.point.y < box2.point.y + box2.size.height &&
+            box2.point.y < box1.point.y + box1.size.height
+        );
+    }
+
     export function model(x: number, y: number, width: number, height: number): ModelCordBox {
         return {
             point: Point.model(x, y),

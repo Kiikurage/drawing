@@ -1,12 +1,11 @@
 import { css } from '@emotion/react';
 import { useMemo } from 'react';
-import { Box, ModelCordBox } from '../../../model/Box';
 import { Entity } from '../../../model/entity/Entity';
-import { Point } from '../../../model/Point';
-import { Size } from '../../../model/Size';
 import { Camera } from '../model/Camera';
 import { ContextMenuState } from '../model/ContextMenuState';
+import { EntityMap } from '../model/EntityMap';
 import { SelectingRangeState } from '../model/SelectingRangeState';
+import { computeVisibleEntities } from '../util';
 import { EntityBoundingBoxView } from './BoundingBoxView/EntityBoundingBoxView';
 import { ContextMenuPopup } from './ContextMenuPopup';
 import { SelectingRangeView } from './SelectingRangeView';
@@ -20,19 +19,19 @@ export const IndicatorLayer = ({
     selectingRange,
 }: {
     camera: Camera;
-    selectedEntities: Entity[];
+    selectedEntities: EntityMap;
     hoveredEntity: Entity | null;
     contextMenu: ContextMenuState;
     selectingRange: SelectingRangeState;
 }) => {
-    const entitiesSet = new Set<Entity>(selectedEntities);
-
-    if (hoveredEntity !== null) {
-        entitiesSet.add(hoveredEntity);
-    }
-
-    const entities = Array.from(entitiesSet);
-    const visibleEntities = useMemo(() => computeVisibleEntities(entities, camera), [camera, entities]);
+    const entitiesMap = useMemo(() => {
+        const map = { ...selectedEntities };
+        if (hoveredEntity !== null) {
+            map[hoveredEntity.id] = hoveredEntity;
+        }
+        return map;
+    }, [hoveredEntity, selectedEntities]);
+    const visibleEntities = useMemo(() => computeVisibleEntities(entitiesMap, camera), [camera, entitiesMap]);
 
     return (
         <div
@@ -50,7 +49,7 @@ export const IndicatorLayer = ({
                 width="100%"
                 height="100%"
             >
-                {visibleEntities.map((entity) => (
+                {Object.values(visibleEntities).map((entity) => (
                     <EntityBoundingBoxView entity={entity} camera={camera} key={entity.id} />
                 ))}
                 <SelectionView selectedEntities={selectedEntities} camera={camera} />
@@ -60,21 +59,3 @@ export const IndicatorLayer = ({
         </div>
     );
 };
-
-function computeVisibleEntities(entities: Entity[], camera: Camera): Entity[] {
-    const box1: ModelCordBox = Box.toModel(camera, {
-        point: Point.display(0, 0),
-        size: Size.display(window.innerWidth, window.innerHeight),
-    });
-
-    return entities.filter((entity) => {
-        const box2 = Entity.getBoundingBox(entity);
-
-        return (
-            box1.point.x < box2.point.x + box2.size.width &&
-            box2.point.x < box1.point.x + box1.size.width &&
-            box1.point.y < box2.point.y + box2.size.height &&
-            box2.point.y < box1.point.y + box1.size.height
-        );
-    });
-}

@@ -1,10 +1,10 @@
 import { memo, useCallback } from 'react';
 import { COLOR_SELECTION } from '../../../styles';
 import { useEditorController } from '../../EditorControllerContext';
-import { TransformHandleHoverState } from '../../model/HoverState';
+import { HoverState } from '../../model/HoverState';
 
 export const ResizeHandle = memo(
-    ({ x = 0, y = 0, hover, cursor }: { x?: number; y?: number; hover: TransformHandleHoverState; cursor: string }) => {
+    ({ x = 0, y = 0, hover, cursor }: { x?: number; y?: number; hover: HoverState; cursor: string }) => {
         const controller = useEditorController();
 
         const onHover = useCallback(() => {
@@ -48,7 +48,7 @@ export const InvisibleResizeHandle = memo(
         y?: number;
         width?: number;
         height?: number;
-        hover: TransformHandleHoverState;
+        hover: HoverState;
         cursor: string;
     }) => {
         const controller = useEditorController();

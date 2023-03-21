@@ -1,18 +1,20 @@
+import { Record } from '../../../../lib/Record';
 import { ModelCordBox } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
 import { Patch } from '../../../../model/Patch';
 import { ModelCordPoint } from '../../../../model/Point';
 import { EditorController } from '../../controllers/EditorController';
+import { EntityMap } from '../EntityMap';
 import { TransformType } from '../TransformType';
 import { Session } from './Session';
 
 export class TransformSession extends Session {
     readonly type = 'Transform';
-    public entities: Entity[];
+    public entities: EntityMap;
     public handle: TransformType;
     public originPoint: ModelCordPoint;
 
-    constructor(entities: Entity[], handle: TransformType, originPoint: ModelCordPoint) {
+    constructor(entities: EntityMap, handle: TransformType, originPoint: ModelCordPoint) {
         super();
         this.entities = entities;
         this.handle = handle;
@@ -20,12 +22,7 @@ export class TransformSession extends Session {
     }
 
     update(controller: EditorController) {
-        const {
-            currentPoint,
-            store: {
-                state: { page },
-            },
-        } = controller;
+        const { currentPoint } = controller;
 
         const prevBoundingBox = Entity.computeBoundingBox(this.entities);
 
@@ -36,17 +33,11 @@ export class TransformSession extends Session {
             this.handle
         );
 
-        const nextEntities = this.entities.map((entity) => {
-            return Entity.transform(entity, prevBoundingBox, nextBoundingBox);
-        });
+        const nextEntities = Record.mapValue(this.entities, (entity) =>
+            Entity.transform(entity, prevBoundingBox, nextBoundingBox)
+        );
 
-        return {
-            page: {
-                entities: page.entities.map((prevEntity) => {
-                    return nextEntities.find((entity) => entity.id === prevEntity.id) ?? prevEntity;
-                }),
-            },
-        };
+        return { page: { entities: nextEntities } };
     }
 
     private static computeNextBoundingBox(

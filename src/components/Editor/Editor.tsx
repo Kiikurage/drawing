@@ -13,7 +13,7 @@ import { ToolBar } from './view/ToolBar';
 
 export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }) => {
     const [controller] = useState(() => new EditorController({ page: defaultValue }));
-    const { page, camera, mode, selectedEntityIds, hover, selectingRange, contextMenu } = useStore(controller.store);
+    const { page, camera, mode, hover, selectingRange, contextMenu } = useStore(controller.store);
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -55,14 +55,12 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
 
     const onModeChange = useCallback((mode: EditorMode) => controller.setMode(mode), [controller]);
 
-    const selectedEntities = useMemo(() => {
-        return page.entities.filter((entity) => selectedEntityIds.includes(entity.id));
-    }, [page.entities, selectedEntityIds]);
+    const selectedEntities = controller.computeSelectedEntities();
 
     const hoveredEntity = useMemo(() => {
         if (hover?.type !== 'entity') return null;
 
-        return page.entities.find((entity) => entity.id === hover.entityId) ?? null;
+        return page.entities[hover.entityId] ?? null;
     }, [hover, page.entities]);
 
     return (

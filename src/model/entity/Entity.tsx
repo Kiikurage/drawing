@@ -1,3 +1,4 @@
+import { EntityMap } from '../../components/Editor/model/EntityMap';
 import { ModelCordBox } from '../Box';
 import { Point } from '../Point';
 import { Size } from '../Size';
@@ -28,13 +29,13 @@ export module Entity {
         return getDelegate(entity).getBoundingBox(entity);
     }
 
-    export function computeBoundingBox(entities: Entity[]): ModelCordBox {
+    export function computeBoundingBox(entities: EntityMap): ModelCordBox {
         let x0 = +Infinity,
             y0 = +Infinity,
             x1 = -Infinity,
             y1 = -Infinity;
 
-        for (const entity of entities) {
+        for (const entity of Object.values(entities)) {
             const box = Entity.getBoundingBox(entity);
             x0 = Math.min(box.point.x, x0);
             y0 = Math.min(box.point.y, y0);

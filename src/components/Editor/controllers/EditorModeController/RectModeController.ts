@@ -9,14 +9,14 @@ export class RectModeController extends EditorModeController {
             p1: this.editorController.currentPoint,
             size: Size.model(1, 1),
         });
-        const newEntities = [...this.store.state.page.entities, newEntity];
+        const newEntityMap = { [newEntity.id]: newEntity };
         this.editorController.saveSnapshot();
         this.store.setState({
-            page: { entities: newEntities },
+            page: { entities: newEntityMap },
         });
 
         this.editorController.startSession(
-            new TransformSession([newEntity], 'resize.bottomRight', this.editorController.currentPoint)
+            new TransformSession(newEntityMap, 'resize.bottomRight', this.editorController.currentPoint)
         );
     };
 

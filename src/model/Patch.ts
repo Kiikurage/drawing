@@ -10,7 +10,9 @@ export module Patch {
         const nextState = { ...prevState };
 
         for (const [key, value] of entries) {
-            if (prevState[key] === null) {
+            if (value === undefined) {
+                delete nextState[key];
+            } else if (prevState[key] === undefined) {
                 nextState[key] = value;
             } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any

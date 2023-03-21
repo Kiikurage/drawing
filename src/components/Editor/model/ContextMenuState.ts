@@ -1,17 +1,13 @@
 import { Patch } from '../../../model/Patch';
-import { ModelCordPoint } from '../../../model/Point';
+import { ModelCordPoint, Point } from '../../../model/Point';
 
 export interface ContextMenuState {
-    p1: ModelCordPoint | null;
+    open: boolean;
+    point: ModelCordPoint;
 }
 
 export module ContextMenuState {
     export function create(initialData: Patch<ContextMenuState> = {}) {
-        return Patch.apply(
-            {
-                p1: null,
-            },
-            initialData
-        );
+        return Patch.apply({ open: false, point: Point.model(0, 0) }, initialData);
     }
 }

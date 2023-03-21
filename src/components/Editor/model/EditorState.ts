@@ -10,8 +10,7 @@ export interface EditorState {
     page: Page;
     mode: EditorMode;
     camera: Camera;
-    hover: HoverState | null;
-
+    hover: HoverState;
     selectingRange: SelectingRangeState;
     selectedEntityIds: string[];
     contextMenu: ContextMenuState;
@@ -24,7 +23,7 @@ export module EditorState {
                 page: Page.create(),
                 mode: 'select',
                 camera: Camera.create(),
-                hover: null,
+                hover: HoverState.IDLE,
                 selectingRange: SelectingRangeState.create(),
                 selectedEntityIds: [],
                 contextMenu: ContextMenuState.create(),

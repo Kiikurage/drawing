@@ -7,10 +7,9 @@ import { ContextMenuState } from '../model/ContextMenuState';
 import { Popup } from './Popup';
 
 export const ContextMenuPopup = ({ camera, state }: { camera: Camera; state: ContextMenuState }) => {
-    const { p1 } = state;
-    if (p1 === null) return null;
+    if (!state.open) return null;
 
-    const { x: left, y: top } = Point.toDisplay(camera, p1);
+    const { x: left, y: top } = Point.toDisplay(camera, state.point);
     return (
         <Popup.Base
             css={css`
