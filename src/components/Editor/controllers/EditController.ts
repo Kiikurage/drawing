@@ -83,6 +83,7 @@ export class EditController {
     }
 
     syncToDB() {
+        console.log(this.store.state.page);
         this.collaborationController.savePage(this.store.state.page);
     }
 }

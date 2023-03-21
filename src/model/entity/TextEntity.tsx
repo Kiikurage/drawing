@@ -1,4 +1,4 @@
-import { uuid } from '../../lib/uuid';
+import { randomId } from '../../lib/randomId';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -18,7 +18,7 @@ export module TextEntity {
     export function create(data: Patch<Omit<TextEntity, 'type' | 'id'>>): TextEntity {
         return Patch.apply<TextEntity>(
             {
-                id: uuid(),
+                id: randomId(),
                 type: 'text' as const,
                 p1: Point.model(0, 0),
                 size: Size.model(100, 100),

@@ -1,6 +1,6 @@
+import { randomId } from '../../../lib/randomId';
 import { Record } from '../../../lib/Record';
 import { ReadonlyStore, Store } from '../../../lib/Store';
-import { uuid } from '../../../lib/uuid';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
@@ -134,7 +134,7 @@ export class EditorController {
             return;
         }
         const entities = Record.map(copiedEntities, (_, entity) => {
-            const id = uuid();
+            const id = randomId();
             return [id, Patch.apply(entity, { id })];
         });
 

@@ -1,4 +1,4 @@
-import { uuid } from '../../lib/uuid';
+import { randomId } from '../../lib/randomId';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -19,7 +19,7 @@ export module RectEntity {
     export function create(data: Patch<Omit<RectEntity, 'type' | 'id'>> = {}): RectEntity {
         return Patch.apply<RectEntity>(
             {
-                id: uuid(),
+                id: randomId(),
                 type: 'rect',
                 p1: Point.model(0, 0),
                 size: Size.model(100, 100),

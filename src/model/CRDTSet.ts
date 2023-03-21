@@ -1,8 +1,8 @@
-import { uuid } from '../lib/uuid';
+import { randomId } from '../lib/randomId';
 import { VectorClock } from './VectorClock';
 
 export class CRDTSet<T extends string | number> {
-    private readonly replicaId = uuid();
+    private readonly replicaId = randomId();
     private readonly addClock = new Map<T, VectorClock>();
     private readonly delClock = new Map<T, VectorClock>();
 

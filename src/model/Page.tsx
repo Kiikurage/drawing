@@ -1,4 +1,4 @@
-import { uuid } from '../lib/uuid';
+import { randomId } from '../lib/randomId';
 import { Entity } from './entity/Entity';
 import { Patch } from './Patch';
 
@@ -11,7 +11,7 @@ export module Page {
     export function create(data: Patch<Omit<Page, 'id'>> = {}): Page {
         return Patch.apply<Page>(
             {
-                id: uuid(),
+                id: randomId(),
                 entities: {},
             },
             data

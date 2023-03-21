@@ -1,34 +1,46 @@
-import { uuid } from '../lib/uuid';
+import { randomId } from '../lib/randomId';
 import { VectorClock } from './VectorClock';
 
 export class CRDTMap<T> {
-    private readonly replicaId = uuid();
-    private readonly _values = new Map<string, T>();
-    private readonly addClock = new Map<string, VectorClock>();
-    private readonly delClock = new Map<string, VectorClock>();
+    private readonly replicaId = randomId();
+    private readonly entries = new Map<
+        string,
+        {
+            value?: T;
+            clock: VectorClock;
+            deleted: boolean;
+        }
+    >();
 
     json(): Record<string, T> {
-        return Object.fromEntries(this._values.entries());
+        return Object.fromEntries(
+            [...this.entries.entries()]
+                .filter(([, entry]) => !entry.deleted)
+                .map(([key, entry]) => [key, entry.value as T] as const)
+        );
     }
 
     set(key: string, value: T): SetAction {
-        const prevClock = this.addClock.get(key) ?? this.delClock.get(key) ?? VectorClock.empty();
+        const prevClock = this.entries.get(key)?.clock ?? VectorClock.empty();
         const nextClock = VectorClock.inc(prevClock, this.replicaId);
 
-        this.delClock.delete(key);
-        this.addClock.set(key, nextClock);
-        this._values.set(key, value);
+        this.entries.set(key, {
+            value,
+            clock: nextClock,
+            deleted: false,
+        });
 
         return { type: 'CRDTMap.set', clock: nextClock, key, value };
     }
 
     del(key: string): DelAction {
-        const prevClock = this.addClock.get(key) ?? this.delClock.get(key) ?? VectorClock.empty();
+        const prevClock = this.entries.get(key)?.clock ?? VectorClock.empty();
         const nextClock = VectorClock.inc(prevClock, this.replicaId);
 
-        this.addClock.delete(key);
-        this._values.delete(key);
-        this.delClock.set(key, nextClock);
+        this.entries.set(key, {
+            clock: nextClock,
+            deleted: true,
+        });
 
         return { type: 'CRDTMap.del', clock: nextClock, key };
     }
@@ -38,30 +50,38 @@ export class CRDTMap<T> {
 
         switch (type) {
             case 'CRDTMap.set': {
-                const prevClock = this.addClock.get(key) ?? this.delClock.get(key) ?? VectorClock.empty();
+                const prevClock = this.entries.get(key)?.clock ?? VectorClock.empty();
                 const compare = VectorClock.compare(prevClock, clock);
                 switch (compare) {
                     case 'gt':
                         return;
 
-                    case 'concurrent': // Value is concurrently updated by multiple replicas
-                        if (this.delClock.has(key) || VectorClock.hardCompare(prevClock, clock) === 'lt') {
-                            this.delClock.delete(key);
-                            this.addClock.set(key, VectorClock.inc(clock, this.replicaId));
-                            this._values.set(key, action.value);
+                    case 'concurrent': {
+                        // Value is concurrently updated by multiple replicas
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        const entry = this.entries.get(key)!;
+                        if (entry.deleted || VectorClock.hardCompare(prevClock, clock) === 'lt') {
+                            this.entries.set(key, {
+                                value: action.value as T,
+                                clock: VectorClock.inc(clock, this.replicaId),
+                                deleted: false,
+                            });
                         }
                         return;
+                    }
 
                     case 'lt':
-                        this.delClock.delete(key);
-                        this.addClock.set(key, VectorClock.inc(clock, this.replicaId));
-                        this._values.set(key, action.value);
+                        this.entries.set(key, {
+                            value: action.value as T,
+                            clock: VectorClock.inc(clock, this.replicaId),
+                            deleted: false,
+                        });
                 }
                 break;
             }
 
             case 'CRDTMap.del': {
-                const prevClock = this.addClock.get(key) ?? this.delClock.get(key) ?? VectorClock.empty();
+                const prevClock = this.entries.get(key)?.clock ?? VectorClock.empty();
                 const compare = VectorClock.compare(prevClock, clock);
                 switch (compare) {
                     case 'gt':
@@ -69,9 +89,10 @@ export class CRDTMap<T> {
                         return;
 
                     case 'lt':
-                        this.addClock.delete(key);
-                        this.delClock.set(key, VectorClock.inc(clock, this.replicaId));
-                        this._values.delete(key);
+                        this.entries.set(key, {
+                            clock: VectorClock.inc(clock, this.replicaId),
+                            deleted: true,
+                        });
                 }
                 break;
             }
@@ -85,7 +106,7 @@ interface SetAction {
     type: 'CRDTMap.set';
     clock: VectorClock;
     key: string;
-    value: any;
+    value: unknown;
 }
 
 interface DelAction {

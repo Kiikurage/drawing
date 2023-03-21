@@ -1,4 +1,4 @@
-import { uuid } from '../../lib/uuid';
+import { randomId } from '../../lib/randomId';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -17,7 +17,7 @@ export module LineEntity {
     export function create(data: Patch<Omit<LineEntity, 'type' | 'id'>>): LineEntity {
         return Patch.apply<LineEntity>(
             {
-                id: uuid(),
+                id: randomId(),
                 type: 'line',
                 p1: Point.model(0, 0),
                 p2: Point.model(100, 100),
