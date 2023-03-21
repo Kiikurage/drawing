@@ -1,11 +1,11 @@
 import * as firebaseAuth from 'firebase/auth';
 import { get, ref } from 'firebase/database';
-import { getAuth, getDatabase } from '../../../../firebaseConfig';
-import { Page } from '../../../../model/Page';
-import { User } from '../../model/User';
-import { SessionInitController } from './SessionInitController';
+import { getAuth, getDatabase } from '../../../firebaseConfig';
+import { Page } from '../../../model/Page';
+import { User } from '../../Editor/model/User';
+import { AppController } from './AppController';
 
-export class FirebaseSessionInitController implements SessionInitController {
+export class FirebaseAppController implements AppController {
     async loadOrCreatePage(pageId?: string): Promise<Page> {
         await this.getOrAuthUser();
 

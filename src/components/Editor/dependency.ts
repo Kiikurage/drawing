@@ -1,9 +1,9 @@
+import { AppController } from '../App/AppController/AppController';
+import { DummyAppController } from '../App/AppController/DummyAppController';
+import { FirebaseAppController } from '../App/AppController/FirebaseAppController';
 import { CollaborationController } from './controllers/CollaborationEditController/CollaborationController';
 import { DummyCollaborationController } from './controllers/CollaborationEditController/DummyCollaborationController';
 import { FirebaseCollaborationController } from './controllers/CollaborationEditController/FirebaseCollaborationController';
-import { DummySessionInitController } from './controllers/SessionInitController/DummySessionInitController';
-import { FirebaseSessionInitController } from './controllers/SessionInitController/FirebaseSessionInitController';
-import { SessionInitController } from './controllers/SessionInitController/SessionInitController';
 
 const USE_DUMMY_CONTROLLERS = false;
 
@@ -15,10 +15,10 @@ export function createCollaborationController(): CollaborationController {
     }
 }
 
-export function createSessionInitController(): SessionInitController {
+export function createSessionInitController(): AppController {
     if (USE_DUMMY_CONTROLLERS && location.host.includes('localhost')) {
-        return new DummySessionInitController();
+        return new DummyAppController();
     } else {
-        return new FirebaseSessionInitController();
+        return new FirebaseAppController();
     }
 }

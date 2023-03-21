@@ -1,6 +1,6 @@
-import { Page } from '../../../../model/Page';
+import { Page } from '../../../model/Page';
 
-export interface SessionInitController {
+export interface AppController {
     loadOrCreatePage(pageId?: string): Promise<Page>;
 
     loadHistory(): Promise<string[]>;

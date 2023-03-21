@@ -1,11 +1,11 @@
 import { css } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSessionInitController } from './SessionInitControllerContext';
+import { useAppController } from './App/AppControllerContext';
 import { COLOR_SELECTION } from './styles';
 
 export const PageListPage = () => {
-    const controller = useSessionInitController();
+    const controller = useAppController();
 
     const [history, setHistory] = useState<string[]>([]);
     useEffect(() => {

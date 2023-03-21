@@ -1,5 +1,5 @@
-import { App } from './App';
+import { EditorWrapper } from './EditorWrapper';
 
 export const EditorPage = () => {
-    return <App />;
+    return <EditorWrapper />;
 };

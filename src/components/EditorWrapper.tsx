@@ -2,14 +2,14 @@ import { css } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Page } from '../model/Page';
+import { useAppController } from './App/AppControllerContext';
 import { Editor } from './Editor/Editor';
-import { useSessionInitController } from './SessionInitControllerContext';
 
-export const App = () => {
+export const EditorWrapper = () => {
     const [initialPage, setInitialPage] = useState<Page | null>(null);
     const location = useLocation();
     const navigate = useNavigate();
-    const controller = useSessionInitController();
+    const controller = useAppController();
 
     useEffect(() => {
         if (initialPage !== null) return;

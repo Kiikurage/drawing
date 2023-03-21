@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, onValue, ref, set } from 'firebase/database';
 import { createRoot } from 'react-dom/client';
-import { App2 } from './components/App2';
+import { App } from './components/App/App';
 import { firebaseConfig } from './firebaseConfig';
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -12,7 +12,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     const root = createRoot(container);
-    root.render(<App2 />);
+    root.render(<App />);
 });
 
 Object.assign(window, {
