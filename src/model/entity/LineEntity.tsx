@@ -14,7 +14,7 @@ export interface LineEntity {
 }
 
 export module LineEntity {
-    export function create(data: Patch<Omit<LineEntity, 'type' | 'id'>>): LineEntity {
+    export function create(data: Patch<Omit<LineEntity, 'type' | 'id'>> = {}): LineEntity {
         return Patch.apply<LineEntity>(
             {
                 id: randomId(),

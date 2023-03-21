@@ -1,6 +1,5 @@
-const CHARS64 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-';
+const CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_';
 
 export function randomId() {
-    // UUID = 128bit = (2^8)^16
-    return 'xxxxxxxxxxxxxxxx'.replace(/x/g, () => CHARS64[Math.floor(Math.random() * 64)]);
+    return 'xxxxxxxx'.replace(/x/g, () => CHARS[Math.floor(Math.random() * CHARS.length)]);
 }

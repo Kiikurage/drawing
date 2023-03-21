@@ -1,72 +1,169 @@
+import { EntityMap } from '../components/Editor/model/EntityMap';
+import { randomId } from '../lib/randomId';
+import { Record } from '../lib/Record';
 import { Entity } from './entity/Entity';
 import { Page } from './Page';
 import { Patch } from './Patch';
 import { VectorClock } from './VectorClock';
 
-export class CRDTMap<T> {
-    page(): Page {}
+export class CRDTPage {
+    private readonly replicaId = randomId();
+    private readonly entries: Record<
+        string,
+        {
+            entity?: Entity;
+            clock: {
+                addDel: VectorClock;
+                [fieldType: string]: VectorClock | undefined;
+            };
+            deleted?: boolean;
+        }
+    >;
 
-    set(key: string, value: T): SetAction {
-        const prevClock = this.addClock.get(key) ?? this.delClock.get(key) ?? VectorClock.empty();
-        const nextClock = VectorClock.inc(prevClock, this.replicaId);
-
-        this.delClock.delete(key);
-        this.addClock.set(key, nextClock);
-        this._values.set(key, value);
-
-        return { type: 'CRDTMap.set', clock: nextClock, key, value };
+    constructor(page?: Page) {
+        this.entries = Record.mapValue(page?.entities ?? {}, (entity) => ({
+            entity,
+            clock: { addDel: VectorClock.inc({}, this.replicaId) },
+        }));
     }
 
-    del(key: string): DelAction {
-        const prevClock = this.addClock.get(key) ?? this.delClock.get(key) ?? VectorClock.empty();
-        const nextClock = VectorClock.inc(prevClock, this.replicaId);
-
-        this.addClock.delete(key);
-        this._values.delete(key);
-        this.delClock.set(key, nextClock);
-
-        return { type: 'CRDTMap.del', clock: nextClock, key };
+    entities(): EntityMap {
+        return Record.mapValue(
+            Record.filter(this.entries, (entry) => !entry.deleted),
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            (entry) => entry.entity!
+        );
     }
 
-    apply(action: Action) {
-        const { type, key, clock } = action;
+    addEntity(entity: Entity): EntityAddAction {
+        const prevClock = this.entries[entity.id]?.clock?.addDel ?? VectorClock.empty();
+        const nextClock = VectorClock.inc(prevClock, this.replicaId);
+
+        this.entries[entity.id] = {
+            entity,
+            clock: { addDel: nextClock },
+        };
+
+        return [ActionType.ENTITY_ADD, nextClock, entity];
+    }
+
+    deleteEntity(entityId: string): EntityDeleteAction {
+        const prevClock = this.entries[entityId]?.clock?.addDel ?? VectorClock.empty();
+        const nextClock = VectorClock.inc(prevClock, this.replicaId);
+
+        this.entries[entityId] = {
+            clock: {
+                addDel: nextClock,
+            },
+            deleted: true,
+        };
+
+        return [ActionType.ENTITY_DELETE, nextClock, entityId];
+    }
+
+    updateEntity(entityId: string, type: 'transform' | 'style', patch: Patch<any>): EntityUpdateAction {
+        const prevClock = this.entries[entityId]?.clock?.[type] ?? VectorClock.empty();
+        const nextClock = VectorClock.inc(prevClock, this.replicaId);
+
+        this.entries[entityId] = {
+            ...this.entries[entityId],
+            entity: Patch.apply(this.entries[entityId].entity, patch),
+            clock: {
+                ...this.entries[entityId]?.clock,
+                [type]: nextClock,
+            },
+        };
+
+        return [ActionType.ENTITY_UPDATE, nextClock, entityId, type, patch];
+    }
+
+    apply(action: CRDTPageAction) {
+        const [type, clock] = action;
 
         switch (type) {
-            case 'CRDTMap.set': {
-                const prevClock = this.addClock.get(key) ?? this.delClock.get(key) ?? VectorClock.empty();
-                const compare = VectorClock.compare(prevClock, clock);
-                switch (compare) {
+            case ActionType.ENTITY_ADD: {
+                const entity = action[2];
+                const prevClock = this.entries[entity.id]?.clock?.addDel ?? VectorClock.empty();
+                switch (VectorClock.compare(prevClock, clock)) {
                     case 'gt':
                         return;
-
-                    case 'concurrent': // Value is concurrently updated by multiple replicas
-                        if (this.delClock.has(key) || VectorClock.hardCompare(prevClock, clock) === 'lt') {
-                            this.delClock.delete(key);
-                            this.addClock.set(key, VectorClock.inc(clock, this.replicaId));
-                            this._values.set(key, action.value);
+                    case 'concurrent': {
+                        // Value is concurrently updated by multiple replicas
+                        const entry = this.entries[entity.id].clock.addDel;
+                        if (entry.deleted) return;
+                        if (VectorClock.hardCompare(prevClock, clock) === 'lt') {
+                            this.entries[entity.id] = {
+                                entity,
+                                clock: { addDel: clock },
+                            };
                         }
                         return;
-
-                    case 'lt':
-                        this.delClock.delete(key);
-                        this.addClock.set(key, VectorClock.inc(clock, this.replicaId));
-                        this._values.set(key, action.value);
+                    }
+                    case 'lt': {
+                        this.entries[entity.id] = {
+                            entity,
+                            clock: { addDel: clock },
+                        };
+                        return;
+                    }
                 }
                 break;
             }
 
-            case 'CRDTMap.del': {
-                const prevClock = this.addClock.get(key) ?? this.delClock.get(key) ?? VectorClock.empty();
-                const compare = VectorClock.compare(prevClock, clock);
-                switch (compare) {
+            case ActionType.ENTITY_DELETE: {
+                const entityId = action[2];
+                const prevClock = this.entries[entityId]?.clock?.addDel ?? VectorClock.empty();
+                switch (VectorClock.compare(prevClock, clock)) {
                     case 'gt':
-                    case 'concurrent': // Add-win, Del-lose
                         return;
+                    case 'concurrent':
+                    case 'lt': {
+                        // Delete is prioritized than others
+                        this.entries[entityId] = {
+                            clock: { addDel: clock },
+                            deleted: true,
+                        };
+                        return;
+                    }
+                }
+                break;
+            }
 
-                    case 'lt':
-                        this.addClock.delete(key);
-                        this.delClock.set(key, VectorClock.inc(clock, this.replicaId));
-                        this._values.delete(key);
+            case ActionType.ENTITY_UPDATE: {
+                const [, , entityId, updateType, patch] = action;
+                const prevClock = this.entries[entityId]?.clock?.[updateType] ?? VectorClock.empty();
+                const entry = this.entries[entityId];
+                if (entry.deleted) return;
+
+                switch (VectorClock.compare(prevClock, clock)) {
+                    case 'gt':
+                        return;
+                    case 'concurrent': {
+                        // Value is concurrently updated by multiple replicas
+                        if (VectorClock.hardCompare(prevClock, clock) === 'lt') {
+                            this.entries[entityId] = {
+                                ...entry,
+                                entity: Patch.apply(entry.entity!, patch),
+                                clock: {
+                                    ...entry.clock,
+                                    [updateType]: clock,
+                                },
+                            };
+                        }
+                        return;
+                    }
+                    case 'lt': {
+                        const entry = this.entries[entityId];
+                        this.entries[entityId] = {
+                            ...entry,
+                            entity: Patch.apply(entry.entity!, patch),
+                            clock: {
+                                ...entry.clock,
+                                [updateType]: clock,
+                            },
+                        };
+                        return;
+                    }
                 }
                 break;
             }
@@ -74,30 +171,20 @@ export class CRDTMap<T> {
     }
 }
 
-export type Action = AddEntityAction | RemoveEntityAction | UpdateEntityFormAction | UpdateEntityStyleAction;
+export type CRDTPageAction = EntityAddAction | EntityDeleteAction | EntityUpdateAction;
 
-interface AddEntityAction {
-    type: 'AddEntity';
-    clock: VectorClock;
-    entity: Entity;
+enum ActionType {
+    ENTITY_ADD = 0,
+    ENTITY_DELETE = 1,
+    ENTITY_UPDATE = 2,
 }
 
-interface RemoveEntityAction {
-    type: 'RemoveEntity';
-    clock: VectorClock;
-    entityId: string;
-}
-
-interface UpdateEntityFormAction {
-    type: 'UpdateEntityForm';
-    clock: VectorClock;
-    entity: Patch<Entity>;
-}
-
-interface UpdateEntityStyleAction {
-    type: 'UpdateEntityStyle';
-    clock: VectorClock;
-    entityId: string;
-    fillColor: string;
-    strokeColor: string;
-}
+type EntityAddAction = [type: ActionType.ENTITY_ADD, clock: VectorClock, entity: Entity];
+type EntityDeleteAction = [type: ActionType.ENTITY_DELETE, clock: VectorClock, entityId: string];
+type EntityUpdateAction = [
+    type: ActionType.ENTITY_UPDATE,
+    clock: VectorClock,
+    entityId: string,
+    updateType: 'transform' | 'style',
+    patch: Patch<Entity>
+];

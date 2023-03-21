@@ -11,6 +11,10 @@ export module VectorClock {
         return { ...clock, [replicaId]: (clock[replicaId] ?? 0) + 1 };
     }
 
+    export function mergeAndInc(selfClock: VectorClock, arrivedClock: VectorClock, replicaId: string): VectorClock {
+        return { ...arrivedClock, [replicaId]: (selfClock[replicaId] ?? 0) + 1 };
+    }
+
     export function compare(v1: VectorClock, v2: VectorClock): 'lt' | 'eq' | 'gt' | 'concurrent' {
         const replicaIds = new Set([...Object.keys(v1), ...Object.keys(v2)]);
 
