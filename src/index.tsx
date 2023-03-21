@@ -1,7 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, onValue, ref, set } from 'firebase/database';
 import { createRoot } from 'react-dom/client';
-import { App } from './components/App';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
+import { routes } from './components/routes';
 import { firebaseConfig } from './firebaseConfig';
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -11,8 +12,9 @@ window.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    const router = createHashRouter(routes);
     const root = createRoot(container);
-    root.render(<App />);
+    root.render(<RouterProvider router={router} />);
 });
 
 Object.assign(window, {

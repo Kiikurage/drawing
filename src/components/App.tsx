@@ -1,44 +1,39 @@
 import { css } from '@emotion/react';
-import { signInAnonymously } from 'firebase/auth';
-import { get, ref } from 'firebase/database';
 import { useEffect, useState } from 'react';
-import { getAuth, getDatabase } from '../firebaseConfig';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Page } from '../model/Page';
+import { createSessionInitController } from './Editor/dependency';
 import { Editor } from './Editor/Editor';
-
-async function loadOrCreateInitialPage() {
-    const searchParams = new URLSearchParams(location.search);
-    const pageId = searchParams.get('page');
-    if (pageId === null) {
-        const page = Page.create();
-        searchParams.set('page', page.id);
-        history.replaceState({}, '', '?' + searchParams.toString());
-        return page;
-    } else {
-        const db = getDatabase();
-        const pageRef = ref(db, `page/${pageId}`);
-        const snapshot = await get(pageRef);
-        const page = snapshot.val();
-        if (page === null) {
-            const page = Page.create();
-            searchParams.set('page', page.id);
-            history.replaceState({}, '', '?' + searchParams.toString());
-            return page;
-        } else {
-            return page;
-        }
-    }
-}
 
 export const App = () => {
     const [initialPage, setInitialPage] = useState<Page | null>(null);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [controller] = useState(() => createSessionInitController());
 
     useEffect(() => {
-        (async () => {
-            await signInAnonymously(getAuth());
-            loadOrCreateInitialPage().then((page) => setInitialPage(page));
-        })();
-    }, []);
+        if (initialPage !== null) return;
+
+        const searchParams = new URLSearchParams(location.search);
+        const pageIdInUrl = searchParams.get('page') ?? undefined;
+        controller.loadOrCreatePage(pageIdInUrl).then(setInitialPage);
+    }, [controller, initialPage, location.search, navigate]);
+
+    useEffect(() => {
+        if (initialPage === null) return;
+        const searchParams = new URLSearchParams(location.search);
+        const pageIdInUrl = searchParams.get('page') ?? undefined;
+
+        if (pageIdInUrl !== initialPage.id) {
+            searchParams.set('page', initialPage.id);
+            navigate(
+                {
+                    search: searchParams.toString(),
+                },
+                { replace: true }
+            );
+        }
+    }, [initialPage, location.search, navigate]);
 
     return (
         <div
@@ -47,7 +42,24 @@ export const App = () => {
                 inset: 0;
             `}
         >
-            {initialPage === null ? <span>Loading...</span> : <Editor defaultValue={initialPage} />}
+            {initialPage === null && <span>Loading...</span>}
+
+            {initialPage !== null && (
+                <>
+                    <Editor defaultValue={initialPage} />
+                    <div
+                        css={css`
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            background: rgba(255, 255, 255, 0.7);
+                            padding: 8px 16px;
+                        `}
+                    >
+                        <Link to="/list">ページ一覧へ</Link>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
