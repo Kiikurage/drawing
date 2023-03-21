@@ -222,16 +222,23 @@ export class EditorController {
         this.moveCamera(point);
     };
 
-    onMouseDown = (info: MouseEventInfo) => this.modeController.onMouseDown?.(info);
+    onMouseDown = (info: MouseEventInfo) => {
+        console.log('onMouseDown');
+        this.modeController.onMouseDown?.(info);
+    };
 
     onMouseMove = (point: DisplayCordPoint) => {
+        console.log('onMouseMove');
         const prevPoint = this.currentPoint;
         const nextPoint = Point.toModel(this.store.state.camera, point);
         this.modeController.onMouseMove?.(prevPoint, nextPoint);
         this._currentPoint = point;
     };
 
-    onMouseUp = () => this.modeController.onMouseUp?.();
+    onMouseUp = () => {
+        console.log('onMouseUp');
+        this.modeController.onMouseUp?.();
+    };
 
     onHover = (hover: HoverState) => {
         this.modeController.onHover?.(hover);

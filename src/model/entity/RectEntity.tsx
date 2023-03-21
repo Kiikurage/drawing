@@ -41,11 +41,11 @@ export const RectEntityDelegate: EntityDelegates<RectEntity> = {
             size: Size.model(Math.abs(entity.size.width), Math.abs(entity.size.height)),
         };
     },
-    transform(entity: RectEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): RectEntity {
+    transform(entity: RectEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Patch<RectEntity> {
         const scaleX = nextBoundingBox.size.width / prevBoundingBox.size.width;
         const scaleY = nextBoundingBox.size.height / prevBoundingBox.size.height;
 
-        const nextEntity = Patch.apply(entity, {
+        const patch = {
             p1: {
                 x: (entity.p1.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
                 y: (entity.p1.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y,
@@ -54,15 +54,15 @@ export const RectEntityDelegate: EntityDelegates<RectEntity> = {
                 width: Math.abs(entity.size.width * scaleX),
                 height: Math.abs(entity.size.height * scaleY),
             },
-        });
+        };
 
         if (scaleX < 0) {
-            nextEntity.p1.x -= nextEntity.size.width;
+            patch.p1.x -= patch.size.width;
         }
         if (scaleY < 0) {
-            nextEntity.p1.y -= nextEntity.size.height;
+            patch.p1.y -= patch.size.height;
         }
 
-        return nextEntity;
+        return patch;
     },
 };

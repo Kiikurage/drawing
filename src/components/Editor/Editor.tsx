@@ -43,13 +43,11 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
             controller.onMouseMove(Point.display(ev.clientX, ev.clientY));
         };
 
-        const onMouseUp = () => controller.onMouseUp();
-
         window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+        window.addEventListener('mouseup', controller.onMouseUp);
         return () => {
             window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', onMouseUp);
+            window.removeEventListener('mouseup', controller.onMouseUp);
         };
     }, [controller]);
 

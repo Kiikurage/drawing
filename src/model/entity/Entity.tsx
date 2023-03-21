@@ -1,5 +1,6 @@
 import { EntityMap } from '../../components/Editor/model/EntityMap';
 import { ModelCordBox } from '../Box';
+import { Patch } from '../Patch';
 import { Point } from '../Point';
 import { Size } from '../Size';
 import { LineEntity, LineEntityDelegate } from './LineEntity';
@@ -11,7 +12,7 @@ export type Entity = RectEntity | TextEntity | LineEntity;
 export interface EntityDelegates<T extends Entity> {
     getBoundingBox(entity: T): ModelCordBox;
 
-    transform(entity: T, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): T;
+    transform(entity: T, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Patch<T>;
 }
 
 export module Entity {
@@ -48,7 +49,11 @@ export module Entity {
         return { point: Point.model(x0, y0), size: Size.model(width, height) };
     }
 
-    export function transform(entity: Entity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Entity {
+    export function transform(
+        entity: Entity,
+        prevBoundingBox: ModelCordBox,
+        nextBoundingBox: ModelCordBox
+    ): Patch<Entity> {
         return getDelegate(entity).transform(entity, prevBoundingBox, nextBoundingBox);
     }
 }

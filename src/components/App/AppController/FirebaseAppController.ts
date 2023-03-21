@@ -21,7 +21,7 @@ export class FirebaseAppController implements AppController {
             return page;
         }
 
-        return Page.create();
+        return { ...Page.create(), id: pageId };
     }
 
     async loadHistory(): Promise<string[]> {

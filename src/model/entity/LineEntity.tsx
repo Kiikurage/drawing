@@ -35,11 +35,11 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
             size: Size.model(Math.abs(entity.p1.x - entity.p2.x), Math.abs(entity.p1.y - entity.p2.y)),
         };
     },
-    transform(entity: LineEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): LineEntity {
+    transform(entity: LineEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Patch<LineEntity> {
         const scaleX = nextBoundingBox.size.width / prevBoundingBox.size.width;
         const scaleY = nextBoundingBox.size.height / prevBoundingBox.size.height;
 
-        return Patch.apply(entity, {
+        return {
             p1: Point.model(
                 (entity.p1.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
                 (entity.p1.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y
@@ -48,6 +48,6 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
                 (entity.p2.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
                 (entity.p2.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y
             ),
-        });
+        };
     },
 };

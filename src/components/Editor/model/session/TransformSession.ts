@@ -37,11 +37,11 @@ export class TransformSession extends Session {
             this.handle
         );
 
-        const nextEntities = Record.mapValue(this.entities, (entity) =>
+        const patches = Record.mapValue(this.entities, (entity) =>
             Entity.transform(entity, prevBoundingBox, nextBoundingBox)
         );
 
-        controller.editController.updateEntities(nextEntities);
+        controller.editController.updateEntities(patches);
     }
 
     private static computeNextBoundingBox(

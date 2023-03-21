@@ -32,13 +32,15 @@ export class EditController {
         firebaseDB.onChildAdded(actionsRef, (data) => {
             const action: CRDTPageAction = data.val();
             this.page.apply(action);
+            const newEntities = this.page.entities();
             this.store.setState({
                 page: {
                     entities: {
                         ...Record.mapValue(this.store.state.page.entities, () => undefined),
-                        ...this.page.entities(),
+                        ...newEntities,
                     },
                 },
+                selectedEntityIds: this.store.state.selectedEntityIds.filter((id) => id in newEntities),
             });
         });
     }
@@ -47,44 +49,28 @@ export class EditController {
         this.saveSnapshot();
         const actions = Object.values(entities).map((entity) => this.page.addEntity(entity));
         this.pushActions(actions);
-        this.store.setState({ page: { entities: this.page.entities() } });
-        this.syncToDB();
     }
 
     deleteEntities(entityIds: string[]) {
-        const entities = Record.mapToRecord(entityIds, (id) => [id, undefined]);
-        const selectedEntityIds = this.store.state.selectedEntityIds.filter((id) => !entityIds.includes(id));
-
         this.saveSnapshot();
         const actions = entityIds.map((entityId) => this.page.deleteEntity(entityId));
         this.pushActions(actions);
-        this.store.setState({
-            page: { entities },
-            selectedEntityIds,
-        });
-        this.syncToDB();
     }
 
-    updateEntities(entities: EntityMap) {
+    updateEntities(patches: Record<string, Patch<Entity>>) {
         this.saveSnapshot();
-        const actions = Object.values(entities).map((entity) => this.page.updateEntity(entity.id, 'transform', entity));
+        const actions = Object.entries(patches).map(([entityId, patch]) =>
+            this.page.updateEntity(entityId, 'transform', patch)
+        );
         this.pushActions(actions);
-        this.store.setState({
-            page: { entities },
-        });
-        this.syncToDB();
     }
 
     setColor(color: string) {
-        const entityIds = this.store.state.selectedEntityIds;
-
-        const patch: Patch<Entity> = { strokeColor: color, fillColor: lighten(0.3, color) };
         this.saveSnapshot();
-        const actions = entityIds.map((entityId) => this.page.updateEntity(entityId, 'style', patch));
+        const actions = this.store.state.selectedEntityIds.map((entityId) =>
+            this.page.updateEntity(entityId, 'style', { strokeColor: color, fillColor: lighten(0.3, color) })
+        );
         this.pushActions(actions);
-        const entitiesPatch = Record.mapToRecord(entityIds, (id) => [id, patch]);
-        this.store.setState({ page: { entities: entitiesPatch } });
-        this.syncToDB();
     }
 
     private pushActions(actions: CRDTPageAction[]) {
@@ -104,8 +90,6 @@ export class EditController {
         const currentPage = this.store.state.page;
         this.store.setState({ page });
         this.redoStack.push(currentPage);
-
-        this.syncToDB();
     }
 
     redo() {
@@ -115,16 +99,10 @@ export class EditController {
         const currentPage = this.store.state.page;
         this.store.setState({ page });
         this.undoStack.push(currentPage);
-
-        this.syncToDB();
     }
 
     saveSnapshot() {
         this.undoStack.push(this.store.state.page);
         this.redoStack.length = 0;
-    }
-
-    syncToDB() {
-        this.collaborationController.savePage(this.store.state.page);
     }
 }
