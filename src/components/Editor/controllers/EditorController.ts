@@ -1,7 +1,4 @@
-import { signInAnonymously } from 'firebase/auth';
-import { get, onValue, ref, set } from 'firebase/database';
 import { lighten } from 'polished';
-import { getAuth, getDatabase } from '../../../firebaseConfig';
 import { Record } from '../../../lib/Record';
 import { Store } from '../../../lib/Store';
 import { uuid } from '../../../lib/uuid';
@@ -9,6 +6,7 @@ import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, ModelCordSize, Size } from '../../../model/Size';
+import { createCollaborationController } from '../dependency';
 import { Camera } from '../model/Camera';
 import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
@@ -35,6 +33,8 @@ export class EditorController {
 
     private _currentPoint = Point.display(0, 0);
 
+    private readonly collaborationController = createCollaborationController();
+
     constructor(initialData: Patch<EditorState>) {
         this.store = new Store(EditorState.create(initialData));
         this.initializeDBConnection();
@@ -45,20 +45,17 @@ export class EditorController {
         };
     }
 
+    // 共同編集
+
     private initializeDBConnection() {
-        const page = this.store.state.page;
-        const db = getDatabase();
-        const pageRef = ref(db, `page/${page.id}`);
-        onValue(pageRef, (snapshot) => {
-            const nextPage = snapshot.val() as Page | null;
-            if (nextPage === null) return;
-            this.onPageUpdated(nextPage);
-        });
+        this.collaborationController.addUpdateListener(this.store.state.page.id, this.onAfterUpdatePage);
     }
 
-    onPageUpdated = (nextPage: Page) => {
-        this.store.setState({ page: nextPage });
-    };
+    private async syncToDB() {
+        await this.collaborationController.savePage(this.store.state.page);
+    }
+
+    // Utility getters
 
     get currentPoint(): ModelCordPoint {
         return this.toModelPoint(this._currentPoint);
@@ -116,6 +113,10 @@ export class EditorController {
     }
 
     // Event handlers
+
+    onAfterUpdatePage = (nextPage: Page) => {
+        this.store.setState({ page: nextPage });
+    };
 
     onZoom = (diff: number) => {
         this.modeController.onZoom?.(diff);
@@ -213,24 +214,6 @@ export class EditorController {
     saveSnapshot() {
         this.undoStack.push(this.store.state.page);
         this.redoStack.length = 0;
-    }
-
-    private async syncToDB() {
-        const page = this.store.state.page;
-
-        const db = getDatabase();
-        const pageRef = ref(db, `page/${page.id}`);
-        set(pageRef, page);
-
-        const auth = getAuth();
-        const { user } = await signInAnonymously(auth);
-
-        const historyRef = ref(db, `history/${user.uid}`);
-        const prevHistory = (await get(historyRef)).val() as string[] | null;
-        if (!prevHistory?.includes(page.id)) {
-            const nextHistory = [...(prevHistory ?? []), page.id];
-            set(historyRef, nextHistory);
-        }
     }
 
     undo() {

@@ -19,7 +19,7 @@ describe('Record', () => {
 
     it('filter', () => {
         const prev = { x: 1, y: 2, z: 3 };
-        const next = Record.filter(prev, (key, value) => value % 2 === 1);
+        const next = Record.filter(prev, (value) => value % 2 === 1);
 
         expect(next).toEqual({ x: 1, z: 3 });
         expect(prev).toEqual({ x: 1, y: 2, z: 3 });
