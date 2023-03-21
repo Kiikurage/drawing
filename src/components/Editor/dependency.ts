@@ -5,7 +5,7 @@ import { DummySessionInitController } from './controllers/SessionInitController/
 import { FirebaseSessionInitController } from './controllers/SessionInitController/FirebaseSessionInitController';
 import { SessionInitController } from './controllers/SessionInitController/SessionInitController';
 
-const USE_DUMMY_CONTROLLERS = true;
+const USE_DUMMY_CONTROLLERS = false;
 
 export function createCollaborationController(): CollaborationController {
     if (USE_DUMMY_CONTROLLERS && location.host.includes('localhost')) {

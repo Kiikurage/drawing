@@ -5,4 +5,8 @@ export class DummySessionInitController implements SessionInitController {
     async loadOrCreatePage(): Promise<Page> {
         return Page.create();
     }
+
+    async loadHistory(): Promise<string[]> {
+        return [];
+    }
 }
