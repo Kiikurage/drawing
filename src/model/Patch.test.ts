@@ -53,17 +53,19 @@ describe('Patch', () => {
 
     it('nullを含む状態にパッチを適用', () => {
         interface State {
-            x: {
-                y: { z: number };
-            } | null;
+            x:
+                | {
+                      y: { z: number };
+                  }
+                | undefined;
         }
 
-        const prevState: State = { x: null };
+        const prevState: State = { x: undefined };
         const patch: Patch<State> = { x: { y: { z: 1 } } };
         const nextState = Patch.apply(prevState, patch);
 
         expect(nextState).toEqual({ x: { y: { z: 1 } } });
-        expect(prevState).toEqual({ x: null });
+        expect(prevState).toEqual({ x: undefined });
     });
 
     it('配列に対するパッチ', () => {

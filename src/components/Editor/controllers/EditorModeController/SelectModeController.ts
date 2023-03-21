@@ -7,25 +7,23 @@ import { EditorModeController } from './EditorModeController';
 
 export class SelectModeController extends EditorModeController {
     onMouseDown = (ev: MouseEventInfo) => {
-        this.store.setState({ contextMenu: { open: false } });
-        const { hover } = this.state;
+        this.editorController.closeContextMenu();
+        const { hover } = this.editorController.state;
 
         switch (ev.button) {
             case MouseEventButton.PRIMARY: {
                 switch (hover.type) {
                     case 'idle': {
-                        this.store.setState({ selectedEntityIds: [] });
+                        this.editorController.clearSelection();
                         this.editorController.startSession(new SelectRangeSession(this.editorController.currentPoint));
                         return;
                     }
 
                     case 'entity': {
                         if (ev.shiftKey) {
-                            this.store.setState({
-                                selectedEntityIds: [...this.state.selectedEntityIds, hover.entityId],
-                            });
+                            this.editorController.addSelection(hover.entityId);
                         } else {
-                            this.store.setState({ selectedEntityIds: [hover.entityId] });
+                            this.editorController.setSelection([hover.entityId]);
                         }
                         this.startTransformSelectedEntities('translate');
                         return;
@@ -41,7 +39,7 @@ export class SelectModeController extends EditorModeController {
 
             case MouseEventButton.WHEEL: {
                 this.editorController.startSession(
-                    new ScrollSession(this.editorController.currentPoint, this.editorController.store.state.camera)
+                    new ScrollSession(this.editorController.currentPoint, this.editorController.state.camera)
                 );
                 return;
             }
@@ -53,17 +51,13 @@ export class SelectModeController extends EditorModeController {
                     }
 
                     case 'entity': {
-                        this.store.setState({
-                            contextMenu: { open: true, point: this.editorController.currentPoint },
-                            selectedEntityIds: [hover.entityId],
-                        });
+                        this.editorController.setSelection([hover.entityId]);
+                        this.editorController.openContextMenu(this.editorController.currentPoint);
                         return;
                     }
 
                     case 'transformHandle': {
-                        this.store.setState({
-                            contextMenu: { open: true, point: this.editorController.currentPoint },
-                        });
+                        this.editorController.openContextMenu(this.editorController.currentPoint);
                         return;
                     }
                 }
@@ -84,11 +78,10 @@ export class SelectModeController extends EditorModeController {
     };
 
     onBeforeDeactivate = () => {
-        this.store.setState({ selectedEntityIds: [], contextMenu: { open: false } });
+        this.editorController.closeContextMenu();
     };
 
     private startTransformSelectedEntities(type: TransformType) {
-        this.editorController.saveSnapshot();
         this.editorController.startSession(
             new TransformSession(
                 this.editorController.computeSelectedEntities(),

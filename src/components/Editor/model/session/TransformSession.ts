@@ -21,6 +21,10 @@ export class TransformSession extends Session {
         this.originPoint = originPoint;
     }
 
+    start(controller: EditorController) {
+        controller.editController.saveSnapshot();
+    }
+
     update(controller: EditorController) {
         const { currentPoint } = controller;
 
@@ -37,7 +41,7 @@ export class TransformSession extends Session {
             Entity.transform(entity, prevBoundingBox, nextBoundingBox)
         );
 
-        return { page: { entities: nextEntities } };
+        controller.editController.updateEntities(nextEntities);
     }
 
     private static computeNextBoundingBox(

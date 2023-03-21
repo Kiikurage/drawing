@@ -1,11 +1,9 @@
-import { lighten } from 'polished';
 import { Record } from '../../../lib/Record';
-import { Store } from '../../../lib/Store';
+import { ReadonlyStore, Store } from '../../../lib/Store';
 import { uuid } from '../../../lib/uuid';
-import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
-import { DisplayCordSize, ModelCordSize, Size } from '../../../model/Size';
+import { DisplayCordSize, Size } from '../../../model/Size';
 import { createCollaborationController } from '../dependency';
 import { Camera } from '../model/Camera';
 import { EditorMode } from '../model/EditorMode';
@@ -15,6 +13,7 @@ import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
 import { KeyboardEventInfo, MouseEventInfo } from '../model/MouseEventInfo';
 import { Session } from '../model/session/Session';
+import { EditController } from './EditController';
 import { EditorModeController } from './EditorModeController/EditorModeController';
 import { LineModeController } from './EditorModeController/LineModeController';
 import { RectModeController } from './EditorModeController/RectModeController';
@@ -24,59 +23,46 @@ import { SelectModeController } from './EditorModeController/SelectModeControlle
  * Root controller for Editor view
  */
 export class EditorController {
-    readonly store: Store<EditorState>;
-    session: Session | null = null;
-    readonly undoStack: Page[] = [];
-    readonly redoStack: Page[] = [];
-
-    private modeControllers: Record<EditorMode, EditorModeController>;
-
+    readonly collaborationController = createCollaborationController();
+    readonly editController: EditController;
+    private _session: Session | null = null;
     private _currentPoint = Point.display(0, 0);
-
-    private readonly collaborationController = createCollaborationController();
+    private readonly _store: Store<EditorState>;
+    private readonly modeControllers: Record<EditorMode, EditorModeController>;
 
     constructor(initialData: Patch<EditorState>) {
-        this.store = new Store(EditorState.create(initialData));
-        this.initializeDBConnection();
+        this._store = new Store(EditorState.create(initialData));
         this.modeControllers = {
             rect: new RectModeController(this),
             select: new SelectModeController(this),
             line: new LineModeController(this),
         };
-    }
-
-    // 共同編集
-
-    private initializeDBConnection() {
-        this.collaborationController.addUpdateListener(this.store.state.page.id, this.onAfterUpdatePage);
-    }
-
-    private async syncToDB() {
-        await this.collaborationController.savePage(this.store.state.page);
+        this.editController = new EditController(this._store, this.collaborationController);
     }
 
     // Utility getters
+    get store(): ReadonlyStore<EditorState> {
+        return this._store;
+    }
+
+    get state(): EditorState {
+        return this.store.state;
+    }
+
+    get session(): Session | null {
+        return this._session;
+    }
 
     get currentPoint(): ModelCordPoint {
-        return this.toModelPoint(this._currentPoint);
+        return Point.toModel(this.store.state.camera, this._currentPoint);
     }
 
     get modeController(): EditorModeController {
         return this.modeControllers[this.store.state.mode];
     }
 
-    get camera(): Camera {
-        return this.store.state.camera;
-    }
-
     computeSelectedEntities(): EntityMap {
-        return Record.mapToRecord(this.store.state.selectedEntityIds, (id) => [id, this.store.state.page.entities[id]]);
-    }
-
-    setMode(mode: EditorMode) {
-        this.modeController.onBeforeDeactivate?.();
-        this.store.setState({ mode });
-        this.modeController.onAfterActivate?.();
+        return Record.mapToRecord(this.state.selectedEntityIds, (id) => [id, this.store.state.page.entities[id]]);
     }
 
     // Session
@@ -88,8 +74,8 @@ export class EditorController {
             return;
         }
 
-        this.session = session;
-        this.store.setState(session.start(this));
+        this._session = session;
+        session.start(this);
     }
 
     updateSession() {
@@ -98,7 +84,7 @@ export class EditorController {
             console.warn('No session on going.');
             return;
         }
-        this.store.setState(session.update(this));
+        session.update(this);
     }
 
     completeSession() {
@@ -107,30 +93,140 @@ export class EditorController {
             console.warn('No session on going.');
             return;
         }
-        this.store.setState(session.complete(this));
-        this.session = null;
-        this.syncToDB();
+        session.complete(this);
+        this._session = null;
+    }
+
+    // Commands
+
+    private setState(patch: Patch<EditorState>) {
+        this._store.setState(patch);
+    }
+
+    setMode(mode: EditorMode) {
+        this.modeController.onBeforeDeactivate?.();
+        this.setState({ mode });
+        this.modeController.onAfterActivate?.();
+    }
+
+    cut() {
+        const selectedEntities = this.computeSelectedEntities();
+        if (Record.size(selectedEntities) === 0) return;
+
+        navigator.clipboard.writeText(JSON.stringify(selectedEntities));
+
+        this.deleteEntities(this.store.state.selectedEntityIds);
+    }
+
+    copy() {
+        const selectedEntities = this.computeSelectedEntities();
+        if (Record.size(selectedEntities) === 0) return;
+
+        navigator.clipboard.writeText(JSON.stringify(selectedEntities));
+    }
+
+    async paste() {
+        const json = await navigator.clipboard.readText();
+        let copiedEntities: EntityMap;
+        try {
+            copiedEntities = JSON.parse(json);
+        } catch (ignored) {
+            return;
+        }
+        const entities = Record.map(copiedEntities, (_, entity) => {
+            const id = uuid();
+            return [id, Patch.apply(entity, { id })];
+        });
+
+        this.addEntities(entities);
+        this.setSelection(Object.keys(entities));
+    }
+
+    addEntities(entities: EntityMap) {
+        this.editController.addEntities(entities);
+    }
+
+    deleteEntities(entityIds: string[]) {
+        this.editController.deleteEntities(entityIds);
+    }
+
+    deleteSelectedEntities() {
+        this.deleteEntities(this.state.selectedEntityIds);
+    }
+
+    setColor(color: string) {
+        this.editController.setColor(color);
+    }
+
+    setSelection(entityIds: string[]) {
+        this.setState({
+            selectedEntityIds: entityIds.filter((entityId) => entityId in this.state.page.entities),
+            mode: 'select',
+        });
+    }
+
+    addSelection(entityId: string) {
+        this.setSelection([...this.state.selectedEntityIds, entityId]);
+    }
+
+    selectAll() {
+        this.setSelection(Object.keys(this.store.state.page.entities));
+    }
+
+    clearSelection() {
+        this.setSelection([]);
+    }
+
+    openContextMenu(point: ModelCordPoint) {
+        this.setState({ contextMenu: { open: true, point } });
+    }
+
+    closeContextMenu() {
+        this.setState({ contextMenu: { open: false } });
+    }
+
+    undo() {
+        this.editController.undo();
+    }
+
+    redo() {
+        this.editController.redo();
+    }
+
+    moveCamera(point: ModelCordPoint) {
+        this.setState({ camera: { point } });
+    }
+
+    setCameraScale(focus: ModelCordPoint, scale: number) {
+        this.setState({
+            camera: Camera.setScale(this.state.camera, focus, scale),
+        });
     }
 
     // Event handlers
 
-    onAfterUpdatePage = (nextPage: Page) => {
-        this.store.setState({ page: nextPage });
-    };
-
     onZoom = (diff: number) => {
-        this.modeController.onZoom?.(diff);
+        const newScale = Math.max(0.1, Math.min(this.state.camera.scale + diff, 5));
+
+        this.setCameraScale(this.currentPoint, newScale);
     };
 
     onScroll = (diff: DisplayCordSize) => {
-        this.modeController.onScroll?.(this.toModelSize(diff));
+        const diffInModel = Size.toModel(this.store.state.camera, diff);
+
+        const point = Point.model(
+            this.state.camera.point.x + diffInModel.width,
+            this.state.camera.point.y + diffInModel.height
+        );
+
+        this.moveCamera(point);
     };
 
     onMouseDown = (info: MouseEventInfo) => this.modeController.onMouseDown?.(info);
 
     onMouseMove = (point: DisplayCordPoint) => {
         const prevPoint = this.currentPoint;
-        const nextPoint = this.toModelPoint(point);
+        const nextPoint = Point.toModel(this.store.state.camera, point);
         this.modeController.onMouseMove?.(prevPoint, nextPoint);
         this._currentPoint = point;
     };
@@ -139,14 +235,14 @@ export class EditorController {
 
     onHover = (hover: HoverState) => {
         this.modeController.onHover?.(hover);
-        this.store.setState({ hover });
+        this.setState({ hover });
     };
 
     onUnhover = () => {
         if (this.store.state.hover === HoverState.IDLE) return;
 
         this.modeController.onUnhover?.(this.store.state.hover);
-        this.store.setState({ hover: HoverState.IDLE });
+        this.setState({ hover: HoverState.IDLE });
     };
 
     onKeyDown = (ev: KeyboardEventInfo) => {
@@ -174,7 +270,7 @@ export class EditorController {
             case Key.serialize(['Delete']):
             case Key.serialize(['Backspace']): {
                 ev.preventDefault();
-                this.deleteSelectedEntity();
+                this.deleteSelectedEntities();
                 return;
             }
             case Key.serialize(['Control', 'A']): {
@@ -210,112 +306,4 @@ export class EditorController {
             }
         }
     };
-
-    saveSnapshot() {
-        this.undoStack.push(this.store.state.page);
-        this.redoStack.length = 0;
-    }
-
-    undo() {
-        const page = this.undoStack.pop();
-        if (page === undefined) return;
-
-        const currentPage = this.store.state.page;
-        this.store.setState({ page });
-        this.redoStack.push(currentPage);
-
-        this.syncToDB();
-    }
-
-    redo() {
-        const page = this.redoStack.pop();
-        if (page === undefined) return;
-
-        const currentPage = this.store.state.page;
-        this.store.setState({ page });
-        this.undoStack.push(currentPage);
-
-        this.syncToDB();
-    }
-
-    cut() {
-        const selectedEntities = this.computeSelectedEntities();
-        if (Record.size(selectedEntities) === 0) return;
-
-        navigator.clipboard.writeText(JSON.stringify(selectedEntities));
-
-        this.deleteSelectedEntity();
-    }
-
-    copy() {
-        const selectedEntities = this.computeSelectedEntities();
-        if (Record.size(selectedEntities) === 0) return;
-
-        navigator.clipboard.writeText(JSON.stringify(selectedEntities));
-    }
-
-    async paste() {
-        const json = await navigator.clipboard.readText();
-        let copiedEntities: EntityMap;
-        try {
-            copiedEntities = JSON.parse(json);
-        } catch (ignored) {
-            return;
-        }
-        const entities = Record.map(copiedEntities, (_, entity) => {
-            const id = uuid();
-            return [id, Patch.apply(entity, { id })];
-        });
-
-        this.saveSnapshot();
-        this.store.setState({
-            page: { entities },
-            selectedEntityIds: Object.keys(entities),
-            mode: 'select',
-        });
-        this.syncToDB();
-    }
-
-    selectAll() {
-        this.store.setState({
-            selectedEntityIds: Object.keys(this.store.state.page.entities),
-        });
-    }
-
-    deleteSelectedEntity() {
-        const deletedEntityMask = Record.mapToRecord(this.store.state.selectedEntityIds, (id) => [id, undefined]);
-        this.store.setState({
-            page: {
-                entities: deletedEntityMask,
-            },
-            selectedEntityIds: [],
-        });
-        this.syncToDB();
-    }
-
-    setColor(color: string) {
-        this.saveSnapshot();
-
-        const entitiesPatch = Object.fromEntries(
-            this.store.state.selectedEntityIds.map((id) => {
-                return [
-                    id,
-                    {
-                        strokeColor: color,
-                        fillColor: lighten(0.3, color),
-                    },
-                ];
-            })
-        );
-        this.store.setState({ page: { entities: entitiesPatch } });
-        this.syncToDB();
-    }
-
-    private toModelPoint(point: DisplayCordPoint): ModelCordPoint {
-        return Point.toModel(this.camera, point);
-    }
-
-    private toModelSize(size: DisplayCordSize): ModelCordSize {
-        return Size.toModel(this.camera, size);
-    }
 }

@@ -1,9 +1,9 @@
 import { AppController } from '../App/AppController/AppController';
 import { DummyAppController } from '../App/AppController/DummyAppController';
 import { FirebaseAppController } from '../App/AppController/FirebaseAppController';
-import { CollaborationController } from './controllers/CollaborationEditController/CollaborationController';
-import { DummyCollaborationController } from './controllers/CollaborationEditController/DummyCollaborationController';
-import { FirebaseCollaborationController } from './controllers/CollaborationEditController/FirebaseCollaborationController';
+import { CollaborationController } from './controllers/CollaborationController/CollaborationController';
+import { DummyCollaborationController } from './controllers/CollaborationController/DummyCollaborationController';
+import { FirebaseCollaborationController } from './controllers/CollaborationController/FirebaseCollaborationController';
 
 const USE_DUMMY_CONTROLLERS = false;
 

@@ -1,19 +1,14 @@
-import { Patch } from '../../../../model/Patch';
 import { EditorController } from '../../controllers/EditorController';
-import { EditorState } from '../EditorState';
 
 export abstract class Session {
     abstract type: string;
 
-    start(controller: EditorController): Patch<EditorState> {
-        return {};
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    start(controller: EditorController): void {}
 
-    update(controller: EditorController): Patch<EditorState> {
-        return {};
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    update(controller: EditorController): void {}
 
-    complete(controller: EditorController): Patch<EditorState> {
-        return {};
-    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    complete(controller: EditorController): void {}
 }

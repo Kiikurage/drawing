@@ -1,6 +1,14 @@
 import { Patch } from '../model/Patch';
 
-export class Store<T extends object> {
+export interface ReadonlyStore<T extends object> {
+    readonly state: T;
+
+    addListener(listener: (newState: T) => void): void;
+
+    removeListener(listener: (newState: T) => void): void;
+}
+
+export class Store<T extends object> implements ReadonlyStore<T> {
     private listeners = new Set<(newState: T) => void>();
 
     constructor(initialState: T) {

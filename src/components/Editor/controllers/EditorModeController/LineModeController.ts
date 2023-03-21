@@ -9,20 +9,11 @@ export class LineModeController extends EditorModeController {
             p1: this.editorController.currentPoint,
             p2: Point.model(this.editorController.currentPoint.x + 1, this.editorController.currentPoint.y + 1),
         });
-
-        this.editorController.saveSnapshot();
-        this.store.setState({
-            page: { entities: { [newEntity.id]: newEntity } },
-        });
-
+        const newEntityMap = { [newEntity.id]: newEntity };
+        this.editorController.addEntities(newEntityMap);
+        this.editorController.setSelection([newEntity.id]);
         this.editorController.startSession(
-            new TransformSession(
-                {
-                    [newEntity.id]: newEntity,
-                },
-                'resize.bottomRight',
-                this.editorController.currentPoint
-            )
+            new TransformSession(newEntityMap, 'resize.bottomRight', this.editorController.currentPoint)
         );
     };
 
@@ -35,7 +26,7 @@ export class LineModeController extends EditorModeController {
     onMouseUp = () => {
         if (this.editorController.session !== null) {
             this.editorController.completeSession();
-            this.store.setState({ mode: 'select' });
+            this.editorController.setMode('select');
         }
     };
 }

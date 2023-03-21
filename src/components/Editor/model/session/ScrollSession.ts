@@ -17,7 +17,7 @@ export class ScrollSession extends Session {
     }
 
     update(controller: EditorController): Patch<EditorState> {
-        const { camera } = controller;
+        const { camera } = controller.state;
         const currentPoint = Point.toDisplay(camera, controller.currentPoint);
 
         return {

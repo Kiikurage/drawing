@@ -14,6 +14,7 @@ module.exports = {
         'react/display-name': 'off',
         'react/no-unknown-property': ['error', { ignore: ['css'] }],
         'react/react-in-jsx-scope': 'off',
+        '@typescript-eslint/no-empty-interface': 'off',
         '@typescript-eslint/prefer-namespace-keyword': 'off',
         '@typescript-eslint/no-namespace': 'off',
     },

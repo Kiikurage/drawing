@@ -16,7 +16,7 @@ export interface RectEntity {
 }
 
 export module RectEntity {
-    export function create(data: Patch<Omit<RectEntity, 'type' | 'id'>>): RectEntity {
+    export function create(data: Patch<Omit<RectEntity, 'type' | 'id'>> = {}): RectEntity {
         return Patch.apply<RectEntity>(
             {
                 id: uuid(),

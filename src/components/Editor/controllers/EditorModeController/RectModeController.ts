@@ -10,11 +10,8 @@ export class RectModeController extends EditorModeController {
             size: Size.model(1, 1),
         });
         const newEntityMap = { [newEntity.id]: newEntity };
-        this.editorController.saveSnapshot();
-        this.store.setState({
-            page: { entities: newEntityMap },
-        });
-
+        this.editorController.addEntities(newEntityMap);
+        this.editorController.setSelection([newEntity.id]);
         this.editorController.startSession(
             new TransformSession(newEntityMap, 'resize.bottomRight', this.editorController.currentPoint)
         );
@@ -29,7 +26,7 @@ export class RectModeController extends EditorModeController {
     onMouseUp = () => {
         if (this.editorController.session !== null) {
             this.editorController.completeSession();
-            this.store.setState({ mode: 'select' });
+            this.editorController.setMode('select');
         }
     };
 }

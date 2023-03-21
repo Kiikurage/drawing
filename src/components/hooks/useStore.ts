@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Store } from '../../lib/Store';
+import { ReadonlyStore } from '../../lib/Store';
 
-export function useStore<T extends object>(store: Store<T>): T {
+export function useStore<T extends object>(store: ReadonlyStore<T>): T {
     const [cachedState, setCachedState] = useState<T>(store.state);
 
     useEffect(() => {

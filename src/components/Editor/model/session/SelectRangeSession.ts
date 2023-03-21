@@ -14,7 +14,7 @@ export class SelectRangeSession extends Session {
 
     start(controller: EditorController) {
         return {
-            selectingRange: Patch.apply(controller.store.state.selectingRange, {
+            selectingRange: Patch.apply(controller.state.selectingRange, {
                 selecting: true,
                 range: {
                     point: this.originPoint,
@@ -27,9 +27,7 @@ export class SelectRangeSession extends Session {
     update(controller: EditorController) {
         const {
             currentPoint,
-            store: {
-                state: { selectingRange: prevSelectingRange },
-            },
+            state: { selectingRange: prevSelectingRange },
         } = controller;
 
         const width = currentPoint.x - this.originPoint.x;
@@ -54,7 +52,7 @@ export class SelectRangeSession extends Session {
 
     complete(controller: EditorController) {
         return {
-            selectingRange: Patch.apply(controller.store.state.selectingRange, {
+            selectingRange: Patch.apply(controller.state.selectingRange, {
                 selecting: false,
             }),
         };
