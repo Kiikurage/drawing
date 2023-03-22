@@ -1,6 +1,7 @@
 import { RectEntity } from '../../../../model/entity/RectEntity';
 import { Size } from '../../../../model/Size';
 import { TransformSession } from '../../model/session/TransformSession';
+import { TransformType } from '../../model/TransformType';
 import { EditorModeController } from './EditorModeController';
 
 export class RectModeController extends EditorModeController {
@@ -13,7 +14,7 @@ export class RectModeController extends EditorModeController {
         this.editorController.addEntities(newEntityMap);
         this.editorController.setSelection([newEntity.id]);
         this.editorController.startSession(
-            new TransformSession(newEntityMap, 'resize.bottomRight', this.editorController.currentPoint)
+            new TransformSession(newEntityMap, TransformType.RESIZE_BOTTOM_RIGHT, this.editorController.currentPoint)
         );
     };
 

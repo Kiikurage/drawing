@@ -59,77 +59,39 @@ export class TransformSession extends Session {
         const diffX = nextPoint.x - prevPoint.x;
         const diffY = nextPoint.y - prevPoint.y;
 
-        switch (handle) {
-            case 'translate': {
-                return Patch.apply(prevBoundingBox, {
-                    point: {
-                        x: prevBoundingBox.point.x + diffX,
-                        y: prevBoundingBox.point.y + diffY,
-                    },
-                });
-            }
-            case 'resize.topLeft': {
-                return Patch.apply(prevBoundingBox, {
-                    point: {
-                        x: prevBoundingBox.point.x + diffX,
-                        y: prevBoundingBox.point.y + diffY,
-                    },
-                    size: {
-                        width: prevBoundingBox.size.width - diffX,
-                        height: prevBoundingBox.size.height - diffY,
-                    },
-                });
-            }
-            case 'resize.top': {
-                return Patch.apply(prevBoundingBox, {
-                    point: { y: prevBoundingBox.point.y + diffY },
-                    size: { height: prevBoundingBox.size.height - diffY },
-                });
-            }
-            case 'resize.topRight': {
-                return Patch.apply(prevBoundingBox, {
-                    point: { y: prevBoundingBox.point.y + diffY },
-                    size: {
-                        width: prevBoundingBox.size.width + diffX,
-                        height: prevBoundingBox.size.height - diffY,
-                    },
-                });
-            }
-            case 'resize.left': {
-                return Patch.apply(prevBoundingBox, {
+        if (handle === 'translate') {
+            return Patch.apply(prevBoundingBox, {
+                point: {
+                    x: prevBoundingBox.point.x + diffX,
+                    y: prevBoundingBox.point.y + diffY,
+                },
+            });
+        } else {
+            let nextBoundingBox = prevBoundingBox;
+
+            if (handle.x === 'start') {
+                nextBoundingBox = Patch.apply(nextBoundingBox, {
                     point: { x: prevBoundingBox.point.x + diffX },
                     size: { width: prevBoundingBox.size.width - diffX },
                 });
-            }
-            case 'resize.right': {
-                return Patch.apply(prevBoundingBox, {
+            } else if (handle.x === 'end') {
+                nextBoundingBox = Patch.apply(nextBoundingBox, {
                     size: { width: prevBoundingBox.size.width + diffX },
                 });
             }
-            case 'resize.bottomLeft': {
-                return Patch.apply(prevBoundingBox, {
-                    point: { x: prevBoundingBox.point.x + diffX },
-                    size: {
-                        width: prevBoundingBox.size.width - diffX,
-                        height: prevBoundingBox.size.height + diffY,
-                    },
+
+            if (handle.y === 'start') {
+                nextBoundingBox = Patch.apply(nextBoundingBox, {
+                    point: { y: prevBoundingBox.point.y + diffY },
+                    size: { height: prevBoundingBox.size.height - diffY },
                 });
-            }
-            case 'resize.bottom': {
-                return Patch.apply(prevBoundingBox, {
+            } else if (handle.y === 'end') {
+                nextBoundingBox = Patch.apply(nextBoundingBox, {
                     size: { height: prevBoundingBox.size.height + diffY },
                 });
             }
-            case 'resize.bottomRight': {
-                return Patch.apply(prevBoundingBox, {
-                    size: {
-                        width: prevBoundingBox.size.width + diffX,
-                        height: prevBoundingBox.size.height + diffY,
-                    },
-                });
-            }
-            default:
-                throw 'Unreachable';
+
+            return nextBoundingBox;
         }
     }
 
@@ -168,64 +130,51 @@ export class TransformSession extends Session {
             'x'
         );
 
-        switch (this.handle) {
-            case 'translate': {
-                const snapResult = [
-                    topLeftSnapResult,
-                    topRightSnapResult,
-                    bottomLeftSnapResult,
-                    bottomRightSnapResult,
-                    centerSnapResult,
-                ].reduce((r1, r2) => (r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1));
+        if (this.handle === 'translate') {
+            const snapResult = [
+                topLeftSnapResult,
+                topRightSnapResult,
+                bottomLeftSnapResult,
+                bottomRightSnapResult,
+                centerSnapResult,
+            ].reduce((r1, r2) => (r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1));
 
-                if (snapResult.points.length === 0) return boundingBox;
-                return Patch.apply(boundingBox, {
-                    point: {
-                        x: boundingBox.point.x + (snapResult.points[0].x - snapResult.originPoint.x),
-                    },
-                });
-            }
-
-            case 'resize.topLeft':
-            case 'resize.left':
-            case 'resize.bottomLeft': {
-                const snapResult = [topLeftSnapResult, bottomLeftSnapResult].reduce((r1, r2) =>
-                    r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1
-                );
-
-                if (snapResult.points.length === 0) return boundingBox;
-                return Patch.apply(boundingBox, {
-                    point: {
-                        x: boundingBox.point.x + (snapResult.points[0].x - snapResult.originPoint.x),
-                    },
-                    size: {
-                        width: boundingBox.size.width - (snapResult.points[0].x - snapResult.originPoint.x),
-                    },
-                });
-            }
-
-            case 'resize.topRight':
-            case 'resize.right':
-            case 'resize.bottomRight': {
-                const snapResult = [topRightSnapResult, bottomRightSnapResult].reduce((r1, r2) =>
-                    r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1
-                );
-
-                if (snapResult.points.length === 0) return boundingBox;
-                return Patch.apply(boundingBox, {
-                    size: {
-                        width: boundingBox.size.width + (snapResult.points[0].x - snapResult.originPoint.x),
-                    },
-                });
-            }
-
-            case 'resize.top':
-            case 'resize.bottom': {
-                return boundingBox;
-            }
-            default:
-                throw 'Unreachable';
+            if (snapResult.points.length === 0) return boundingBox;
+            return Patch.apply(boundingBox, {
+                point: {
+                    x: boundingBox.point.x + (snapResult.points[0].x - snapResult.originPoint.x),
+                },
+            });
         }
+        if (this.handle.x === 'start') {
+            const snapResult = [topLeftSnapResult, bottomLeftSnapResult].reduce((r1, r2) =>
+                r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1
+            );
+
+            if (snapResult.points.length === 0) return boundingBox;
+            return Patch.apply(boundingBox, {
+                point: {
+                    x: boundingBox.point.x + (snapResult.points[0].x - snapResult.originPoint.x),
+                },
+                size: {
+                    width: boundingBox.size.width - (snapResult.points[0].x - snapResult.originPoint.x),
+                },
+            });
+        }
+        if (this.handle.x === 'end') {
+            const snapResult = [topRightSnapResult, bottomRightSnapResult].reduce((r1, r2) =>
+                r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1
+            );
+
+            if (snapResult.points.length === 0) return boundingBox;
+            return Patch.apply(boundingBox, {
+                size: {
+                    width: boundingBox.size.width + (snapResult.points[0].x - snapResult.originPoint.x),
+                },
+            });
+        }
+
+        return boundingBox;
     }
 
     private adjustBoundingBoxY(boundingBox: ModelCordBox, controller: EditorController): ModelCordBox {
@@ -263,64 +212,51 @@ export class TransformSession extends Session {
             'y'
         );
 
-        switch (this.handle) {
-            case 'translate': {
-                const snapResult = [
-                    topLeftSnapResult,
-                    topRightSnapResult,
-                    bottomLeftSnapResult,
-                    bottomRightSnapResult,
-                    centerSnapResult,
-                ].reduce((r1, r2) => (r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1));
+        if (this.handle === 'translate') {
+            const snapResult = [
+                topLeftSnapResult,
+                topRightSnapResult,
+                bottomLeftSnapResult,
+                bottomRightSnapResult,
+                centerSnapResult,
+            ].reduce((r1, r2) => (r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1));
 
-                if (snapResult.points.length === 0) return boundingBox;
-                return Patch.apply(boundingBox, {
-                    point: {
-                        y: boundingBox.point.y + (snapResult.points[0].y - snapResult.originPoint.y),
-                    },
-                });
-            }
-
-            case 'resize.topLeft':
-            case 'resize.top':
-            case 'resize.topRight': {
-                const snapResult = [topLeftSnapResult, topRightSnapResult].reduce((r1, r2) =>
-                    r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1
-                );
-
-                if (snapResult.points.length === 0) return boundingBox;
-                return Patch.apply(boundingBox, {
-                    point: {
-                        y: boundingBox.point.y + (snapResult.points[0].y - snapResult.originPoint.y),
-                    },
-                    size: {
-                        height: boundingBox.size.height - (snapResult.points[0].y - snapResult.originPoint.y),
-                    },
-                });
-            }
-
-            case 'resize.bottomLeft':
-            case 'resize.bottom':
-            case 'resize.bottomRight': {
-                const snapResult = [bottomLeftSnapResult, bottomRightSnapResult].reduce((r1, r2) =>
-                    r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1
-                );
-
-                if (snapResult.points.length === 0) return boundingBox;
-                return Patch.apply(boundingBox, {
-                    size: {
-                        height: boundingBox.size.height + (snapResult.points[0].y - snapResult.originPoint.y),
-                    },
-                });
-            }
-
-            case 'resize.left':
-            case 'resize.right': {
-                return boundingBox;
-            }
-            default:
-                throw 'Unreachable';
+            if (snapResult.points.length === 0) return boundingBox;
+            return Patch.apply(boundingBox, {
+                point: {
+                    y: boundingBox.point.y + (snapResult.points[0].y - snapResult.originPoint.y),
+                },
+            });
         }
+        if (this.handle.y === 'start') {
+            const snapResult = [topLeftSnapResult, topRightSnapResult].reduce((r1, r2) =>
+                r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1
+            );
+
+            if (snapResult.points.length === 0) return boundingBox;
+            return Patch.apply(boundingBox, {
+                point: {
+                    y: boundingBox.point.y + (snapResult.points[0].y - snapResult.originPoint.y),
+                },
+                size: {
+                    height: boundingBox.size.height - (snapResult.points[0].y - snapResult.originPoint.y),
+                },
+            });
+        }
+        if (this.handle.y === 'end') {
+            const snapResult = [bottomLeftSnapResult, bottomRightSnapResult].reduce((r1, r2) =>
+                r1.distance < r2.distance ? r1 : r1.distance > r2.distance ? r2 : r1
+            );
+
+            if (snapResult.points.length === 0) return boundingBox;
+            return Patch.apply(boundingBox, {
+                size: {
+                    height: boundingBox.size.height + (snapResult.points[0].y - snapResult.originPoint.y),
+                },
+            });
+        }
+
+        return boundingBox;
     }
 
     private static getSnap(
