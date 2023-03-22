@@ -13,6 +13,8 @@ export interface EntityDelegates<T extends Entity> {
     getBoundingBox(entity: T): ModelCordBox;
 
     transform(entity: T, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Patch<T>;
+
+    getSnap(entity: T, offset: number, direction: 'x' | 'y'): number;
 }
 
 export module Entity {
@@ -47,6 +49,10 @@ export module Entity {
         const height = y1 - y0;
 
         return { point: Point.model(x0, y0), size: Size.model(width, height) };
+    }
+
+    export function getSnap(entity: Entity, offset: number, direction: 'x' | 'y') {
+        return getDelegate(entity).getSnap(entity, offset, direction);
     }
 
     export function transform(

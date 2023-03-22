@@ -223,12 +223,10 @@ export class EditorController {
     };
 
     onMouseDown = (info: MouseEventInfo) => {
-        console.log('onMouseDown');
         this.modeController.onMouseDown?.(info);
     };
 
     onMouseMove = (point: DisplayCordPoint) => {
-        console.log('onMouseMove');
         const prevPoint = this.currentPoint;
         const nextPoint = Point.toModel(this.store.state.camera, point);
         this.modeController.onMouseMove?.(prevPoint, nextPoint);
@@ -236,7 +234,6 @@ export class EditorController {
     };
 
     onMouseUp = () => {
-        console.log('onMouseUp');
         this.modeController.onMouseUp?.();
     };
 

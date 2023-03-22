@@ -1,3 +1,4 @@
+import { getClosestValue } from '../../lib/getClosestValue';
 import { randomId } from '../../lib/randomId';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
@@ -49,5 +50,12 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
                 (entity.p2.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y
             ),
         };
+    },
+    getSnap(entity: LineEntity, offset: number, direction: 'x' | 'y'): number {
+        if (direction === 'x') {
+            return getClosestValue([entity.p1.x, (entity.p1.x + entity.p2.x) / 2, entity.p2.x], offset);
+        } else {
+            return getClosestValue([entity.p1.y, (entity.p1.y + entity.p2.y) / 2, entity.p2.y], offset);
+        }
     },
 };
