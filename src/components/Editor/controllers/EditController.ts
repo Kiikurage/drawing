@@ -58,7 +58,6 @@ export class EditController {
     }
 
     updateEntities(patches: Record<string, Patch<Entity>>) {
-        this.saveSnapshot();
         const actions = Object.entries(patches).map(([entityId, patch]) =>
             this.page.updateEntity(entityId, 'transform', patch)
         );

@@ -20,7 +20,11 @@ export class TransformSession implements Session {
         this.originPoint = originPoint;
     }
 
-    update = (controller: EditorController) => {
+    start(controller: EditorController) {
+        controller.editController.saveSnapshot();
+    }
+
+    update(controller: EditorController) {
         const { currentPoint } = controller;
 
         const prevBoundingBox = Entity.computeBoundingBox(this.entities);
@@ -41,7 +45,7 @@ export class TransformSession implements Session {
             Entity.transform(entity, prevBoundingBox, snappedNextBoundingBox)
         );
         controller.editController.updateEntities(patch);
-    };
+    }
 
     complete(controller: EditorController) {
         controller.setMode('select');
