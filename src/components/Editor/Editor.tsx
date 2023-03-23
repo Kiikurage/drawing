@@ -77,6 +77,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                 tabIndex={-1}
                 onMouseDown={controller.onMouseDown}
                 onKeyDown={controller.onKeyDown}
+                onKeyUp={controller.onKeyUp}
                 onContextMenu={(ev) => ev.preventDefault()}
             >
                 <PageView page={page} camera={camera} />

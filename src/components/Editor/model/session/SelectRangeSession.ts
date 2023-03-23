@@ -5,6 +5,8 @@ import { EditorController } from '../../controllers/EditorController';
 import { Session } from './Session';
 
 export class SelectRangeSession implements Session {
+    readonly type = 'selectRange';
+
     public readonly originPoint: ModelCordPoint;
     public readonly preSelectedEntityIds: string[];
 

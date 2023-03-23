@@ -82,6 +82,7 @@ export class EditorController {
 
         this._session = session;
         session.start?.(this);
+        this._store.setState({ sessionType: session.type });
     }
 
     updateSession() {
@@ -101,6 +102,7 @@ export class EditorController {
         }
         session.complete?.(this);
         this._session = null;
+        this._store.setState({ sessionType: 'idle' });
     }
 
     // Commands
@@ -226,6 +228,14 @@ export class EditorController {
         });
     }
 
+    enableSnap() {
+        this._store.setState({ snapEnabled: true });
+    }
+
+    disableSnap() {
+        this._store.setState({ snapEnabled: false });
+    }
+
     // Event handlers
 
     onZoom = (diff: number) => {
@@ -283,6 +293,10 @@ export class EditorController {
     };
 
     onKeyDown = (ev: KeyboardEventInfo) => {
+        this.session?.onKeyDown?.(this, ev);
+
+        if (ev.key === 'Control') this.enableSnap();
+
         const keys = [ev.key];
         if (ev.shiftKey) keys.push('Shift');
         if (ev.ctrlKey) keys.push('Control');
@@ -339,6 +353,23 @@ export class EditorController {
             case Key.serialize(['Control', 'Y']): {
                 ev.preventDefault();
                 this.redo();
+                return;
+            }
+        }
+    };
+
+    onKeyUp = (ev: KeyboardEventInfo) => {
+        this.session?.onKeyUp?.(this, ev);
+
+        if (ev.key === 'Control') this.disableSnap();
+
+        const keys = [ev.key];
+        if (ev.shiftKey) keys.push('Shift');
+        if (ev.ctrlKey) keys.push('Control');
+
+        switch (Key.serialize(keys)) {
+            case Key.serialize(['Control']): {
+                console.log('Keyup:Control');
                 return;
             }
         }

@@ -10,6 +10,7 @@ import { EntityBoundingBoxView } from './BoundingBoxView/EntityBoundingBoxView';
 import { ContextMenuPopup } from './ContextMenuPopup';
 import { SelectingRangeView } from './SelectingRangeView';
 import { SelectionView } from './SelectionView/SelectionView';
+import { SnapGuide } from './SnapGuide';
 
 export const IndicatorLayer = ({
     camera,
@@ -54,6 +55,7 @@ export const IndicatorLayer = ({
                 ))}
                 <SelectionView selectedEntities={selectedEntities} camera={camera} />
                 <SelectingRangeView selectingRange={selectingRange} camera={camera} />
+                <SnapGuide />
             </svg>
             <ContextMenuPopup camera={camera} state={contextMenu} />
         </div>

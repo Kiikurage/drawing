@@ -14,6 +14,8 @@ export interface EditorState {
     selectingRange: SelectingRangeState;
     selectedEntityIds: string[];
     contextMenu: ContextMenuState;
+    snapEnabled: boolean;
+    sessionType: string;
 }
 
 export module EditorState {
@@ -27,6 +29,8 @@ export module EditorState {
                 selectingRange: SelectingRangeState.create(),
                 selectedEntityIds: [],
                 contextMenu: ContextMenuState.create(),
+                snapEnabled: false,
+                sessionType: 'idle',
             },
             initialData
         );
