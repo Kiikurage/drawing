@@ -17,17 +17,4 @@ export class LineModeController extends EditorModeController {
             new TransformSession(newEntityMap, TransformType.RESIZE_BOTTOM_RIGHT, this.editorController.currentPoint)
         );
     };
-
-    onMouseMove = () => {
-        if (this.editorController.session !== null) {
-            this.editorController.updateSession();
-        }
-    };
-
-    onMouseUp = () => {
-        if (this.editorController.session !== null) {
-            this.editorController.completeSession();
-            this.editorController.setMode('select');
-        }
-    };
 }

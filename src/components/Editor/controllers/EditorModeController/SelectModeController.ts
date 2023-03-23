@@ -1,5 +1,4 @@
 import { MouseEventButton, MouseEventInfo } from '../../model/MouseEventInfo';
-import { ScrollSession } from '../../model/session/ScrollSession';
 import { SelectRangeSession } from '../../model/session/SelectRangeSession';
 import { TransformSession } from '../../model/session/TransformSession';
 import { TransformType } from '../../model/TransformType';
@@ -14,8 +13,14 @@ export class SelectModeController extends EditorModeController {
             case MouseEventButton.PRIMARY: {
                 switch (hover.type) {
                     case 'idle': {
-                        this.editorController.clearSelection();
-                        this.editorController.startSession(new SelectRangeSession(this.editorController.currentPoint));
+                        if (!ev.shiftKey) this.editorController.clearSelection();
+
+                        this.editorController.startSession(
+                            new SelectRangeSession(
+                                this.editorController.currentPoint,
+                                this.editorController.state.selectedEntityIds
+                            )
+                        );
                         return;
                     }
 
@@ -34,13 +39,6 @@ export class SelectModeController extends EditorModeController {
                         return;
                     }
                 }
-                return;
-            }
-
-            case MouseEventButton.WHEEL: {
-                this.editorController.startSession(
-                    new ScrollSession(this.editorController.currentPoint, this.editorController.state.camera)
-                );
                 return;
             }
 
@@ -64,19 +62,6 @@ export class SelectModeController extends EditorModeController {
             }
         }
     };
-
-    onMouseMove = () => {
-        if (this.editorController.session !== null) {
-            this.editorController.updateSession();
-        }
-    };
-
-    onMouseUp = () => {
-        if (this.editorController.session !== null) {
-            this.editorController.completeSession();
-        }
-    };
-
     onBeforeDeactivate = () => {
         this.editorController.closeContextMenu();
     };

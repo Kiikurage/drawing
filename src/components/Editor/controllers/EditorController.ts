@@ -1,6 +1,7 @@
 import { randomId } from '../../../lib/randomId';
 import { Record } from '../../../lib/Record';
 import { ReadonlyStore, Store } from '../../../lib/Store';
+import { ModelCordBox } from '../../../model/Box';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
@@ -11,7 +12,8 @@ import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
-import { KeyboardEventInfo, MouseEventInfo } from '../model/MouseEventInfo';
+import { KeyboardEventInfo, MouseEventButton, MouseEventInfo } from '../model/MouseEventInfo';
+import { ScrollSession } from '../model/session/ScrollSession';
 import { Session } from '../model/session/Session';
 import { EditController } from './EditController';
 import { EditorModeController } from './EditorModeController/EditorModeController';
@@ -57,6 +59,10 @@ export class EditorController {
         return Point.toModel(this.store.state.camera, this._currentPoint);
     }
 
+    private set currentPoint(point: ModelCordPoint) {
+        this._currentPoint = Point.toDisplay(this.state.camera, point);
+    }
+
     get modeController(): EditorModeController {
         return this.modeControllers[this.store.state.mode];
     }
@@ -75,7 +81,7 @@ export class EditorController {
         }
 
         this._session = session;
-        session.start(this);
+        session.start?.(this);
     }
 
     updateSession() {
@@ -84,7 +90,7 @@ export class EditorController {
             console.warn('No session on going.');
             return;
         }
-        session.update(this);
+        session.update?.(this);
     }
 
     completeSession() {
@@ -93,7 +99,7 @@ export class EditorController {
             console.warn('No session on going.');
             return;
         }
-        session.complete(this);
+        session.complete?.(this);
         this._session = null;
     }
 
@@ -177,6 +183,23 @@ export class EditorController {
         this.setSelection([]);
     }
 
+    setSelectingRange(range: ModelCordBox) {
+        return this._store.setState({
+            selectingRange: {
+                selecting: true,
+                range,
+            },
+        });
+    }
+
+    clearSelectingRange() {
+        return this._store.setState({
+            selectingRange: {
+                selecting: false,
+            },
+        });
+    }
+
     openContextMenu(point: ModelCordPoint) {
         this.setState({ contextMenu: { open: true, point } });
     }
@@ -223,17 +246,27 @@ export class EditorController {
     };
 
     onMouseDown = (info: MouseEventInfo) => {
+        if (info.button === MouseEventButton.WHEEL) {
+            this.startSession(new ScrollSession(this.currentPoint, this.state.camera));
+        }
         this.modeController.onMouseDown?.(info);
     };
 
     onMouseMove = (point: DisplayCordPoint) => {
         const prevPoint = this.currentPoint;
         const nextPoint = Point.toModel(this.store.state.camera, point);
+        this.currentPoint = nextPoint;
+
+        if (this.session !== null) {
+            this.updateSession();
+        }
         this.modeController.onMouseMove?.(prevPoint, nextPoint);
-        this._currentPoint = point;
     };
 
     onMouseUp = () => {
+        if (this.session !== null) {
+            this.completeSession();
+        }
         this.modeController.onMouseUp?.();
     };
 

@@ -1,60 +1,42 @@
-import { Patch } from '../../../../model/Patch';
+import { Box } from '../../../../model/Box';
+import { Entity } from '../../../../model/entity/Entity';
 import { ModelCordPoint } from '../../../../model/Point';
 import { EditorController } from '../../controllers/EditorController';
 import { Session } from './Session';
 
-export class SelectRangeSession extends Session {
-    readonly type = 'SelectRange';
-    public originPoint: ModelCordPoint;
+export class SelectRangeSession implements Session {
+    public readonly originPoint: ModelCordPoint;
+    public readonly preSelectedEntityIds: string[];
 
-    constructor(originPoint: ModelCordPoint) {
-        super();
+    constructor(originPoint: ModelCordPoint, preSelectedEntityIds: string[]) {
         this.originPoint = originPoint;
+        this.preSelectedEntityIds = preSelectedEntityIds;
     }
 
     start(controller: EditorController) {
-        return {
-            selectingRange: Patch.apply(controller.state.selectingRange, {
-                selecting: true,
-                range: {
-                    point: this.originPoint,
-                    size: { width: 0, height: 0 },
-                },
-            }),
-        };
+        controller.setSelectingRange(Box.model(this.originPoint.x, this.originPoint.y, 0, 0));
     }
 
     update(controller: EditorController) {
-        const {
-            currentPoint,
-            state: { selectingRange: prevSelectingRange },
-        } = controller;
+        const width = controller.currentPoint.x - this.originPoint.x;
+        const height = controller.currentPoint.y - this.originPoint.y;
 
-        const width = currentPoint.x - this.originPoint.x;
-        const height = currentPoint.y - this.originPoint.y;
+        const range = Box.model(
+            Math.min(this.originPoint.x, this.originPoint.x + width),
+            Math.min(this.originPoint.y, this.originPoint.y + height),
+            Math.abs(width),
+            Math.abs(height)
+        );
 
-        return {
-            selectingRange: Patch.apply(prevSelectingRange, {
-                selecting: true,
-                range: {
-                    point: {
-                        x: Math.min(this.originPoint.x, this.originPoint.x + width),
-                        y: Math.min(this.originPoint.y, this.originPoint.y + height),
-                    },
-                    size: {
-                        width: Math.abs(width),
-                        height: Math.abs(height),
-                    },
-                },
-            }),
-        };
+        const overlappedEntityIds = Object.values(controller.state.page.entities)
+            .filter((entity) => Box.isOverlap(Entity.getBoundingBox(entity), range))
+            .map((entity) => entity.id);
+
+        controller.setSelectingRange(range);
+        controller.setSelection([...this.preSelectedEntityIds, ...overlappedEntityIds]);
     }
 
     complete(controller: EditorController) {
-        return {
-            selectingRange: Patch.apply(controller.state.selectingRange, {
-                selecting: false,
-            }),
-        };
+        controller.clearSelectingRange();
     }
 }

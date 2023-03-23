@@ -9,24 +9,18 @@ import { EntityMap } from '../EntityMap';
 import { TransformType } from '../TransformType';
 import { Session } from './Session';
 
-export class TransformSession extends Session {
-    readonly type = 'Transform';
+export class TransformSession implements Session {
     public entities: EntityMap;
     public handle: TransformType;
     public originPoint: ModelCordPoint;
 
     constructor(entities: EntityMap, handle: TransformType, originPoint: ModelCordPoint) {
-        super();
         this.entities = entities;
         this.handle = handle;
         this.originPoint = originPoint;
     }
 
-    start(controller: EditorController) {
-        controller.editController.saveSnapshot();
-    }
-
-    update(controller: EditorController) {
+    update = (controller: EditorController) => {
         const { currentPoint } = controller;
 
         const prevBoundingBox = Entity.computeBoundingBox(this.entities);
@@ -43,11 +37,14 @@ export class TransformSession extends Session {
             controller
         );
 
-        const patches = Record.mapValue(this.entities, (entity) =>
+        const patch = Record.mapValue(this.entities, (entity) =>
             Entity.transform(entity, prevBoundingBox, snappedNextBoundingBox)
         );
+        controller.editController.updateEntities(patch);
+    };
 
-        controller.editController.updateEntities(patches);
+    complete(controller: EditorController) {
+        controller.setMode('select');
     }
 
     private static computeNextBoundingBox(
