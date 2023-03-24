@@ -30,7 +30,7 @@ export class SelectModeController extends EditorModeController {
                         } else {
                             this.editorController.setSelection([hover.entityId]);
                         }
-                        this.startTransformSelectedEntities('translate');
+                        this.startTransformSelectedEntities(TransformType.TRANSLATE);
                         return;
                     }
 

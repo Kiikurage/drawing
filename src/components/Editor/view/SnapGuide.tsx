@@ -4,7 +4,7 @@ import { Entity } from '../../../model/entity/Entity';
 import { Point } from '../../../model/Point';
 import { useStore } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
-import { getSnap } from '../model/session/SnapUtil';
+import { getSnap, getSnapPoints } from '../model/session/SnapUtil';
 import { TransformSession } from '../model/session/TransformSession';
 
 export const SnapGuide = () => {
@@ -17,41 +17,11 @@ export const SnapGuide = () => {
         [page.entities, selectedEntityIds]
     );
 
-    const DELTA = 1;
     const snapResults = useMemo(() => {
-        return [
-            getSnap(range.point, snapTargets, 'x', DELTA),
-            getSnap(range.point, snapTargets, 'y', DELTA),
-            getSnap(Point.model(range.point.x, range.point.y + range.size.height), snapTargets, 'x', DELTA),
-            getSnap(Point.model(range.point.x, range.point.y + range.size.height), snapTargets, 'y', DELTA),
-            getSnap(Point.model(range.point.x + range.size.width, range.point.y), snapTargets, 'x', DELTA),
-            getSnap(Point.model(range.point.x + range.size.width, range.point.y), snapTargets, 'y', DELTA),
-            getSnap(
-                Point.model(range.point.x + range.size.width, range.point.y + range.size.height),
-                snapTargets,
-                'x',
-                DELTA
-            ),
-            getSnap(
-                Point.model(range.point.x + range.size.width, range.point.y + range.size.height),
-                snapTargets,
-                'y',
-                DELTA
-            ),
-            getSnap(
-                Point.model(range.point.x + range.size.width / 2, range.point.y + range.size.height / 2),
-                snapTargets,
-                'x',
-                DELTA
-            ),
-            getSnap(
-                Point.model(range.point.x + range.size.width / 2, range.point.y + range.size.height / 2),
-                snapTargets,
-                'y',
-                DELTA
-            ),
-        ].flatMap((result) => result.points.map((point) => [result.originPoint, point] as const));
-    }, [range.point, range.size.height, range.size.width, snapTargets]);
+        return Object.values(getSnapPoints(range)).flatMap((point) =>
+            (['x', 'y'] as const).flatMap((direction) => getSnap(point, snapTargets, direction, 0).pairs)
+        );
+    }, [range, snapTargets]);
 
     if (!snapEnabled || sessionType !== TransformSession.TYPE) return null;
 

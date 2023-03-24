@@ -1,13 +1,11 @@
 import { Record } from '../../../../lib/Record';
-import { ModelCordBox } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
-import { Patch } from '../../../../model/Patch';
 import { ModelCordPoint } from '../../../../model/Point';
 import { EditorController } from '../../controllers/EditorController';
 import { EntityMap } from '../EntityMap';
 import { TransformType } from '../TransformType';
 import { Session } from './Session';
-import { snap } from './SnapUtil';
+import { snap, transform } from './SnapUtil';
 
 export class TransformSession implements Session {
     static readonly TYPE = 'transform';
@@ -36,13 +34,7 @@ export class TransformSession implements Session {
 
         const prevBoundingBox = Entity.computeBoundingBox(this.entities);
 
-        let nextBoundingBox = this.computeNextBoundingBox(
-            prevBoundingBox,
-            this.originPoint,
-            currentPoint,
-            this.transformType
-        );
-
+        let nextBoundingBox = transform(prevBoundingBox, this.transformType, this.originPoint, currentPoint);
         if (snapEnabled) {
             const delta = 16 / controller.state.camera.scale;
             const snapTargets = Record.filter(
@@ -60,50 +52,5 @@ export class TransformSession implements Session {
 
     complete(controller: EditorController) {
         controller.setMode('select');
-    }
-
-    private computeNextBoundingBox(
-        prevBoundingBox: ModelCordBox,
-        prevPoint: ModelCordPoint,
-        nextPoint: ModelCordPoint,
-        handle: TransformType
-    ): ModelCordBox {
-        const diffX = nextPoint.x - prevPoint.x;
-        const diffY = nextPoint.y - prevPoint.y;
-
-        if (handle === 'translate') {
-            return Patch.apply(prevBoundingBox, {
-                point: {
-                    x: prevBoundingBox.point.x + diffX,
-                    y: prevBoundingBox.point.y + diffY,
-                },
-            });
-        } else {
-            let nextBoundingBox = prevBoundingBox;
-
-            if (handle.x === 'start') {
-                nextBoundingBox = Patch.apply(nextBoundingBox, {
-                    point: { x: prevBoundingBox.point.x + diffX },
-                    size: { width: prevBoundingBox.size.width - diffX },
-                });
-            } else if (handle.x === 'end') {
-                nextBoundingBox = Patch.apply(nextBoundingBox, {
-                    size: { width: prevBoundingBox.size.width + diffX },
-                });
-            }
-
-            if (handle.y === 'start') {
-                nextBoundingBox = Patch.apply(nextBoundingBox, {
-                    point: { y: prevBoundingBox.point.y + diffY },
-                    size: { height: prevBoundingBox.size.height - diffY },
-                });
-            } else if (handle.y === 'end') {
-                nextBoundingBox = Patch.apply(nextBoundingBox, {
-                    size: { height: prevBoundingBox.size.height + diffY },
-                });
-            }
-
-            return nextBoundingBox;
-        }
     }
 }

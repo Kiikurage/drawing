@@ -50,5 +50,8 @@ export module HoverState {
         type: 'transformHandle',
         transformType: TransformType.RESIZE_BOTTOM_RIGHT,
     };
-    export const TRANSLATE_HANDLE: TransformHandleHoverState = { type: 'transformHandle', transformType: 'translate' };
+    export const TRANSLATE_HANDLE: TransformHandleHoverState = {
+        type: 'transformHandle',
+        transformType: TransformType.TRANSLATE,
+    };
 }
