@@ -4,7 +4,7 @@ import { Page } from '../../model/Page';
 import { Point } from '../../model/Point';
 import { Size } from '../../model/Size';
 import { useStore } from '../hooks/useStore';
-import { EditorController } from './controllers/EditorController';
+import { EditorController } from './controller/EditorController';
 import { EditorControllerContextProvider } from './EditorControllerContext';
 import { EditorMode } from './model/EditorMode';
 import { IndicatorLayer } from './view/IndicatorLayer';

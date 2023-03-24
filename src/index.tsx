@@ -1,8 +1,8 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, onValue, ref, set } from 'firebase/database';
 import { createRoot } from 'react-dom/client';
-import { App } from './components/App/App';
 import { firebaseConfig } from './firebaseConfig';
+import { App } from './view/App/App';
 
 window.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('root');

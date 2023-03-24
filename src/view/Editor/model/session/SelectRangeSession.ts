@@ -1,7 +1,7 @@
 import { Box } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
 import { ModelCordPoint } from '../../../../model/Point';
-import { EditorController } from '../../controllers/EditorController';
+import { EditorController } from '../../controller/EditorController';
 import { Session } from './Session';
 
 export class SelectRangeSession implements Session {

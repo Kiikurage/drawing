@@ -1,4 +1,4 @@
-import { EditorController } from '../../controllers/EditorController';
+import { EditorController } from '../../controller/EditorController';
 import { KeyboardEventInfo } from '../MouseEventInfo';
 
 export interface Session {

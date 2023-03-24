@@ -1,4 +1,4 @@
-import { EntityMap } from '../../components/Editor/model/EntityMap';
+import { EntityMap } from '../../view/Editor/model/EntityMap';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { Point } from '../Point';

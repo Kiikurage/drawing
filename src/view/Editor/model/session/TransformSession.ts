@@ -1,7 +1,7 @@
 import { Record } from '../../../../lib/Record';
 import { Entity } from '../../../../model/entity/Entity';
 import { ModelCordPoint } from '../../../../model/Point';
-import { EditorController } from '../../controllers/EditorController';
+import { EditorController } from '../../controller/EditorController';
 import { EntityMap } from '../EntityMap';
 import { TransformType } from '../TransformType';
 import { Session } from './Session';

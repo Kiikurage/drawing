@@ -1,4 +1,4 @@
-import { Camera } from '../components/Editor/model/Camera';
+import { Camera } from '../view/Editor/model/Camera';
 
 export module Size {
     export function model(width: number, height: number): ModelCordSize {

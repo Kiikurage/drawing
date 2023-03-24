@@ -1,5 +1,5 @@
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../../model/Point';
-import { EditorController } from '../../controllers/EditorController';
+import { EditorController } from '../../controller/EditorController';
 import { Camera } from '../Camera';
 import { Session } from './Session';
 

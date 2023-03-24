@@ -1,4 +1,4 @@
-import { Camera } from '../components/Editor/model/Camera';
+import { Camera } from '../view/Editor/model/Camera';
 import { DisplayCordPoint, ModelCordPoint, Point } from './Point';
 import { DisplayCordSize, ModelCordSize, Size } from './Size';
 

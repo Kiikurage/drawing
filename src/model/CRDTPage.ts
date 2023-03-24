@@ -1,6 +1,6 @@
-import { EntityMap } from '../components/Editor/model/EntityMap';
 import { randomId } from '../lib/randomId';
 import { Record } from '../lib/Record';
+import { EntityMap } from '../view/Editor/model/EntityMap';
 import { Entity } from './entity/Entity';
 import { Page } from './Page';
 import { Patch } from './Patch';
