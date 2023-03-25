@@ -79,4 +79,7 @@ export const RectEntityDelegate: EntityDelegates<RectEntity> = {
             );
         }
     },
+    isTextEditable(): boolean {
+        return true;
+    },
 };

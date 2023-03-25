@@ -59,4 +59,7 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
             return getClosestValue([entity.p1.y, (entity.p1.y + entity.p2.y) / 2, entity.p2.y], offset);
         }
     },
+    isTextEditable(): boolean {
+        return false;
+    },
 };

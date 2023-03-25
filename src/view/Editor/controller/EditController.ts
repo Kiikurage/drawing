@@ -47,7 +47,7 @@ export class EditController {
         this.saveSnapshot();
         const entity = this.page.entities()[entityId];
         if (entity === undefined) return;
-        if (entity.type !== 'rect') return;
+        if (!Entity.isTextEditable(entity)) return;
 
         const actions = this.page.updateEntity(entityId, 'text', { text });
         this.dispatchActions([actions]);

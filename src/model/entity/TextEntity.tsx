@@ -13,7 +13,7 @@ export interface TextEntity {
     p1: ModelCordPoint;
     palette: ColorPaletteKey;
     size: ModelCordSize;
-    value: string;
+    text: string;
 }
 
 export module TextEntity {
@@ -25,7 +25,7 @@ export module TextEntity {
                 p1: Point.model(0, 0),
                 palette: 'BLACK',
                 size: Size.model(100, 100),
-                value: 'Hello World!',
+                text: '',
             },
             data
         );
@@ -78,5 +78,8 @@ export const TextEntityDelegate: EntityDelegates<TextEntity> = {
                 offset
             );
         }
+    },
+    isTextEditable(): boolean {
+        return true;
     },
 };

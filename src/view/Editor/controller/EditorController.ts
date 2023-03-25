@@ -2,6 +2,7 @@ import { randomId } from '../../../lib/randomId';
 import { Record } from '../../../lib/Record';
 import { ReadonlyStore, Store } from '../../../lib/Store';
 import { ModelCordBox } from '../../../model/Box';
+import { Entity } from '../../../model/entity/Entity';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
@@ -166,10 +167,6 @@ export class EditorController {
         this.deleteEntities(this.state.selectMode.selectedEntityIds);
     }
 
-    setEntityText(entityId: string, text: string) {
-        this.editController.setEntityText(entityId, text);
-    }
-
     setColor(palette: ColorPaletteKey) {
         this.editController.setColor(palette);
     }
@@ -252,6 +249,10 @@ export class EditorController {
         if (entity === undefined) return;
 
         this._store.setState({ textEditMode: { editing: true, entityId } });
+    }
+
+    setEntityText(entityId: string, text: string) {
+        this.editController.setEntityText(entityId, text);
     }
 
     completeTextEdit() {
@@ -405,7 +406,7 @@ export class EditorController {
         if (this.state.selectMode.selectedEntityIds.length !== 1) return false;
 
         const selectedEntity = Object.values(this.computeSelectedEntities())[0];
-        if (selectedEntity.type !== 'rect') return false;
+        if (!Entity.isTextEditable(selectedEntity)) return false;
 
         return true;
     }

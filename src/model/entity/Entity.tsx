@@ -15,6 +15,8 @@ export interface EntityDelegates<T extends Entity> {
     transform(entity: T, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Patch<T>;
 
     getSnap(entity: T, offset: number, direction: 'x' | 'y'): number;
+
+    isTextEditable(entity: T): boolean;
 }
 
 export module Entity {
@@ -61,5 +63,9 @@ export module Entity {
         nextBoundingBox: ModelCordBox
     ): Patch<Entity> {
         return getDelegate(entity).transform(entity, prevBoundingBox, nextBoundingBox);
+    }
+
+    export function isTextEditable(entity: Entity): boolean {
+        return getDelegate(entity).isTextEditable(entity);
     }
 }
