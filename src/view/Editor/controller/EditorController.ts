@@ -7,7 +7,7 @@ import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
 import { createCollaborationController } from '../dependency';
 import { Camera } from '../model/Camera';
-import { ColorPalette } from '../model/ColorPalette';
+import { ColorPaletteKey } from '../model/ColorPalette';
 import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
@@ -21,6 +21,7 @@ import { EditorModeController } from './EditorModeController/EditorModeControlle
 import { LineModeController } from './EditorModeController/LineModeController';
 import { RectModeController } from './EditorModeController/RectModeController';
 import { SelectModeController } from './EditorModeController/SelectModeController';
+import { TextModeController } from './EditorModeController/TextModeController';
 
 /**
  * Root controller for Editor view
@@ -39,6 +40,7 @@ export class EditorController {
             rect: new RectModeController(this),
             select: new SelectModeController(this),
             line: new LineModeController(this),
+            text: new TextModeController(this),
         };
         this.editController = new EditController(this._store, this.collaborationController);
     }
@@ -168,7 +170,7 @@ export class EditorController {
         this.editController.setEntityText(entityId, text);
     }
 
-    setColor(palette: ColorPalette) {
+    setColor(palette: ColorPaletteKey) {
         this.editController.setColor(palette);
     }
 

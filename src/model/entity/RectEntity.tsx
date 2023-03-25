@@ -1,5 +1,6 @@
 import { getClosestValue } from '../../lib/getClosestValue';
 import { randomId } from '../../lib/randomId';
+import { ColorPaletteKey } from '../../view/Editor/model/ColorPalette';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -10,10 +11,9 @@ export interface RectEntity {
     id: string;
     type: 'rect';
     p1: ModelCordPoint;
+    palette: ColorPaletteKey;
     size: ModelCordSize;
     text: string;
-    strokeColor: string;
-    fillColor: string;
 }
 
 export module RectEntity {
@@ -25,8 +25,7 @@ export module RectEntity {
                 p1: Point.model(0, 0),
                 size: Size.model(100, 100),
                 text: '',
-                strokeColor: '#000',
-                fillColor: 'none',
+                palette: 'BLACK',
             },
             data
         );

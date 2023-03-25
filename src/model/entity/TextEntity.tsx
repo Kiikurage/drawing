@@ -1,5 +1,6 @@
 import { getClosestValue } from '../../lib/getClosestValue';
 import { randomId } from '../../lib/randomId';
+import { ColorPaletteKey } from '../../view/Editor/model/ColorPalette';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -10,7 +11,7 @@ export interface TextEntity {
     id: string;
     type: 'text';
     p1: ModelCordPoint;
-
+    palette: ColorPaletteKey;
     size: ModelCordSize;
     value: string;
 }
@@ -22,6 +23,7 @@ export module TextEntity {
                 id: randomId(),
                 type: 'text' as const,
                 p1: Point.model(0, 0),
+                palette: 'BLACK',
                 size: Size.model(100, 100),
                 value: 'Hello World!',
             },

@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Point } from '../../../model/Point';
 import { useEditorController } from '../EditorControllerContext';
 import { Camera } from '../model/Camera';
-import { ColorPalette } from '../model/ColorPalette';
+import { ColorPalette, ColorPaletteKey } from '../model/ColorPalette';
 import { ContextMenuState } from '../model/ContextMenuState';
 import { Popup } from './Popup';
 
@@ -30,17 +30,17 @@ export const ContextMenuPopup = ({ camera, state }: { camera: Camera; state: Con
                     gap: 4px;
                 `}
             >
-                <ColorButton palette={ColorPalette.BLACK} />
-                <ColorButton palette={ColorPalette.RED} />
-                <ColorButton palette={ColorPalette.PINK} />
+                <ColorButton palette="BLACK" />
+                <ColorButton palette="RED" />
+                <ColorButton palette="PINK" />
 
-                <ColorButton palette={ColorPalette.ORANGE} />
-                <ColorButton palette={ColorPalette.GRAY} />
-                <ColorButton palette={ColorPalette.PURPLE} />
+                <ColorButton palette="ORANGE" />
+                <ColorButton palette="GRAY" />
+                <ColorButton palette="PURPLE" />
 
-                <ColorButton palette={ColorPalette.GREEN} />
-                <ColorButton palette={ColorPalette.ANY_COLOR} />
-                <ColorButton palette={ColorPalette.BLUE} />
+                <ColorButton palette="GREEN" />
+                <ColorButton palette="ANY_COLOR" />
+                <ColorButton palette="BLUE" />
             </div>
             <MenuButton>Menu 1</MenuButton>
             <MenuButton>Menu 2</MenuButton>
@@ -49,7 +49,7 @@ export const ContextMenuPopup = ({ camera, state }: { camera: Camera; state: Con
     );
 };
 
-export const ColorButton = ({ palette }: { palette: ColorPalette }) => {
+export const ColorButton = ({ palette }: { palette: ColorPaletteKey }) => {
     const controller = useEditorController();
 
     return (
@@ -71,7 +71,7 @@ export const ColorButton = ({ palette }: { palette: ColorPalette }) => {
                     margin: 0;
                     display: block;
                     border: none;
-                    background: ${palette.strokeColor};
+                    background: ${ColorPalette[palette].strokeColor};
                 `}
             />
         </Popup.Button>

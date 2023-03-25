@@ -130,7 +130,7 @@ describe('CRDTPage', () => {
         expect(page3.entities()).toEqual({ [entity1.id]: entity1 });
 
         const patch1: Patch<RectEntity> = { p1: Point.model(2, 3) };
-        const patch2: Patch<RectEntity> = { strokeColor: '#abc', fillColor: '#cba' };
+        const patch2: Patch<RectEntity> = { palette: 'RED' };
 
         const action21 = page2.updateEntity(entity1.id, 'transform', patch1);
         const action22 = page3.updateEntity(entity1.id, 'style', patch2);
@@ -164,7 +164,7 @@ describe('CRDTPage', () => {
         expect(page3.entities()).toEqual({ [entity1.id]: entity1 });
 
         const patch1: Patch<RectEntity> = { p1: Point.model(2, 3) };
-        const patch2: Patch<RectEntity> = { strokeColor: '#abc', fillColor: '#cba' };
+        const patch2: Patch<RectEntity> = { palette: 'RED' };
 
         const action21 = page1.deleteEntity(entity1.id);
         const action22 = page2.updateEntity(entity1.id, 'transform', patch1);

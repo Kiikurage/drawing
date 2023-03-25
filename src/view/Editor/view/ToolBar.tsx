@@ -22,6 +22,9 @@ export const ToolBar = ({ mode, onChange }: { mode: EditorMode; onChange: (mode:
                 <ModeButton aria-pressed={mode === 'line'} onClick={() => onChange('line')}>
                     線
                 </ModeButton>
+                <ModeButton aria-pressed={mode === 'text'} onClick={() => onChange('text')}>
+                    文字
+                </ModeButton>
             </div>
         </Popup.Base>
     );

@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import { RectEntity } from '../../../../model/entity/RectEntity';
 import { useStore } from '../../../hooks/useStore';
 import { useEditorController } from '../../EditorControllerContext';
+import { ColorPalette } from '../../model/ColorPalette';
 
 export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
     const controller = useEditorController();
@@ -36,9 +37,9 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
                         y={0}
                         width={entity.size.width}
                         height={entity.size.height}
-                        stroke={entity.strokeColor}
+                        stroke={ColorPalette[entity.palette].strokeColor}
                         strokeWidth={4}
-                        fill={entity.fillColor}
+                        fill={ColorPalette[entity.palette].fillColor}
                         onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
                         onMouseLeave={() => controller.onUnhover()}
                     />

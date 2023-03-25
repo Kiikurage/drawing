@@ -45,3 +45,5 @@ export module ColorPalette {
         fillColor: lighten(0.3, '#1565C0'),
     };
 }
+
+export type ColorPaletteKey = keyof typeof ColorPalette;

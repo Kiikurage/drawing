@@ -4,7 +4,7 @@ import { CRDTPage, CRDTPageAction } from '../../../model/CRDTPage';
 import { Entity } from '../../../model/entity/Entity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
-import { ColorPalette } from '../model/ColorPalette';
+import { ColorPaletteKey } from '../model/ColorPalette';
 import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
 import { CollaborationController } from './CollaborationController/CollaborationController';
@@ -53,10 +53,10 @@ export class EditController {
         this.dispatchActions([actions]);
     }
 
-    setColor(palette: ColorPalette) {
+    setColor(palette: ColorPaletteKey) {
         this.saveSnapshot();
         const actions = this.store.state.selectMode.selectedEntityIds.map((entityId) =>
-            this.page.updateEntity(entityId, 'style', palette)
+            this.page.updateEntity(entityId, 'style', { palette })
         );
         this.dispatchActions(actions);
     }

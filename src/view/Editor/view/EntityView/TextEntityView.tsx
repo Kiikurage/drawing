@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import { TextEntity } from '../../../../model/entity/TextEntity';
 import { useEditorController } from '../../EditorControllerContext';
+import { ColorPalette } from '../../model/ColorPalette';
 
 export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
     const controller = useEditorController();
@@ -12,6 +13,8 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
                 left: ${entity.p1.x}px;
                 top: ${entity.p1.y}px;
                 user-select: none;
+                pointer-events: all;
+                color: ${ColorPalette[entity.palette].strokeColor};
             `}
             onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
             onMouseLeave={() => controller.onUnhover()}
