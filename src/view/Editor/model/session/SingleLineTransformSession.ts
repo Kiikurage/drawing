@@ -1,7 +1,9 @@
 import { Record } from '../../../../lib/Record';
+import { Entity } from '../../../../model/entity/Entity';
 import { LineEntity } from '../../../../model/entity/LineEntity';
 import { ModelCordPoint, Point } from '../../../../model/Point';
 import { EditorController } from '../../controller/EditorController';
+import { EntityMap } from '../EntityMap';
 import { getSnap } from './SnapUtil';
 
 export class SingleLineTransformSession {
@@ -45,45 +47,31 @@ export class SingleLineTransformSession {
             if (snapTargetY.pairs.length > 0) nextPoint.y = snapTargetY.pairs[0][1].y;
         }
 
+        const linkedEntity = this.findLinkTarget(nextPoint, controller.state.page.entities);
+
         controller.editController.updateEntities({
             [this.entity.id]: {
                 [this.pointKey]: nextPoint,
+                linkedEntityId1: this.pointKey === 'p1' ? linkedEntity?.id ?? null : this.entity.linkedEntityId1,
+                linkedEntityId2: this.pointKey === 'p2' ? linkedEntity?.id ?? null : this.entity.linkedEntityId2,
             },
         });
     }
 
     complete(controller: EditorController) {
         controller.setMode('select');
-        // this.checkLinks(controller);
         controller.onTransformEnd();
     }
 
-    // private checkLinks(controller: EditorController) {
-    //     if (controller.state.selectMode.snapEnabled) return;
-    //
-    //     const targetEntity = this.findLinkableEntity(controller);
-    //     if (targetEntity === undefined) return;
-    //
-    //     const entity = Object.values(this.entities)[0] as LineEntity;
-    //     switch (this.transformType) {
-    //     }
-    // }
-    //
-    // private findLinkableEntity(controller: EditorController): Entity | undefined {
-    //     if (Object.values(this.entities).length > 1) return undefined;
-    //     if (this.transformType === TransformType.TRANSLATE) return undefined;
-    //
-    //     const entity = Object.values(this.entities)[0];
-    //     if (entity.type !== 'line') return undefined;
-    //
-    //     for (const targetEntity of Object.values(controller.state.page.entities)) {
-    //         if (targetEntity.type === 'line') continue;
-    //
-    //         if (Entity.includes(targetEntity, controller.currentPoint)) {
-    //             return targetEntity;
-    //         }
-    //     }
-    //
-    //     return undefined;
-    // }
+    private findLinkTarget(point: ModelCordPoint, entities: EntityMap): Entity | undefined {
+        for (const entity of Object.values(entities)) {
+            if (entity.type === 'line') continue;
+
+            if (Entity.includes(entity, point)) {
+                return entity;
+            }
+        }
+
+        return undefined;
+    }
 }

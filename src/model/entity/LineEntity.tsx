@@ -5,7 +5,7 @@ import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
 import { Size } from '../Size';
-import { EntityDelegates } from './Entity';
+import { Entity, EntityDelegates } from './Entity';
 
 export interface LineEntity {
     id: string;
@@ -13,8 +13,8 @@ export interface LineEntity {
     p1: ModelCordPoint;
     palette: ColorPaletteKey;
     p2: ModelCordPoint;
-    linkedEntityId1?: string;
-    linkedEntityId2?: string;
+    linkedEntityId1: string | null;
+    linkedEntityId2: string | null;
 }
 
 export module LineEntity {
@@ -26,9 +26,15 @@ export module LineEntity {
                 p1: Point.model(0, 0),
                 p2: Point.model(100, 100),
                 palette: 'BLACK',
+                linkedEntityId1: null,
+                linkedEntityId2: null,
             },
             data
         );
+    }
+
+    export function isLine(entity: Entity): entity is LineEntity {
+        return entity.type === 'line';
     }
 }
 
