@@ -1,13 +1,36 @@
-import { LineEntity } from '../../../../model/entity/LineEntity';
-import { Point } from '../../../../model/Point';
+import { css } from '@emotion/react';
+import { ModelCordPoint, Point } from '../../../../model/Point';
 import { COLOR_SELECTION } from '../../../styles';
 import { Camera } from '../../model/Camera';
 
-export const LineEntityBoundingBoxView = ({ camera, entity }: { camera: Camera; entity: LineEntity }) => {
-    const p1 = Point.toDisplay(camera, entity.p1);
-    const p2 = Point.toDisplay(camera, entity.p2);
+export const LineEntityBoundingBoxView = ({
+    camera,
+    p1,
+    p2,
+}: {
+    camera: Camera;
+    p1: ModelCordPoint;
+    p2: ModelCordPoint;
+}) => {
+    const p1d = Point.toDisplay(camera, p1);
+    const p2d = Point.toDisplay(camera, p2);
 
     return (
-        <path d={`M${p1.x},${p1.y} L${p2.x},${p2.y}`} pointerEvents="all" stroke={COLOR_SELECTION} strokeWidth={1.5} />
+        <svg
+            css={css`
+                position: absolute;
+                top: 0;
+                left: 0;
+            `}
+            width="100%"
+            height="100%"
+        >
+            <path
+                d={`M${p1d.x},${p1d.y} L${p2d.x},${p2d.y}`}
+                pointerEvents="all"
+                stroke={COLOR_SELECTION}
+                strokeWidth={1.5}
+            />
+        </svg>
     );
 };

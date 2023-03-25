@@ -5,7 +5,7 @@ import { useEditorController } from '../EditorControllerContext';
 import { computeVisibleEntities } from '../util';
 import { EntityView } from './EntityView/EntityView';
 
-export const PageView = memo(() => {
+export const ContentLayer = memo(() => {
     const controller = useEditorController();
     const { page, camera } = useSlice(controller.store, (state) => ({
         page: state.page,

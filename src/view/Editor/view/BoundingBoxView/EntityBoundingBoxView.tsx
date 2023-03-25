@@ -6,8 +6,8 @@ import { RectBoundingBoxView } from './RectBoundingBoxView';
 
 export const EntityBoundingBoxView = memo(({ camera, entity }: { camera: Camera; entity: Entity }) => {
     if (entity.type === 'line') {
-        return <LineEntityBoundingBoxView entity={entity} camera={camera} />;
+        return <LineEntityBoundingBoxView p1={entity.p1} p2={entity.p2} camera={camera} />;
     }
 
-    return <RectBoundingBoxView entity={entity} camera={camera} />;
+    return <RectBoundingBoxView box={Entity.getBoundingBox(entity)} camera={camera} />;
 });

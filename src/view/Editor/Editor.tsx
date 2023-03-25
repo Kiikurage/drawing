@@ -5,8 +5,9 @@ import { Point } from '../../model/Point';
 import { Size } from '../../model/Size';
 import { EditorController } from './controller/EditorController';
 import { EditorControllerContextProvider } from './EditorControllerContext';
+import { ContentLayer } from './view/ContentLayer';
+import { ContextMenuPopup } from './view/ContextMenuPopup';
 import { IndicatorLayer } from './view/IndicatorLayer';
-import { PageView } from './view/PageView';
 import { ToolBar } from './view/ToolBar';
 
 export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
@@ -35,19 +36,6 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
         };
     }, [controller]);
 
-    useEffect(() => {
-        const onMouseMove = (ev: MouseEvent) => {
-            controller.onMouseMove(Point.display(ev.clientX, ev.clientY));
-        };
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', controller.onMouseUp);
-        return () => {
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', controller.onMouseUp);
-        };
-    }, [controller]);
-
     return (
         <EditorControllerContextProvider value={controller}>
             <div
@@ -63,24 +51,17 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                 `}
                 tabIndex={-1}
                 onMouseDown={controller.onMouseDown}
+                onMouseMove={(ev) => controller.onMouseMove(Point.display(ev.clientX, ev.clientY))}
+                onMouseUp={controller.onMouseUp}
                 onKeyDown={controller.onKeyDown}
                 onKeyUp={controller.onKeyUp}
                 onContextMenu={(ev) => ev.preventDefault()}
                 onDoubleClick={controller.onDoubleClick}
             >
-                <PageView />
+                <ContentLayer />
                 <IndicatorLayer />
-                <div
-                    css={css`
-                        position: absolute;
-                        bottom: 32px;
-                        display: flex;
-                        justify-content: center;
-                        width: 100%;
-                    `}
-                >
-                    <ToolBar />
-                </div>
+                <ToolBar />
+                <ContextMenuPopup />
             </div>
         </EditorControllerContextProvider>
     );

@@ -5,7 +5,6 @@ import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
 import { computeVisibleEntities } from '../util';
 import { EntityBoundingBoxView } from './BoundingBoxView/EntityBoundingBoxView';
-import { ContextMenuPopup } from './ContextMenuPopup';
 import { HoveredEntityBoundingBox } from './HoveredEntityBoundingBox';
 import { SelectingRangeView } from './SelectingRangeView';
 import { SelectionView } from './SelectionView/SelectionView';
@@ -35,24 +34,13 @@ export const IndicatorLayer = memo(() => {
                 inset: 0;
             `}
         >
-            <svg
-                css={css`
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                `}
-                width="100%"
-                height="100%"
-            >
-                {Object.values(visibleSelectedEntities).map((entity) => (
-                    <EntityBoundingBoxView entity={entity} camera={camera} key={entity.id} />
-                ))}
-                <HoveredEntityBoundingBox />
-                {!textEditMode.editing && <SelectionView selectedEntities={selectedEntities} camera={camera} />}
-                <SelectingRangeView />
-                <SnapGuide />
-            </svg>
-            <ContextMenuPopup />
+            {Object.values(visibleSelectedEntities).map((entity) => (
+                <EntityBoundingBoxView entity={entity} camera={camera} key={entity.id} />
+            ))}
+            <HoveredEntityBoundingBox />
+            {!textEditMode.editing && <SelectionView selectedEntities={selectedEntities} camera={camera} />}
+            <SelectingRangeView />
+            <SnapGuide />
         </div>
     );
 });

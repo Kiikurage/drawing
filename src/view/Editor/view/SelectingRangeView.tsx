@@ -1,3 +1,4 @@
+import { css } from '@emotion/react';
 import { Box } from '../../../model/Box';
 import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
@@ -16,5 +17,17 @@ export const SelectingRangeView = () => {
         size: { width, height },
     } = Box.toDisplay(camera, selectRange);
 
-    return <rect cursor="move" pointerEvents="all" x={x} y={y} width={width} height={height} fill="rgba(0,0,0,0.1)" />;
+    return (
+        <svg
+            css={css`
+                position: absolute;
+                top: 0;
+                left: 0;
+            `}
+            width="100%"
+            height="100%"
+        >
+            <rect cursor="move" pointerEvents="all" x={x} y={y} width={width} height={height} fill="rgba(0,0,0,0.1)" />
+        </svg>
+    );
 };

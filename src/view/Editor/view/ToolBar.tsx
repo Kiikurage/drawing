@@ -11,28 +11,38 @@ export const ToolBar = memo(() => {
         mode: state.mode,
     }));
     return (
-        <Popup.Base>
-            <div
-                css={css`
-                    display: flex;
-                    justify-content: center;
-                    gap: 4px;
-                `}
-            >
-                <ModeButton aria-pressed={mode === 'select'} onClick={() => controller.setMode('select')}>
-                    選択
-                </ModeButton>
-                <ModeButton aria-pressed={mode === 'rect'} onClick={() => controller.setMode('rect')}>
-                    長方形
-                </ModeButton>
-                <ModeButton aria-pressed={mode === 'line'} onClick={() => controller.setMode('line')}>
-                    線
-                </ModeButton>
-                <ModeButton aria-pressed={mode === 'text'} onClick={() => controller.setMode('text')}>
-                    文字
-                </ModeButton>
-            </div>
-        </Popup.Base>
+        <div
+            css={css`
+                position: absolute;
+                bottom: 32px;
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            `}
+        >
+            <Popup.Base>
+                <div
+                    css={css`
+                        display: flex;
+                        justify-content: center;
+                        gap: 4px;
+                    `}
+                >
+                    <ModeButton aria-pressed={mode === 'select'} onClick={() => controller.setMode('select')}>
+                        選択
+                    </ModeButton>
+                    <ModeButton aria-pressed={mode === 'rect'} onClick={() => controller.setMode('rect')}>
+                        長方形
+                    </ModeButton>
+                    <ModeButton aria-pressed={mode === 'line'} onClick={() => controller.setMode('line')}>
+                        線
+                    </ModeButton>
+                    <ModeButton aria-pressed={mode === 'text'} onClick={() => controller.setMode('text')}>
+                        文字
+                    </ModeButton>
+                </div>
+            </Popup.Base>
+        </div>
     );
 });
 

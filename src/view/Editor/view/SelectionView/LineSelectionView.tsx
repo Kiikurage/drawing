@@ -1,3 +1,4 @@
+import { css } from '@emotion/react';
 import { Box } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
 import { LineEntity } from '../../../../model/entity/LineEntity';
@@ -19,19 +20,29 @@ export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: 
     const p2 = Point.toDisplay(modelBoundingBoxCamera, entity.p2);
 
     return (
-        <g transform={`translate(${displayBoundingBox.point.x},${displayBoundingBox.point.y})`}>
-            <path
-                cursor="move"
-                d={`M${p1.x},${p1.y} L${p2.x},${p2.y}`}
-                pointerEvents="all"
-                stroke={COLOR_SELECTION}
-                strokeWidth={1.5}
-                onMouseOver={() => controller.onHover(HoverState.TRANSLATE_HANDLE)}
-                onMouseLeave={() => controller.onUnhover()}
-            />
-            <ResizeHandle cursor="move" x={p1.x} y={p1.y} hover={getHoverState(entity.p1, entity.p2)} />
-            <ResizeHandle cursor="move" x={p2.x} y={p2.y} hover={getHoverState(entity.p2, entity.p1)} />
-        </g>
+        <svg
+            css={css`
+                position: absolute;
+                top: 0;
+                left: 0;
+            `}
+            width="100%"
+            height="100%"
+        >
+            <g transform={`translate(${displayBoundingBox.point.x},${displayBoundingBox.point.y})`}>
+                <path
+                    cursor="move"
+                    d={`M${p1.x},${p1.y} L${p2.x},${p2.y}`}
+                    pointerEvents="all"
+                    stroke={COLOR_SELECTION}
+                    strokeWidth={1.5}
+                    onMouseOver={() => controller.onHover(HoverState.TRANSLATE_HANDLE)}
+                    onMouseLeave={() => controller.onUnhover()}
+                />
+                <ResizeHandle cursor="move" x={p1.x} y={p1.y} hover={getHoverState(entity.p1, entity.p2)} />
+                <ResizeHandle cursor="move" x={p2.x} y={p2.y} hover={getHoverState(entity.p2, entity.p1)} />
+            </g>
+        </svg>
     );
 };
 
