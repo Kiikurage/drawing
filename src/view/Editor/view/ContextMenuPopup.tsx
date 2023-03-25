@@ -1,16 +1,21 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import { memo } from 'react';
 import { Point } from '../../../model/Point';
+import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
-import { Camera } from '../model/Camera';
 import { ColorPalette, ColorPaletteKey } from '../model/ColorPalette';
-import { ContextMenuState } from '../model/ContextMenuState';
 import { Popup } from './Popup';
 
-export const ContextMenuPopup = ({ camera, state }: { camera: Camera; state: ContextMenuState }) => {
-    if (!state.open) return null;
+export const ContextMenuPopup = memo(() => {
+    const controller = useEditorController();
+    const { camera, contextMenu } = useSlice(controller.store, (state) => ({
+        camera: state.camera,
+        contextMenu: state.contextMenu,
+    }));
+    if (!contextMenu.open) return null;
 
-    const { x: left, y: top } = Point.toDisplay(camera, state.point);
+    const { x: left, y: top } = Point.toDisplay(camera, contextMenu.point);
     return (
         <Popup.Base
             css={css`
@@ -47,7 +52,7 @@ export const ContextMenuPopup = ({ camera, state }: { camera: Camera; state: Con
             <MenuButton>Menu 3</MenuButton>
         </Popup.Base>
     );
-};
+});
 
 export const ColorButton = ({ palette }: { palette: ColorPaletteKey }) => {
     const controller = useEditorController();
@@ -77,6 +82,7 @@ export const ColorButton = ({ palette }: { palette: ColorPaletteKey }) => {
         </Popup.Button>
     );
 };
+
 export const MenuButton = styled(Popup.Button)`
     display: flex;
     width: 100%;

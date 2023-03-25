@@ -1,9 +1,15 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { EditorMode } from '../model/EditorMode';
+import { memo } from 'react';
+import { useSlice } from '../../hooks/useStore';
+import { useEditorController } from '../EditorControllerContext';
 import { Popup } from './Popup';
 
-export const ToolBar = ({ mode, onChange }: { mode: EditorMode; onChange: (mode: EditorMode) => void }) => {
+export const ToolBar = memo(() => {
+    const controller = useEditorController();
+    const { mode } = useSlice(controller.store, (state) => ({
+        mode: state.mode,
+    }));
     return (
         <Popup.Base>
             <div
@@ -13,22 +19,22 @@ export const ToolBar = ({ mode, onChange }: { mode: EditorMode; onChange: (mode:
                     gap: 4px;
                 `}
             >
-                <ModeButton aria-pressed={mode === 'select'} onClick={() => onChange('select')}>
+                <ModeButton aria-pressed={mode === 'select'} onClick={() => controller.setMode('select')}>
                     選択
                 </ModeButton>
-                <ModeButton aria-pressed={mode === 'rect'} onClick={() => onChange('rect')}>
+                <ModeButton aria-pressed={mode === 'rect'} onClick={() => controller.setMode('rect')}>
                     長方形
                 </ModeButton>
-                <ModeButton aria-pressed={mode === 'line'} onClick={() => onChange('line')}>
+                <ModeButton aria-pressed={mode === 'line'} onClick={() => controller.setMode('line')}>
                     線
                 </ModeButton>
-                <ModeButton aria-pressed={mode === 'text'} onClick={() => onChange('text')}>
+                <ModeButton aria-pressed={mode === 'text'} onClick={() => controller.setMode('text')}>
                     文字
                 </ModeButton>
             </div>
         </Popup.Base>
     );
-};
+});
 
 const ModeButton = styled(Popup.Button)`
     width: 48px;

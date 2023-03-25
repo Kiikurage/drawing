@@ -130,7 +130,7 @@ const ENTITY_FONT_STYLES = css`
     font-size: 28px;
     font-family: inherit;
     font-weight: inherit;
-    line-height: inherit;
+    line-height: 1;
     font-feature-settings: inherit;
     font-variant: inherit;
     font-style: inherit;

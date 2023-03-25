@@ -1,19 +1,16 @@
 import { css } from '@emotion/react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Page } from '../../model/Page';
 import { Point } from '../../model/Point';
 import { Size } from '../../model/Size';
-import { useStore } from '../hooks/useStore';
 import { EditorController } from './controller/EditorController';
 import { EditorControllerContextProvider } from './EditorControllerContext';
-import { EditorMode } from './model/EditorMode';
 import { IndicatorLayer } from './view/IndicatorLayer';
 import { PageView } from './view/PageView';
 import { ToolBar } from './view/ToolBar';
 
-export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }) => {
-    const [controller] = useState(() => new EditorController({ page: defaultValue }));
-    const { page, camera, mode, hover, selectMode, textEditMode, contextMenu } = useStore(controller.store);
+export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
+    const [controller] = useState(() => new EditorController({ page: defaultValue ?? Page.create() }));
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -51,16 +48,6 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
         };
     }, [controller]);
 
-    const onModeChange = useCallback((mode: EditorMode) => controller.setMode(mode), [controller]);
-
-    const selectedEntities = controller.computeSelectedEntities();
-
-    const hoveredEntity = useMemo(() => {
-        if (hover?.type !== 'entity') return null;
-
-        return page.entities[hover.entityId] ?? null;
-    }, [hover, page.entities]);
-
     return (
         <EditorControllerContextProvider value={controller}>
             <div
@@ -81,15 +68,8 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                 onContextMenu={(ev) => ev.preventDefault()}
                 onDoubleClick={controller.onDoubleClick}
             >
-                <PageView page={page} camera={camera} />
-                <IndicatorLayer
-                    camera={camera}
-                    selectedEntities={selectedEntities}
-                    hoveredEntity={hoveredEntity}
-                    contextMenu={contextMenu}
-                    selectMode={selectMode}
-                    textEditMode={textEditMode}
-                />
+                <PageView />
+                <IndicatorLayer />
                 <div
                     css={css`
                         position: absolute;
@@ -99,7 +79,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                         width: 100%;
                     `}
                 >
-                    <ToolBar mode={mode} onChange={onModeChange} />
+                    <ToolBar />
                 </div>
             </div>
         </EditorControllerContextProvider>

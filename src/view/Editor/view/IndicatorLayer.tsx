@@ -1,41 +1,32 @@
 import { css } from '@emotion/react';
-import { useMemo } from 'react';
-import { Entity } from '../../../model/entity/Entity';
-import { Camera } from '../model/Camera';
-import { ContextMenuState } from '../model/ContextMenuState';
-import { EntityMap } from '../model/EntityMap';
-import { SelectModeState } from '../model/SelectModeState';
-import { TextEditModeState } from '../model/TextEditModeState';
+import { memo, useMemo } from 'react';
+import { Record } from '../../../lib/Record';
+import { useSlice } from '../../hooks/useStore';
+import { useEditorController } from '../EditorControllerContext';
 import { computeVisibleEntities } from '../util';
 import { EntityBoundingBoxView } from './BoundingBoxView/EntityBoundingBoxView';
 import { ContextMenuPopup } from './ContextMenuPopup';
+import { HoveredEntityBoundingBox } from './HoveredEntityBoundingBox';
 import { SelectingRangeView } from './SelectingRangeView';
 import { SelectionView } from './SelectionView/SelectionView';
 import { SnapGuide } from './SnapGuide';
 
-export const IndicatorLayer = ({
-    camera,
-    selectedEntities,
-    hoveredEntity,
-    contextMenu,
-    selectMode,
-    textEditMode,
-}: {
-    camera: Camera;
-    selectedEntities: EntityMap;
-    hoveredEntity: Entity | null;
-    contextMenu: ContextMenuState;
-    selectMode: SelectModeState;
-    textEditMode: TextEditModeState;
-}) => {
-    const entitiesMap = useMemo(() => {
-        const map = { ...selectedEntities };
-        if (hoveredEntity !== null) {
-            map[hoveredEntity.id] = hoveredEntity;
-        }
-        return map;
-    }, [hoveredEntity, selectedEntities]);
-    const visibleEntities = useMemo(() => computeVisibleEntities(entitiesMap, camera), [camera, entitiesMap]);
+export const IndicatorLayer = memo(() => {
+    const controller = useEditorController();
+    const { page, camera, selectMode, textEditMode } = useSlice(controller.store, (state) => ({
+        page: state.page,
+        camera: state.camera,
+        selectMode: state.selectMode,
+        textEditMode: state.textEditMode,
+    }));
+    const selectedEntities = useMemo(
+        () => Record.mapToRecord(selectMode.selectedEntityIds, (id) => [id, page.entities[id]]),
+        [page.entities, selectMode.selectedEntityIds]
+    );
+    const visibleSelectedEntities = useMemo(
+        () => computeVisibleEntities(selectedEntities, camera),
+        [camera, selectedEntities]
+    );
 
     return (
         <div
@@ -53,14 +44,15 @@ export const IndicatorLayer = ({
                 width="100%"
                 height="100%"
             >
-                {Object.values(visibleEntities).map((entity) => (
+                {Object.values(visibleSelectedEntities).map((entity) => (
                     <EntityBoundingBoxView entity={entity} camera={camera} key={entity.id} />
                 ))}
+                <HoveredEntityBoundingBox />
                 {!textEditMode.editing && <SelectionView selectedEntities={selectedEntities} camera={camera} />}
-                <SelectingRangeView selectMode={selectMode} camera={camera} />
+                <SelectingRangeView />
                 <SnapGuide />
             </svg>
-            <ContextMenuPopup camera={camera} state={contextMenu} />
+            <ContextMenuPopup />
         </div>
     );
-};
+});

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Record } from '../../../lib/Record';
 import { Entity } from '../../../model/entity/Entity';
 import { Point } from '../../../model/Point';
@@ -6,7 +6,7 @@ import { useStore } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
 import { getSnap, getSnapPoints } from '../model/session/SnapUtil';
 
-export const SnapGuide = () => {
+export const SnapGuide = memo(() => {
     const controller = useEditorController();
     const {
         selectMode: { snapEnabled, selectedEntityIds, transforming },
@@ -38,4 +38,4 @@ export const SnapGuide = () => {
             })}
         </g>
     );
-};
+});
