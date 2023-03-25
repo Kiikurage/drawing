@@ -1,15 +1,24 @@
+import { Page } from '../../../../model/Page';
 import { CollaborationController } from './CollaborationController';
 
 export class DummyCollaborationController implements CollaborationController {
+    dispatchActions() {
+        // No op
+    }
+
+    async loadPage(pageId: string): Promise<Page | null> {
+        return null;
+    }
+
     async savePage(): Promise<void> {
         // No op
     }
 
-    addUpdateListener() {
+    addActionListener(): void {
         // No op
     }
 
-    removeUpdateListener() {
+    removeActionListener(): void {
         // No op
     }
 }

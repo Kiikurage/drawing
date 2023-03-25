@@ -4,18 +4,17 @@ import { Camera } from './Camera';
 import { ContextMenuState } from './ContextMenuState';
 import { EditorMode } from './EditorMode';
 import { HoverState } from './HoverState';
-import { SelectingRangeState } from './SelectingRangeState';
+import { SelectModeState } from './SelectModeState';
+import { TextEditModeState } from './TextEditModeState';
 
 export interface EditorState {
     page: Page;
     mode: EditorMode;
     camera: Camera;
     hover: HoverState;
-    selectingRange: SelectingRangeState;
-    selectedEntityIds: string[];
     contextMenu: ContextMenuState;
-    snapEnabled: boolean;
-    sessionType: string;
+    textEditMode: TextEditModeState;
+    selectMode: SelectModeState;
 }
 
 export module EditorState {
@@ -26,11 +25,9 @@ export module EditorState {
                 mode: 'select',
                 camera: Camera.create(),
                 hover: HoverState.IDLE,
-                selectingRange: SelectingRangeState.create(),
-                selectedEntityIds: [],
                 contextMenu: ContextMenuState.create(),
-                snapEnabled: false,
-                sessionType: 'idle',
+                textEditMode: TextEditModeState.create(),
+                selectMode: SelectModeState.create(),
             },
             initialData
         );

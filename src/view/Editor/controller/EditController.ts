@@ -1,13 +1,10 @@
-import * as firebaseDB from 'firebase/database';
-import { set } from 'firebase/database';
-import { lighten } from 'polished';
-import { getDatabase } from '../../../firebaseConfig';
 import { Record } from '../../../lib/Record';
 import { Store } from '../../../lib/Store';
 import { CRDTPage, CRDTPageAction } from '../../../model/CRDTPage';
 import { Entity } from '../../../model/entity/Entity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
+import { ColorPalette } from '../model/ColorPalette';
 import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
 import { CollaborationController } from './CollaborationController/CollaborationController';
@@ -22,64 +19,69 @@ export class EditController {
         private readonly collaborationController: CollaborationController
     ) {
         this.page = new CRDTPage(this.store.state.page);
-        this.collaborationController.addUpdateListener(this.store.state.page.id, (nextPage: Page) => {
-            this.store.setState({ page: nextPage });
-        });
-
-        const db = getDatabase();
-        const actionsRef = firebaseDB.ref(db, `actions/${this.store.state.page.id}`);
-
-        firebaseDB.onChildAdded(actionsRef, (data) => {
-            const action: CRDTPageAction = data.val();
-            this.page.apply(action);
-            const newEntities = this.page.entities();
-            this.store.setState({
-                page: {
-                    entities: {
-                        ...Record.mapValue(this.store.state.page.entities, () => undefined),
-                        ...newEntities,
-                    },
-                },
-                selectedEntityIds: this.store.state.selectedEntityIds.filter((id) => id in newEntities),
-            });
-        });
+        this.collaborationController.addActionListener(this.store.state.page.id, (action) =>
+            this.applyActions([action])
+        );
     }
 
     addEntities(entities: EntityMap) {
         this.saveSnapshot();
         const actions = Object.values(entities).map((entity) => this.page.addEntity(entity));
-        this.pushActions(actions);
+        this.dispatchActions(actions);
     }
 
     deleteEntities(entityIds: string[]) {
         this.saveSnapshot();
         const actions = entityIds.map((entityId) => this.page.deleteEntity(entityId));
-        this.pushActions(actions);
+        this.dispatchActions(actions);
     }
 
     updateEntities(patches: Record<string, Patch<Entity>>) {
         const actions = Object.entries(patches).map(([entityId, patch]) =>
             this.page.updateEntity(entityId, 'transform', patch)
         );
-        this.pushActions(actions);
+        this.dispatchActions(actions);
     }
 
-    setColor(color: string) {
+    setEntityText(entityId: string, text: string) {
         this.saveSnapshot();
-        const actions = this.store.state.selectedEntityIds.map((entityId) =>
-            this.page.updateEntity(entityId, 'style', { strokeColor: color, fillColor: lighten(0.3, color) })
-        );
-        this.pushActions(actions);
+        const entity = this.page.entities()[entityId];
+        if (entity === undefined) return;
+        if (entity.type !== 'rect') return;
+
+        const actions = this.page.updateEntity(entityId, 'text', { text });
+        this.dispatchActions([actions]);
     }
 
-    private pushActions(actions: CRDTPageAction[]) {
-        const db = getDatabase();
-        const actionsRef = firebaseDB.ref(db, `actions/${this.store.state.page.id}`);
+    setColor(palette: ColorPalette) {
+        this.saveSnapshot();
+        const actions = this.store.state.selectMode.selectedEntityIds.map((entityId) =>
+            this.page.updateEntity(entityId, 'style', palette)
+        );
+        this.dispatchActions(actions);
+    }
 
-        for (const action of actions) {
-            const actionRef = firebaseDB.push(actionsRef);
-            set(actionRef, action);
-        }
+    dispatchActions(actions: CRDTPageAction[]) {
+        this.applyActions(actions);
+        this.collaborationController.dispatchActions(this.store.state.page.id, actions);
+        this.collaborationController.savePage(this.store.state.page);
+    }
+
+    applyActions(actions: CRDTPageAction[]) {
+        for (const action of actions) this.page.apply(action);
+
+        const newEntities = this.page.entities();
+        this.store.setState({
+            page: {
+                entities: {
+                    ...Record.mapValue(this.store.state.page.entities, () => undefined),
+                    ...newEntities,
+                },
+            },
+            selectMode: {
+                selectedEntityIds: this.store.state.selectMode.selectedEntityIds.filter((id) => id in newEntities),
+            },
+        });
     }
 
     undo() {

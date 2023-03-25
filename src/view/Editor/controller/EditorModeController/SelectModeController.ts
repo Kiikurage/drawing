@@ -18,7 +18,7 @@ export class SelectModeController extends EditorModeController {
                         this.editorController.startSession(
                             new SelectRangeSession(
                                 this.editorController.currentPoint,
-                                this.editorController.state.selectedEntityIds
+                                this.editorController.state.selectMode.selectedEntityIds
                             )
                         );
                         return;

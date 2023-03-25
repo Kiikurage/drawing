@@ -49,6 +49,7 @@ export const EditorWrapper = () => {
                     <Editor defaultValue={initialPage} />
                     <div
                         css={css`
+                            user-select: none;
                             position: fixed;
                             top: 0;
                             left: 0;

@@ -5,11 +5,14 @@ import { Point } from '../../../model/Point';
 import { useStore } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
 import { getSnap, getSnapPoints } from '../model/session/SnapUtil';
-import { TransformSession } from '../model/session/TransformSession';
 
 export const SnapGuide = () => {
     const controller = useEditorController();
-    const { sessionType, snapEnabled, camera, page, selectedEntityIds } = useStore(controller.store);
+    const {
+        selectMode: { snapEnabled, selectedEntityIds, transforming },
+        camera,
+        page,
+    } = useStore(controller.store);
 
     const range = Entity.computeBoundingBox(controller.computeSelectedEntities());
     const snapTargets = useMemo(
@@ -23,7 +26,7 @@ export const SnapGuide = () => {
         );
     }, [range, snapTargets]);
 
-    if (!snapEnabled || sessionType !== TransformSession.TYPE) return null;
+    if (!snapEnabled || !transforming) return null;
 
     return (
         <g>

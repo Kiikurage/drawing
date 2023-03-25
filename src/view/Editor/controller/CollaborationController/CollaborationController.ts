@@ -1,9 +1,14 @@
+import { CRDTPageAction } from '../../../../model/CRDTPage';
 import { Page } from '../../../../model/Page';
 
 export interface CollaborationController {
     savePage(page: Page): Promise<void>;
 
-    addUpdateListener(pageId: string, callback: (page: Page) => void): void;
+    loadPage(pageId: string): Promise<Page | null>;
 
-    removeUpdateListener(pageId: string, callback: (page: Page) => void): void;
+    dispatchActions(pageId: string, actions: CRDTPageAction[]): void;
+
+    addActionListener(pageId: string, callback: (action: CRDTPageAction) => void): void;
+
+    removeActionListener(pageId: string, callback: (action: CRDTPageAction) => void): void;
 }

@@ -13,7 +13,7 @@ import { ToolBar } from './view/ToolBar';
 
 export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }) => {
     const [controller] = useState(() => new EditorController({ page: defaultValue }));
-    const { page, camera, mode, hover, selectingRange, contextMenu } = useStore(controller.store);
+    const { page, camera, mode, hover, selectMode, textEditMode, contextMenu } = useStore(controller.store);
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -79,6 +79,7 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                 onKeyDown={controller.onKeyDown}
                 onKeyUp={controller.onKeyUp}
                 onContextMenu={(ev) => ev.preventDefault()}
+                onDoubleClick={controller.onDoubleClick}
             >
                 <PageView page={page} camera={camera} />
                 <IndicatorLayer
@@ -86,7 +87,8 @@ export const Editor = ({ defaultValue = Page.create() }: { defaultValue?: Page }
                     selectedEntities={selectedEntities}
                     hoveredEntity={hoveredEntity}
                     contextMenu={contextMenu}
-                    selectingRange={selectingRange}
+                    selectMode={selectMode}
+                    textEditMode={textEditMode}
                 />
                 <div
                     css={css`

@@ -1,12 +1,37 @@
 import * as firebaseAuth from 'firebase/auth';
 import * as firebaseDB from 'firebase/database';
-import { onValue, ref } from 'firebase/database';
+import { get, ref, set } from 'firebase/database';
 import { getAuth, getDatabase } from '../../../../firebaseConfig';
+import { CRDTPageAction } from '../../../../model/CRDTPage';
 import { Page } from '../../../../model/Page';
 import { User } from '../../model/User';
 import { CollaborationController } from './CollaborationController';
 
 export class FirebaseCollaborationController implements CollaborationController {
+    async dispatchActions(pageId: string, actions: CRDTPageAction[]) {
+        const db = getDatabase();
+        const actionsRef = firebaseDB.ref(db, `actions/${pageId}`);
+
+        for (const action of actions) {
+            const actionRef = firebaseDB.push(actionsRef);
+            set(actionRef, action);
+        }
+    }
+
+    addActionListener(pageId: string, callback: (action: CRDTPageAction) => void) {
+        const db = getDatabase();
+        const actionsRef = firebaseDB.ref(db, `actions/${pageId}`);
+
+        firebaseDB.onChildAdded(actionsRef, (data) => {
+            const action: CRDTPageAction = data.val();
+            callback(action);
+        });
+    }
+
+    removeActionListener() {
+        throw new Error('Not implemented yet');
+    }
+
     async savePage(page: Page): Promise<void> {
         const user = await this.getOrAuthUser();
         const db = getDatabase();
@@ -22,18 +47,13 @@ export class FirebaseCollaborationController implements CollaborationController 
         }
     }
 
-    addUpdateListener(pageId: string, callback: (page: Page) => void) {
+    async loadPage(pageId: string): Promise<Page | null> {
+        await this.getOrAuthUser();
+
         const db = getDatabase();
         const pageRef = ref(db, `page/${pageId}`);
-        onValue(pageRef, (snapshot) => {
-            const nextPage = snapshot.val() as Page | null;
-            if (nextPage === null) return;
-            callback(nextPage);
-        });
-    }
-
-    removeUpdateListener(pageId: string, callback: (page: Page) => void) {
-        throw new Error('Not implemented yet');
+        const snapshot = await get(pageRef);
+        return snapshot.val() as Page | null;
     }
 
     private async getOrAuthUser(): Promise<User> {

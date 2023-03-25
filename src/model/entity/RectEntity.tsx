@@ -10,8 +10,8 @@ export interface RectEntity {
     id: string;
     type: 'rect';
     p1: ModelCordPoint;
-
     size: ModelCordSize;
+    text: string;
     strokeColor: string;
     fillColor: string;
 }
@@ -24,6 +24,7 @@ export module RectEntity {
                 type: 'rect',
                 p1: Point.model(0, 0),
                 size: Size.model(100, 100),
+                text: '',
                 strokeColor: '#000',
                 fillColor: 'none',
             },

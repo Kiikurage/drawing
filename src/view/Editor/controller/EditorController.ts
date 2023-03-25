@@ -7,6 +7,7 @@ import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
 import { createCollaborationController } from '../dependency';
 import { Camera } from '../model/Camera';
+import { ColorPalette } from '../model/ColorPalette';
 import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
@@ -68,7 +69,10 @@ export class EditorController {
     }
 
     computeSelectedEntities(): EntityMap {
-        return Record.mapToRecord(this.state.selectedEntityIds, (id) => [id, this.store.state.page.entities[id]]);
+        return Record.mapToRecord(this.state.selectMode.selectedEntityIds, (id) => [
+            id,
+            this.store.state.page.entities[id],
+        ]);
     }
 
     // Session
@@ -82,7 +86,6 @@ export class EditorController {
 
         this._session = session;
         session.start?.(this);
-        this._store.setState({ sessionType: session.type });
     }
 
     updateSession() {
@@ -102,7 +105,6 @@ export class EditorController {
         }
         session.complete?.(this);
         this._session = null;
-        this._store.setState({ sessionType: 'idle' });
     }
 
     // Commands
@@ -123,7 +125,7 @@ export class EditorController {
 
         navigator.clipboard.writeText(JSON.stringify(selectedEntities));
 
-        this.deleteEntities(this.store.state.selectedEntityIds);
+        this.deleteEntities(this.store.state.selectMode.selectedEntityIds);
     }
 
     copy() {
@@ -159,22 +161,28 @@ export class EditorController {
     }
 
     deleteSelectedEntities() {
-        this.deleteEntities(this.state.selectedEntityIds);
+        this.deleteEntities(this.state.selectMode.selectedEntityIds);
     }
 
-    setColor(color: string) {
-        this.editController.setColor(color);
+    setEntityText(entityId: string, text: string) {
+        this.editController.setEntityText(entityId, text);
+    }
+
+    setColor(palette: ColorPalette) {
+        this.editController.setColor(palette);
     }
 
     setSelection(entityIds: string[]) {
         this.setState({
-            selectedEntityIds: entityIds.filter((entityId) => entityId in this.state.page.entities),
+            selectMode: {
+                selectedEntityIds: entityIds.filter((entityId) => entityId in this.state.page.entities),
+            },
             mode: 'select',
         });
     }
 
     addSelection(entityId: string) {
-        this.setSelection([...this.state.selectedEntityIds, entityId]);
+        this.setSelection([...this.state.selectMode.selectedEntityIds, entityId]);
     }
 
     selectAll() {
@@ -182,12 +190,13 @@ export class EditorController {
     }
 
     clearSelection() {
+        this.completeSession();
         this.setSelection([]);
     }
 
     setSelectingRange(range: ModelCordBox) {
         return this._store.setState({
-            selectingRange: {
+            selectMode: {
                 selecting: true,
                 range,
             },
@@ -196,7 +205,7 @@ export class EditorController {
 
     clearSelectingRange() {
         return this._store.setState({
-            selectingRange: {
+            selectMode: {
                 selecting: false,
             },
         });
@@ -229,11 +238,22 @@ export class EditorController {
     }
 
     enableSnap() {
-        this._store.setState({ snapEnabled: true });
+        this._store.setState({ selectMode: { snapEnabled: true } });
     }
 
     disableSnap() {
-        this._store.setState({ snapEnabled: false });
+        this._store.setState({ selectMode: { snapEnabled: false } });
+    }
+
+    startTextEdit(entityId: string) {
+        const entity = this.state.page.entities[entityId];
+        if (entity === undefined) return;
+
+        this._store.setState({ textEditMode: { editing: true, entityId } });
+    }
+
+    completeTextEdit() {
+        this._store.setState({ textEditMode: { editing: false } });
     }
 
     // Event handlers
@@ -278,6 +298,12 @@ export class EditorController {
             this.completeSession();
         }
         this.modeController.onMouseUp?.();
+    };
+
+    onDoubleClick = () => {
+        if (this.checkIfHoveredEntityTextEditable()) {
+            this.startTextEdit(this.state.selectMode.selectedEntityIds[0]);
+        }
     };
 
     onHover = (hover: HoverState) => {
@@ -362,16 +388,23 @@ export class EditorController {
         this.session?.onKeyUp?.(this, ev);
 
         if (ev.key === 'Control') this.disableSnap();
-
-        const keys = [ev.key];
-        if (ev.shiftKey) keys.push('Shift');
-        if (ev.ctrlKey) keys.push('Control');
-
-        switch (Key.serialize(keys)) {
-            case Key.serialize(['Control']): {
-                console.log('Keyup:Control');
-                return;
-            }
-        }
     };
+
+    onTransformStart = () => {
+        this._store.setState({ selectMode: { transforming: true } });
+    };
+
+    onTransformEnd = () => {
+        this._store.setState({ selectMode: { transforming: false } });
+    };
+
+    private checkIfHoveredEntityTextEditable(): boolean {
+        if (this.state.hover.type !== 'transformHandle') return false;
+        if (this.state.selectMode.selectedEntityIds.length !== 1) return false;
+
+        const selectedEntity = Object.values(this.computeSelectedEntities())[0];
+        if (selectedEntity.type !== 'rect') return false;
+
+        return true;
+    }
 }

@@ -6,9 +6,7 @@ import { EditorController } from '../EditorController';
 export abstract class EditorModeController {
     // Event handler
     onAfterActivate?: () => void;
-
     onBeforeDeactivate?: () => void;
-
     onMouseDown?: (info: MouseEventInfo) => void;
     onMouseMove?: (prevPoint: ModelCordPoint, nextPoint: ModelCordPoint) => void;
     onMouseUp?: () => void;

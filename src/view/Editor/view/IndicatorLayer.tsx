@@ -4,7 +4,8 @@ import { Entity } from '../../../model/entity/Entity';
 import { Camera } from '../model/Camera';
 import { ContextMenuState } from '../model/ContextMenuState';
 import { EntityMap } from '../model/EntityMap';
-import { SelectingRangeState } from '../model/SelectingRangeState';
+import { SelectModeState } from '../model/SelectModeState';
+import { TextEditModeState } from '../model/TextEditModeState';
 import { computeVisibleEntities } from '../util';
 import { EntityBoundingBoxView } from './BoundingBoxView/EntityBoundingBoxView';
 import { ContextMenuPopup } from './ContextMenuPopup';
@@ -17,13 +18,15 @@ export const IndicatorLayer = ({
     selectedEntities,
     hoveredEntity,
     contextMenu,
-    selectingRange,
+    selectMode,
+    textEditMode,
 }: {
     camera: Camera;
     selectedEntities: EntityMap;
     hoveredEntity: Entity | null;
     contextMenu: ContextMenuState;
-    selectingRange: SelectingRangeState;
+    selectMode: SelectModeState;
+    textEditMode: TextEditModeState;
 }) => {
     const entitiesMap = useMemo(() => {
         const map = { ...selectedEntities };
@@ -53,8 +56,8 @@ export const IndicatorLayer = ({
                 {Object.values(visibleEntities).map((entity) => (
                     <EntityBoundingBoxView entity={entity} camera={camera} key={entity.id} />
                 ))}
-                <SelectionView selectedEntities={selectedEntities} camera={camera} />
-                <SelectingRangeView selectingRange={selectingRange} camera={camera} />
+                {!textEditMode.editing && <SelectionView selectedEntities={selectedEntities} camera={camera} />}
+                <SelectingRangeView selectMode={selectMode} camera={camera} />
                 <SnapGuide />
             </svg>
             <ContextMenuPopup camera={camera} state={contextMenu} />

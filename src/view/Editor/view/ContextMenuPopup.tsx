@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { Point } from '../../../model/Point';
 import { useEditorController } from '../EditorControllerContext';
 import { Camera } from '../model/Camera';
+import { ColorPalette } from '../model/ColorPalette';
 import { ContextMenuState } from '../model/ContextMenuState';
 import { Popup } from './Popup';
 
@@ -29,17 +30,17 @@ export const ContextMenuPopup = ({ camera, state }: { camera: Camera; state: Con
                     gap: 4px;
                 `}
             >
-                <ColorButton color="#212121" />
-                <ColorButton color="#C62828" />
-                <ColorButton color="#AD1457" />
+                <ColorButton palette={ColorPalette.BLACK} />
+                <ColorButton palette={ColorPalette.RED} />
+                <ColorButton palette={ColorPalette.PINK} />
 
-                <ColorButton color="#EF6C00" />
-                <ColorButton color="#546E7A" />
-                <ColorButton color="#4527A0" />
+                <ColorButton palette={ColorPalette.ORANGE} />
+                <ColorButton palette={ColorPalette.GRAY} />
+                <ColorButton palette={ColorPalette.PURPLE} />
 
-                <ColorButton color="#2E7D32" />
-                <ColorButton color="#00695C" />
-                <ColorButton color="#1565C0" />
+                <ColorButton palette={ColorPalette.GREEN} />
+                <ColorButton palette={ColorPalette.ANY_COLOR} />
+                <ColorButton palette={ColorPalette.BLUE} />
             </div>
             <MenuButton>Menu 1</MenuButton>
             <MenuButton>Menu 2</MenuButton>
@@ -48,7 +49,7 @@ export const ContextMenuPopup = ({ camera, state }: { camera: Camera; state: Con
     );
 };
 
-export const ColorButton = ({ color }: { color: string }) => {
+export const ColorButton = ({ palette }: { palette: ColorPalette }) => {
     const controller = useEditorController();
 
     return (
@@ -59,7 +60,7 @@ export const ColorButton = ({ color }: { color: string }) => {
             `}
             onMouseDown={(ev) => ev.stopPropagation()}
             onMouseUp={(ev) => ev.stopPropagation()}
-            onClick={() => controller.setColor(color)}
+            onClick={() => controller.setColor(palette)}
         >
             <div
                 css={css`
@@ -70,7 +71,7 @@ export const ColorButton = ({ color }: { color: string }) => {
                     margin: 0;
                     display: block;
                     border: none;
-                    background: ${color};
+                    background: ${palette.strokeColor};
                 `}
             />
         </Popup.Button>

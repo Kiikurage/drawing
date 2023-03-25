@@ -24,12 +24,15 @@ export class TransformSession implements Session {
 
     start(controller: EditorController) {
         controller.editController.saveSnapshot();
+        controller.onTransformStart();
     }
 
     update(controller: EditorController) {
         const {
             currentPoint,
-            state: { snapEnabled },
+            state: {
+                selectMode: { snapEnabled },
+            },
         } = controller;
 
         const prevBoundingBox = Entity.computeBoundingBox(this.entities);
@@ -52,5 +55,6 @@ export class TransformSession implements Session {
 
     complete(controller: EditorController) {
         controller.setMode('select');
+        controller.onTransformEnd();
     }
 }
