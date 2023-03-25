@@ -8,10 +8,6 @@ import { Session } from './Session';
 import { snap, transform } from './SnapUtil';
 
 export class TransformSession implements Session {
-    static readonly TYPE = 'transform';
-
-    readonly type = TransformSession.TYPE;
-
     public entities: EntityMap;
     public transformType: TransformType;
     public originPoint: ModelCordPoint;

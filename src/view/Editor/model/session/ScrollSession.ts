@@ -4,8 +4,6 @@ import { Camera } from '../Camera';
 import { Session } from './Session';
 
 export class ScrollSession implements Session {
-    readonly type = 'scroll';
-
     public prevPoint: DisplayCordPoint;
     public prevCamera: Camera;
 

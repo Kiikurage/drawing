@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import { Box } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
 import { LineEntity } from '../../../../model/entity/LineEntity';
-import { ModelCordPoint, Point } from '../../../../model/Point';
+import { Point } from '../../../../model/Point';
 import { COLOR_SELECTION } from '../../../styles';
 import { useEditorController } from '../../EditorControllerContext';
 import { Camera } from '../../model/Camera';
@@ -39,25 +39,25 @@ export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: 
                     onMouseOver={() => controller.onHover(HoverState.TRANSLATE_HANDLE)}
                     onMouseLeave={() => controller.onUnhover()}
                 />
-                <ResizeHandle cursor="move" x={p1.x} y={p1.y} hover={getHoverState(entity.p1, entity.p2)} />
-                <ResizeHandle cursor="move" x={p2.x} y={p2.y} hover={getHoverState(entity.p2, entity.p1)} />
+                <ResizeHandle cursor="move" x={p1.x} y={p1.y} hover={HoverState.RESIZE_HANDLE_P1} />
+                <ResizeHandle cursor="move" x={p2.x} y={p2.y} hover={HoverState.RESIZE_HANDLE_P2} />
             </g>
         </svg>
     );
 };
-
-function getHoverState(targetPoint: ModelCordPoint, anchorPoint: ModelCordPoint): HoverState {
-    if (targetPoint.x < anchorPoint.x) {
-        if (targetPoint.y < anchorPoint.y) {
-            return HoverState.RESIZE_HANDLE_TOP_LEFT;
-        } else {
-            return HoverState.RESIZE_HANDLE_BOTTOM_LEFT;
-        }
-    } else {
-        if (targetPoint.y < anchorPoint.y) {
-            return HoverState.RESIZE_HANDLE_TOP_RIGHT;
-        } else {
-            return HoverState.RESIZE_HANDLE_BOTTOM_RIGHT;
-        }
-    }
-}
+//
+// function getHoverState(targetPoint: ModelCordPoint, anchorPoint: ModelCordPoint): HoverState {
+//     if (targetPoint.x < anchorPoint.x) {
+//         if (targetPoint.y < anchorPoint.y) {
+//             return HoverState.RESIZE_HANDLE_TOP_LEFT;
+//         } else {
+//             return HoverState.RESIZE_HANDLE_BOTTOM_LEFT;
+//         }
+//     } else {
+//         if (targetPoint.y < anchorPoint.y) {
+//             return HoverState.RESIZE_HANDLE_TOP_RIGHT;
+//         } else {
+//             return HoverState.RESIZE_HANDLE_BOTTOM_RIGHT;
+//         }
+//     }
+// }

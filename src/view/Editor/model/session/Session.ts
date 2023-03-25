@@ -2,8 +2,6 @@ import { EditorController } from '../../controller/EditorController';
 import { KeyboardEventInfo } from '../MouseEventInfo';
 
 export interface Session {
-    type: string;
-
     start?: (controller: EditorController) => void;
 
     update?: (controller: EditorController) => void;

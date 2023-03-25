@@ -5,6 +5,13 @@ import { Patch } from './Patch';
 export interface Page {
     id: string;
     entities: Record<string, Entity>;
+    link: Record<string, Link>;
+}
+
+interface Link {
+    source: string;
+    destination: string;
+    line: string;
 }
 
 export module Page {
@@ -13,6 +20,7 @@ export module Page {
             {
                 id: randomId(),
                 entities: {},
+                link: {},
             },
             data
         );

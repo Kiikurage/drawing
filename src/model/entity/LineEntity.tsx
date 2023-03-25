@@ -13,6 +13,8 @@ export interface LineEntity {
     p1: ModelCordPoint;
     palette: ColorPaletteKey;
     p2: ModelCordPoint;
+    linkedEntityId1?: string;
+    linkedEntityId2?: string;
 }
 
 export module LineEntity {
@@ -60,6 +62,9 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
         }
     },
     isTextEditable(): boolean {
+        return false;
+    },
+    includes(): boolean {
         return false;
     },
 };

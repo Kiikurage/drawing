@@ -1,7 +1,7 @@
 import { EntityMap } from '../../view/Editor/model/EntityMap';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
-import { Point } from '../Point';
+import { ModelCordPoint, Point } from '../Point';
 import { Size } from '../Size';
 import { LineEntity, LineEntityDelegate } from './LineEntity';
 import { RectEntity, RectEntityDelegate } from './RectEntity';
@@ -17,6 +17,8 @@ export interface EntityDelegates<T extends Entity> {
     getSnap(entity: T, offset: number, direction: 'x' | 'y'): number;
 
     isTextEditable(entity: T): boolean;
+
+    includes(entity: T, point: ModelCordPoint): boolean;
 }
 
 export module Entity {
@@ -53,8 +55,8 @@ export module Entity {
         return { point: Point.model(x0, y0), size: Size.model(width, height) };
     }
 
-    export function getSnap(entity: Entity, offset: number, direction: 'x' | 'y') {
-        return getDelegate(entity).getSnap(entity, offset, direction);
+    export function includes(entity: Entity, point: ModelCordPoint): boolean {
+        return getDelegate(entity).includes(entity, point);
     }
 
     export function transform(

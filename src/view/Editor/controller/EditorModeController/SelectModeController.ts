@@ -1,5 +1,7 @@
+import { LineEntity } from '../../../../model/entity/LineEntity';
 import { MouseEventButton, MouseEventInfo } from '../../model/MouseEventInfo';
 import { SelectRangeSession } from '../../model/session/SelectRangeSession';
+import { SingleLineTransformSession } from '../../model/session/SingleLineTransformSession';
 import { TransformSession } from '../../model/session/TransformSession';
 import { TransformType } from '../../model/TransformType';
 import { EditorModeController } from './EditorModeController';
@@ -31,6 +33,14 @@ export class SelectModeController extends EditorModeController {
                             this.editorController.setSelection([hover.entityId]);
                         }
                         this.startTransformSelectedEntities(TransformType.TRANSLATE);
+                        return;
+                    }
+
+                    case 'singleLineTransformHandle': {
+                        const entity = Object.values(this.editorController.computeSelectedEntities())[0] as LineEntity;
+                        this.editorController.startSession(
+                            new SingleLineTransformSession(entity, hover.point, this.editorController.currentPoint)
+                        );
                         return;
                     }
 

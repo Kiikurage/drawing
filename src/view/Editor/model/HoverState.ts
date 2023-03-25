@@ -1,6 +1,10 @@
 import { TransformType } from './TransformType';
 
-export type HoverState = IdleHoverState | EntityHoverState | TransformHandleHoverState;
+export type HoverState =
+    | IdleHoverState
+    | EntityHoverState
+    | TransformHandleHoverState
+    | SingleLineTransformHandleHoverState;
 
 export interface IdleHoverState {
     type: 'idle';
@@ -14,6 +18,11 @@ export interface EntityHoverState {
 export interface TransformHandleHoverState {
     type: 'transformHandle';
     transformType: TransformType;
+}
+
+export interface SingleLineTransformHandleHoverState {
+    type: 'singleLineTransformHandle';
+    point: 'p1' | 'p2';
 }
 
 export module HoverState {
@@ -49,6 +58,14 @@ export module HoverState {
     export const RESIZE_HANDLE_BOTTOM_RIGHT: TransformHandleHoverState = {
         type: 'transformHandle',
         transformType: TransformType.RESIZE_BOTTOM_RIGHT,
+    };
+    export const RESIZE_HANDLE_P1: SingleLineTransformHandleHoverState = {
+        type: 'singleLineTransformHandle',
+        point: 'p1',
+    };
+    export const RESIZE_HANDLE_P2: SingleLineTransformHandleHoverState = {
+        type: 'singleLineTransformHandle',
+        point: 'p2',
     };
     export const TRANSLATE_HANDLE: TransformHandleHoverState = {
         type: 'transformHandle',

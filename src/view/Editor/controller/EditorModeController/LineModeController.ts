@@ -1,7 +1,6 @@
 import { LineEntity } from '../../../../model/entity/LineEntity';
 import { Point } from '../../../../model/Point';
-import { TransformSession } from '../../model/session/TransformSession';
-import { TransformType } from '../../model/TransformType';
+import { SingleLineTransformSession } from '../../model/session/SingleLineTransformSession';
 import { EditorModeController } from './EditorModeController';
 
 export class LineModeController extends EditorModeController {
@@ -14,7 +13,7 @@ export class LineModeController extends EditorModeController {
         this.editorController.addEntities(newEntityMap);
         this.editorController.setSelection([newEntity.id]);
         this.editorController.startSession(
-            new TransformSession(newEntityMap, TransformType.RESIZE_BOTTOM_RIGHT, this.editorController.currentPoint)
+            new SingleLineTransformSession(newEntity, 'p2', this.editorController.currentPoint)
         );
     };
 }

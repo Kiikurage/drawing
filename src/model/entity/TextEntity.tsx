@@ -82,4 +82,12 @@ export const TextEntityDelegate: EntityDelegates<TextEntity> = {
     isTextEditable(): boolean {
         return true;
     },
+    includes(entity: TextEntity, point: ModelCordPoint): boolean {
+        return (
+            entity.p1.x <= point.x &&
+            point.x <= entity.p1.x + entity.size.width &&
+            entity.p1.y <= point.y &&
+            point.y <= entity.p1.y + entity.size.height
+        );
+    },
 };
