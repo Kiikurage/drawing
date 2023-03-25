@@ -1,22 +1,26 @@
 import { Box } from '../../../../model/Box';
 import { RectEntity } from '../../../../model/entity/RectEntity';
-import { useStore } from '../../../hooks/useStore';
+import { useSlice } from '../../../hooks/useStore';
 import { useEditorController } from '../../EditorControllerContext';
 import { ColorPalette } from '../../model/ColorPalette';
-import { EditableTextView } from '../EditableTextView';
+import { EditableTextView } from './EditableTextView';
 
 export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
     const controller = useEditorController();
-    const {
-        camera,
-        textEditMode: { editing, entityId: editingEntityId },
-    } = useStore(controller.store);
+    const { camera, textEditing, highlighted } = useSlice(controller.store, (state) => ({
+        camera: state.camera,
+        textEditing: state.textEditMode.editing && state.textEditMode.entityId === entity.id,
+        highlighted:
+            state.selectMode.selectedEntityIds.includes(entity.id) ||
+            (state.hover.type === 'entity' && state.hover.entityId === entity.id),
+    }));
 
     return (
         <EditableTextView
             box={Box.model(entity.p1.x, entity.p1.y, entity.size.width, entity.size.height)}
             camera={camera}
-            editing={editing && editingEntityId === entity.id}
+            editing={textEditing}
+            highlighted={highlighted}
             fillColor={ColorPalette[entity.palette].fillColor}
             strokeColor={ColorPalette[entity.palette].strokeColor}
             textColor="#000"

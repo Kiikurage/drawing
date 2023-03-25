@@ -3,9 +3,6 @@ import { memo, useMemo } from 'react';
 import { Record } from '../../../lib/Record';
 import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
-import { computeVisibleEntities } from '../util';
-import { EntityBoundingBoxView } from './BoundingBoxView/EntityBoundingBoxView';
-import { HoveredEntityBoundingBox } from './HoveredEntityBoundingBox';
 import { SelectingRangeView } from './SelectingRangeView';
 import { SelectionView } from './SelectionView/SelectionView';
 import { SnapGuide } from './SnapGuide';
@@ -22,10 +19,6 @@ export const IndicatorLayer = memo(() => {
         () => Record.mapToRecord(selectMode.selectedEntityIds, (id) => [id, page.entities[id]]),
         [page.entities, selectMode.selectedEntityIds]
     );
-    const visibleSelectedEntities = useMemo(
-        () => computeVisibleEntities(selectedEntities, camera),
-        [camera, selectedEntities]
-    );
 
     return (
         <div
@@ -34,10 +27,6 @@ export const IndicatorLayer = memo(() => {
                 inset: 0;
             `}
         >
-            {Object.values(visibleSelectedEntities).map((entity) => (
-                <EntityBoundingBoxView entity={entity} camera={camera} key={entity.id} />
-            ))}
-            <HoveredEntityBoundingBox />
             {!textEditMode.editing && <SelectionView selectedEntities={selectedEntities} camera={camera} />}
             <SelectingRangeView />
             <SnapGuide />

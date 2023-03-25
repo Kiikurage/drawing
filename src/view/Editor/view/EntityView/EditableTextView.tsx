@@ -1,12 +1,14 @@
 import { css } from '@emotion/react';
 import { ChangeEventHandler, FocusEventHandler, MouseEventHandler } from 'react';
-import { ModelCordBox } from '../../../model/Box';
-import { Camera } from '../model/Camera';
+import { ModelCordBox } from '../../../../model/Box';
+import { COLOR_SELECTION } from '../../../styles';
+import { Camera } from '../../model/Camera';
 
 export const EditableTextView = ({
     box,
     value,
     editing,
+    highlighted,
     strokeColor,
     fillColor,
     textColor,
@@ -19,6 +21,7 @@ export const EditableTextView = ({
     box: ModelCordBox;
     value: string;
     editing: boolean;
+    highlighted: boolean;
     strokeColor: string;
     fillColor: string;
     textColor: string;
@@ -59,6 +62,17 @@ export const EditableTextView = ({
                         onMouseOver={onMouseOver}
                         onMouseLeave={onMouseLeave}
                     />
+                    {highlighted && (
+                        <rect
+                            x={0}
+                            y={0}
+                            width={box.size.width}
+                            height={box.size.height}
+                            stroke={COLOR_SELECTION}
+                            strokeWidth={2 / camera.scale}
+                            fill="transparent"
+                        />
+                    )}
                 </g>
             </svg>
             <div
