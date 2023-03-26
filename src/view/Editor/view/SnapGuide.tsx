@@ -5,7 +5,7 @@ import { Entity } from '../../../model/entity/Entity';
 import { Point } from '../../../model/Point';
 import { useStore } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
-import { getSnap, getSnapPoints } from '../model/session/SnapUtil';
+import { getSnapPoints, snapPoint } from '../model/SnapUtil';
 
 export const SnapGuide = memo(() => {
     const controller = useEditorController();
@@ -22,9 +22,10 @@ export const SnapGuide = memo(() => {
     );
 
     const snapResults = useMemo(() => {
-        return Object.values(getSnapPoints(range)).flatMap((point) =>
-            (['x', 'y'] as const).flatMap((direction) => getSnap(point, snapTargets, direction, 0).pairs)
-        );
+        return Object.values(getSnapPoints(range)).flatMap((point) => {
+            const result = snapPoint(point, snapTargets, 0);
+            return [...result.pairsX, ...result.pairsY];
+        });
     }, [range, snapTargets]);
 
     if (!snapEnabled || !transforming) return null;

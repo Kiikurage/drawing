@@ -36,6 +36,17 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
         };
     }, [controller]);
 
+    useEffect(() => {
+        const onMouseMove = (ev: MouseEvent) => controller.onMouseMove(Point.display(ev.clientX, ev.clientY));
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', controller.onMouseUp);
+        return () => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', controller.onMouseUp);
+        };
+    }, [controller]);
+
     return (
         <EditorControllerContextProvider value={controller}>
             <div
@@ -47,12 +58,11 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
 
                     & > * {
                         pointer-events: none;
+                        user-select: none;
                     }
                 `}
                 tabIndex={-1}
                 onMouseDown={controller.onMouseDown}
-                onMouseMove={(ev) => controller.onMouseMove(Point.display(ev.clientX, ev.clientY))}
-                onMouseUp={controller.onMouseUp}
                 onKeyDown={controller.onKeyDown}
                 onKeyUp={controller.onKeyUp}
                 onContextMenu={(ev) => ev.preventDefault()}

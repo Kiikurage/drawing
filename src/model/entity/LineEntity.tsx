@@ -1,6 +1,7 @@
 import { getClosestValue } from '../../lib/getClosestValue';
 import { randomId } from '../../lib/randomId';
 import { ColorPaletteKey } from '../../view/Editor/model/ColorPalette';
+import { Transform } from '../../view/Editor/model/SnapUtil';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -45,19 +46,10 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
             size: Size.model(Math.abs(entity.p1.x - entity.p2.x), Math.abs(entity.p1.y - entity.p2.y)),
         };
     },
-    transform(entity: LineEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Patch<LineEntity> {
-        const scaleX = nextBoundingBox.size.width / prevBoundingBox.size.width;
-        const scaleY = nextBoundingBox.size.height / prevBoundingBox.size.height;
-
+    transform(entity: LineEntity, transform: Transform): Patch<LineEntity> {
         return {
-            p1: Point.model(
-                (entity.p1.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
-                (entity.p1.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y
-            ),
-            p2: Point.model(
-                (entity.p2.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
-                (entity.p2.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y
-            ),
+            p1: transform.apply(entity.p1),
+            p2: transform.apply(entity.p2),
         };
     },
     getSnap(entity: LineEntity, offset: number, direction: 'x' | 'y'): number {

@@ -1,46 +1,43 @@
 import { LineEntity } from '../../../../model/entity/LineEntity';
+import { ModelCordPoint } from '../../../../model/Point';
 import { MouseEventButton, MouseEventInfo } from '../../model/MouseEventInfo';
-import { SelectRangeSession } from '../../model/session/SelectRangeSession';
-import { SingleLineTransformSession } from '../../model/session/SingleLineTransformSession';
-import { TransformSession } from '../../model/session/TransformSession';
 import { TransformType } from '../../model/TransformType';
+import { RangeSelectSessionController } from '../RangeSelectSessionController';
 import { EditorModeController } from './EditorModeController';
 
 export class SelectModeController extends EditorModeController {
+    public rangeSelectSession: RangeSelectSessionController | null = null;
+
     onMouseDown = (ev: MouseEventInfo) => {
-        this.editorController.closeContextMenu();
-        const { hover } = this.editorController.state;
+        this.controller.closeContextMenu();
+        const { hover } = this.controller.state;
 
         switch (ev.button) {
             case MouseEventButton.PRIMARY: {
                 switch (hover.type) {
                     case 'idle': {
-                        if (!ev.shiftKey) this.editorController.clearSelection();
+                        if (!ev.shiftKey) this.controller.clearSelection();
 
-                        this.editorController.startSession(
-                            new SelectRangeSession(
-                                this.editorController.currentPoint,
-                                this.editorController.state.selectMode.selectedEntityIds
-                            )
+                        this.rangeSelectSession = new RangeSelectSessionController(
+                            this.controller,
+                            this.controller.state.selectMode.selectedEntityIds
                         );
                         return;
                     }
 
                     case 'entity': {
                         if (ev.shiftKey) {
-                            this.editorController.addSelection(hover.entityId);
+                            this.controller.addSelection(hover.entityId);
                         } else {
-                            this.editorController.setSelection([hover.entityId]);
+                            this.controller.setSelection([hover.entityId]);
                         }
                         this.startTransformSelectedEntities(TransformType.TRANSLATE);
                         return;
                     }
 
                     case 'singleLineTransformHandle': {
-                        const entity = Object.values(this.editorController.computeSelectedEntities())[0] as LineEntity;
-                        this.editorController.startSession(
-                            new SingleLineTransformSession(entity, hover.point, this.editorController.currentPoint)
-                        );
+                        const entity = Object.values(this.controller.computeSelectedEntities())[0] as LineEntity;
+                        this.controller.startSingleLineTransform(entity, hover.point);
                         return;
                     }
 
@@ -59,30 +56,34 @@ export class SelectModeController extends EditorModeController {
                     }
 
                     case 'entity': {
-                        this.editorController.setSelection([hover.entityId]);
-                        this.editorController.openContextMenu(this.editorController.currentPoint);
+                        this.controller.setSelection([hover.entityId]);
+                        this.controller.openContextMenu(this.controller.currentPoint);
                         return;
                     }
 
                     case 'transformHandle': {
-                        this.editorController.openContextMenu(this.editorController.currentPoint);
+                        this.controller.openContextMenu(this.controller.currentPoint);
                         return;
                     }
                 }
             }
         }
     };
+
+    onMouseMove = (prevPoint: ModelCordPoint, nextPoint: ModelCordPoint) => {
+        this.rangeSelectSession?.onMouseMove(prevPoint, nextPoint);
+    };
+
+    onMouseUp = () => {
+        this.rangeSelectSession?.onMouseUp();
+        this.rangeSelectSession = null;
+    };
+
     onBeforeDeactivate = () => {
-        this.editorController.closeContextMenu();
+        this.controller.closeContextMenu();
     };
 
     private startTransformSelectedEntities(type: TransformType) {
-        this.editorController.startSession(
-            new TransformSession(
-                this.editorController.computeSelectedEntities(),
-                type,
-                this.editorController.currentPoint
-            )
-        );
+        this.controller.startTransform(this.controller.computeSelectedEntities(), type);
     }
 }

@@ -7,14 +7,6 @@ export const ResizeHandle = memo(
     ({ x = 0, y = 0, hover, cursor }: { x?: number; y?: number; hover: HoverState; cursor: string }) => {
         const controller = useEditorController();
 
-        const onHover = useCallback(() => {
-            controller.onHover(hover);
-        }, [controller, hover]);
-
-        const onUnhover = useCallback(() => {
-            controller.onUnhover();
-        }, [controller]);
-
         return (
             <g transform={`translate(${x},${y})`}>
                 <rect
@@ -23,8 +15,8 @@ export const ResizeHandle = memo(
                     y={-12}
                     width={24}
                     height={24}
-                    onMouseOver={onHover}
-                    onMouseLeave={onUnhover}
+                    onMouseOver={() => controller.onHover(hover)}
+                    onMouseLeave={() => controller.onUnhover()}
                     pointerEvents="all"
                     fill="none"
                     stroke="none"

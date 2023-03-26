@@ -45,19 +45,3 @@ export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: 
         </svg>
     );
 };
-//
-// function getHoverState(targetPoint: ModelCordPoint, anchorPoint: ModelCordPoint): HoverState {
-//     if (targetPoint.x < anchorPoint.x) {
-//         if (targetPoint.y < anchorPoint.y) {
-//             return HoverState.RESIZE_HANDLE_TOP_LEFT;
-//         } else {
-//             return HoverState.RESIZE_HANDLE_BOTTOM_LEFT;
-//         }
-//     } else {
-//         if (targetPoint.y < anchorPoint.y) {
-//             return HoverState.RESIZE_HANDLE_TOP_RIGHT;
-//         } else {
-//             return HoverState.RESIZE_HANDLE_BOTTOM_RIGHT;
-//         }
-//     }
-// }

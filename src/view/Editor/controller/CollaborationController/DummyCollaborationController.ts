@@ -6,7 +6,7 @@ export class DummyCollaborationController implements CollaborationController {
         // No op
     }
 
-    async loadPage(pageId: string): Promise<Page | null> {
+    async loadPage(): Promise<Page | null> {
         return null;
     }
 

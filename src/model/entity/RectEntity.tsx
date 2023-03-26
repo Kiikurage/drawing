@@ -1,6 +1,7 @@
 import { getClosestValue } from '../../lib/getClosestValue';
 import { randomId } from '../../lib/randomId';
 import { ColorPaletteKey } from '../../view/Editor/model/ColorPalette';
+import { Transform } from '../../view/Editor/model/SnapUtil';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
@@ -42,25 +43,22 @@ export const RectEntityDelegate: EntityDelegates<RectEntity> = {
             size: Size.model(Math.abs(entity.size.width), Math.abs(entity.size.height)),
         };
     },
-    transform(entity: RectEntity, prevBoundingBox: ModelCordBox, nextBoundingBox: ModelCordBox): Patch<RectEntity> {
-        const scaleX = nextBoundingBox.size.width / prevBoundingBox.size.width;
-        const scaleY = nextBoundingBox.size.height / prevBoundingBox.size.height;
+    transform(entity: RectEntity, transform: Transform): Patch<RectEntity> {
+        const prevP2 = Point.model(entity.p1.x + entity.size.width, entity.p1.y + entity.size.height);
+        const nextP1 = transform.apply(entity.p1);
+        const nextP2 = transform.apply(prevP2);
 
         const patch = {
-            p1: {
-                x: (entity.p1.x - prevBoundingBox.point.x) * scaleX + nextBoundingBox.point.x,
-                y: (entity.p1.y - prevBoundingBox.point.y) * scaleY + nextBoundingBox.point.y,
-            },
-            size: {
-                width: Math.abs(entity.size.width * scaleX),
-                height: Math.abs(entity.size.height * scaleY),
-            },
+            p1: nextP1,
+            size: Size.model(nextP2.x - nextP1.x, nextP2.y - nextP1.y),
         };
 
-        if (scaleX < 0) {
+        if (patch.size.width < 0) {
+            patch.size.width *= -1;
             patch.p1.x -= patch.size.width;
         }
-        if (scaleY < 0) {
+        if (patch.size.height < 0) {
+            patch.size.height *= -1;
             patch.p1.y -= patch.size.height;
         }
 

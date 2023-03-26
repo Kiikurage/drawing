@@ -3,6 +3,7 @@ import { Record } from '../../../lib/Record';
 import { ReadonlyStore, Store } from '../../../lib/Store';
 import { ModelCordBox } from '../../../model/Box';
 import { Entity } from '../../../model/entity/Entity';
+import { LineEntity } from '../../../model/entity/LineEntity';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
@@ -15,14 +16,16 @@ import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
 import { KeyboardEventInfo, MouseEventButton, MouseEventInfo } from '../model/MouseEventInfo';
-import { ScrollSession } from '../model/session/ScrollSession';
-import { Session } from '../model/session/Session';
+import { TransformType } from '../model/TransformType';
 import { EditController } from './EditController';
 import { EditorModeController } from './EditorModeController/EditorModeController';
 import { LineModeController } from './EditorModeController/LineModeController';
 import { RectModeController } from './EditorModeController/RectModeController';
 import { SelectModeController } from './EditorModeController/SelectModeController';
 import { TextModeController } from './EditorModeController/TextModeController';
+import { ScrollSessionController } from './ScrollSessionController';
+import { SingleLineTransformSessionController } from './SingleLineTransformSessionController';
+import { TransformSessionController } from './TransformSessionController';
 
 /**
  * Root controller for Editor view
@@ -30,10 +33,12 @@ import { TextModeController } from './EditorModeController/TextModeController';
 export class EditorController {
     readonly collaborationController = createCollaborationController();
     readonly editController: EditController;
-    private _session: Session | null = null;
     private _currentPoint = Point.display(0, 0);
     private readonly _store: Store<EditorState>;
     private readonly modeControllers: Record<EditorMode, EditorModeController>;
+    private scrollSession: ScrollSessionController | null = null;
+    private transformSession: TransformSessionController | null = null;
+    private singleLineTransformSession: SingleLineTransformSessionController | null = null;
 
     constructor(initialData: Patch<EditorState>) {
         this._store = new Store(EditorState.create(initialData));
@@ -55,8 +60,8 @@ export class EditorController {
         return this.store.state;
     }
 
-    get session(): Session | null {
-        return this._session;
+    private setState(patch: Patch<EditorState>) {
+        this._store.setState(patch);
     }
 
     get currentPoint(): ModelCordPoint {
@@ -78,43 +83,7 @@ export class EditorController {
         ]);
     }
 
-    // Session
-
-    startSession(session: Session) {
-        if (this.session !== null) {
-            console.warn('Another session on going.');
-            console.dir(this.session);
-            return;
-        }
-
-        this._session = session;
-        session.start?.(this);
-    }
-
-    updateSession() {
-        const session = this.session;
-        if (session === null) {
-            console.warn('No session on going.');
-            return;
-        }
-        session.update?.(this);
-    }
-
-    completeSession() {
-        const session = this.session;
-        if (session === null) {
-            console.warn('No session on going.');
-            return;
-        }
-        session.complete?.(this);
-        this._session = null;
-    }
-
     // Commands
-
-    private setState(patch: Patch<EditorState>) {
-        this._store.setState(patch);
-    }
 
     setMode(mode: EditorMode) {
         this.modeController.onBeforeDeactivate?.();
@@ -189,7 +158,6 @@ export class EditorController {
     }
 
     clearSelection() {
-        this.completeSession();
         this.setSelection([]);
     }
 
@@ -259,6 +227,17 @@ export class EditorController {
         this._store.setState({ textEditMode: { editing: false } });
     }
 
+    startTransform(entities: EntityMap, transformType: TransformType) {
+        this.editController.saveSnapshot();
+        this.transformSession = new TransformSessionController(this, entities, transformType);
+    }
+
+    startSingleLineTransform(entity: LineEntity, pointKey: 'p1' | 'p2') {
+        this.editController.saveSnapshot();
+        this.singleLineTransformSession = new SingleLineTransformSessionController(this, entity, pointKey);
+        this._store.setState({ selectMode: { transforming: true } });
+    }
+
     // Event handlers
 
     onZoom = (diff: number) => {
@@ -280,7 +259,7 @@ export class EditorController {
 
     onMouseDown = (info: MouseEventInfo) => {
         if (info.button === MouseEventButton.WHEEL) {
-            this.startSession(new ScrollSession(this.currentPoint, this.state.camera));
+            this.scrollSession = new ScrollSessionController(this);
         }
         this.modeController.onMouseDown?.(info);
     };
@@ -290,16 +269,19 @@ export class EditorController {
         const nextPoint = Point.toModel(this.store.state.camera, point);
         this.currentPoint = nextPoint;
 
-        if (this.session !== null) {
-            this.updateSession();
-        }
+        this.scrollSession?.onMouseMove(prevPoint, nextPoint);
+        this.transformSession?.onMouseMove(prevPoint, nextPoint);
+        this.singleLineTransformSession?.onMouseMove(prevPoint, nextPoint);
         this.modeController.onMouseMove?.(prevPoint, nextPoint);
     };
 
     onMouseUp = () => {
-        if (this.session !== null) {
-            this.completeSession();
-        }
+        this._store.setState({ selectMode: { transforming: false } });
+
+        this.scrollSession = null;
+        this.transformSession = null;
+        this.singleLineTransformSession = null;
+
         this.modeController.onMouseUp?.();
     };
 
@@ -310,20 +292,16 @@ export class EditorController {
     };
 
     onHover = (hover: HoverState) => {
-        this.modeController.onHover?.(hover);
         this.setState({ hover });
     };
 
     onUnhover = () => {
         if (this.store.state.hover === HoverState.IDLE) return;
 
-        this.modeController.onUnhover?.(this.store.state.hover);
         this.setState({ hover: HoverState.IDLE });
     };
 
     onKeyDown = (ev: KeyboardEventInfo) => {
-        this.session?.onKeyDown?.(this, ev);
-
         if (ev.key === 'Control') this.enableSnap();
 
         const keys = [ev.key];
@@ -388,17 +366,7 @@ export class EditorController {
     };
 
     onKeyUp = (ev: KeyboardEventInfo) => {
-        this.session?.onKeyUp?.(this, ev);
-
         if (ev.key === 'Control') this.disableSnap();
-    };
-
-    onTransformStart = () => {
-        this._store.setState({ selectMode: { transforming: true } });
-    };
-
-    onTransformEnd = () => {
-        this._store.setState({ selectMode: { transforming: false } });
     };
 
     private checkIfHoveredEntityTextEditable(): boolean {

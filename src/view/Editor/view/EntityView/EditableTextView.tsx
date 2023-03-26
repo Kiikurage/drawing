@@ -85,8 +85,8 @@ export const EditableTextView = ({
                     flex-direction: column;
                     align-items: stretch;
                     justify-content: center;
-                    user-select: none;
                     padding: 10px;
+                    overflow: visible;
                 `}
             >
                 <div
