@@ -4,6 +4,7 @@ import { ReadonlyStore, Store } from '../../../lib/Store';
 import { ModelCordBox } from '../../../model/Box';
 import { Entity } from '../../../model/entity/Entity';
 import { LineEntity } from '../../../model/entity/LineEntity';
+import { TextEntity } from '../../../model/entity/TextEntity';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
@@ -160,7 +161,8 @@ export class EditorController {
         const prevEntityIds = this.state.selectMode.entityIds;
         const nextEntityIds = entityIds.filter((entityId) => entityId in this.state.page.entities);
 
-        this.setState({ selectMode: { entityIds: nextEntityIds }, mode: 'select' });
+        this.setState({ selectMode: { entityIds: nextEntityIds } });
+        this.setMode('select');
 
         const unselectedEntityIds = prevEntityIds.filter((entityId) => !nextEntityIds.includes(entityId));
 
@@ -251,7 +253,8 @@ export class EditorController {
         const entity = this.state.page.entities[entityId];
         if (entity === undefined) return;
 
-        this._store.setState({ mode: 'textEditing', textEditMode: { entityId } });
+        this._store.setState({ textEditMode: { entityId } });
+        this.setMode('textEditing');
     }
 
     setEntityText(entityId: string, text: string) {
@@ -259,7 +262,16 @@ export class EditorController {
     }
 
     completeTextEdit() {
-        this._store.setState({ mode: 'select' });
+        const entity = this.state.page.entities[this.state.textEditMode.entityId];
+        if (entity) {
+            if (!this.state.selectMode.entityIds.includes(entity.id)) {
+                if ((entity as TextEntity).text.trim() === '') {
+                    this.editController.deleteEntities([entity.id]);
+                }
+            }
+        }
+
+        this.setMode('select');
     }
 
     startTransform(entities: EntityMap, transformType: TransformType) {
