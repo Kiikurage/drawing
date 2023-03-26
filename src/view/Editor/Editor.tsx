@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { useEffect, useRef, useState } from 'react';
 import { Page } from '../../model/Page';
 import { Point } from '../../model/Point';
@@ -40,7 +40,7 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
         <EditorControllerContextProvider value={controller}>
             <div
                 ref={ref}
-                css={css`
+                className={css`
                     position: absolute;
                     inset: 0;
                     outline: none;

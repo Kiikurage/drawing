@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     cache: true,
@@ -21,23 +22,28 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
-                use: 'babel-loader',
+                use: [
+                    { loader: 'babel-loader' },
+                    {
+                        loader: '@linaria/webpack-loader',
+                        options: {
+                            variableNameSlug: '[componentName]-[valueSlug]-[index]',
+                        },
+                    },
+                ],
+            },
+            {
+                test: /\.css$/,
+                use: [{ loader: MiniCssExtractPlugin.loader }, { loader: 'css-loader' }],
             },
         ],
     },
-    devServer: {
-        port: 3001,
-        proxy: {
-            '/api': {
-                target: 'http://localhost:3000',
-                pathRewrite: { '/api': '' },
-            },
-        },
-    },
+    devServer: { port: 3001 },
     plugins: [
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, './src/index.html'),
         }),
         new ForkTsCheckerWebpackPlugin(),
+        new MiniCssExtractPlugin({ filename: 'styles.css' }),
     ],
 };

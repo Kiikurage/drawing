@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { ModelCordPoint, Point } from '../../../../model/Point';
 import { COLOR_SELECTION } from '../../../styles';
 import { Camera } from '../../model/Camera';
@@ -17,7 +17,7 @@ export const LineEntityBoundingBoxView = ({
 
     return (
         <svg
-            css={css`
+            className={css`
                 position: absolute;
                 top: 0;
                 left: 0;

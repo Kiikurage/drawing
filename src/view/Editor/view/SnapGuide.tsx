@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { memo, useMemo } from 'react';
 import { Record } from '../../../lib/Record';
 import { Entity } from '../../../model/entity/Entity';
@@ -31,7 +31,7 @@ export const SnapGuide = memo(() => {
 
     return (
         <svg
-            css={css`
+            className={css`
                 position: absolute;
                 top: 0;
                 left: 0;

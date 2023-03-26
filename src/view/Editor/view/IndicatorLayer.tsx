@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { memo, useMemo } from 'react';
 import { Record } from '../../../lib/Record';
 import { useSlice } from '../../hooks/useStore';
@@ -22,7 +22,7 @@ export const IndicatorLayer = memo(() => {
 
     return (
         <div
-            css={css`
+            className={css`
                 position: absolute;
                 inset: 0;
             `}

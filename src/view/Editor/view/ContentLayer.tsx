@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { memo, useMemo } from 'react';
 import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
@@ -16,7 +16,7 @@ export const ContentLayer = memo(() => {
 
     return (
         <div
-            css={css`
+            className={css`
                 transform-origin: 0 0;
                 width: 100%;
                 height: 100%;

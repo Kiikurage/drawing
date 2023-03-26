@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { Box } from '../../../model/Box';
 import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
@@ -19,7 +19,7 @@ export const SelectingRangeView = () => {
 
     return (
         <svg
-            css={css`
+            className={css`
                 position: absolute;
                 top: 0;
                 left: 0;

@@ -1,5 +1,5 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
+import { css } from '@linaria/core';
+import { styled } from '@linaria/react';
 import { memo } from 'react';
 import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
@@ -12,7 +12,7 @@ export const ToolBar = memo(() => {
     }));
     return (
         <div
-            css={css`
+            className={css`
                 position: absolute;
                 bottom: 32px;
                 display: flex;
@@ -22,7 +22,7 @@ export const ToolBar = memo(() => {
         >
             <Popup.Base>
                 <div
-                    css={css`
+                    className={css`
                         display: flex;
                         justify-content: center;
                         gap: 4px;

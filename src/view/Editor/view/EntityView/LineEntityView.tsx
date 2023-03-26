@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { Entity } from '../../../../model/entity/Entity';
 import { LineEntity } from '../../../../model/entity/LineEntity';
 import { useSlice } from '../../../hooks/useStore';
@@ -26,11 +26,13 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
 
     return (
         <svg
-            css={css`
+            className={css`
                 position: absolute;
-                left: ${x - 100}px;
-                top: ${y - 100}px;
             `}
+            style={{
+                left: x - 100,
+                top: y - 100,
+            }}
             width={Math.abs(width) + 200}
             height={Math.abs(height) + 200}
         >

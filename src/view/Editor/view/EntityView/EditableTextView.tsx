@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css, CSSProperties } from '@linaria/core';
 import { ChangeEventHandler, FocusEventHandler, MouseEventHandler } from 'react';
 import { ModelCordBox } from '../../../../model/Box';
 import { COLOR_SELECTION } from '../../../styles';
@@ -33,19 +33,21 @@ export const EditableTextView = ({
 }) => {
     return (
         <div
-            css={css`
+            className={css`
                 position: absolute;
-                left: ${box.point.x - 10}px;
-                top: ${box.point.y - 10}px;
-                width: ${box.size.width + 20}px;
-                height: ${box.size.height + 20}px;
                 pointer-events: none;
             `}
+            style={{
+                left: box.point.x - 10,
+                top: box.point.y - 10,
+                width: box.size.width + 20,
+                height: box.size.height + 20,
+            }}
         >
             <svg
                 width="100%"
                 height="100%"
-                css={css`
+                className={css`
                     position: absolute;
                 `}
             >
@@ -76,7 +78,7 @@ export const EditableTextView = ({
                 </g>
             </svg>
             <div
-                css={css`
+                className={css`
                     position: absolute;
                     inset: 10px;
                     display: flex;
@@ -88,29 +90,34 @@ export const EditableTextView = ({
                 `}
             >
                 <div
-                    css={css`
+                    className={css`
                         position: relative;
                         text-align: center;
                         min-height: 28px;
                     `}
                 >
                     <span
-                        css={css`
-                            ${ENTITY_FONT_STYLES};
-                            color: ${editing ? 'transparent' : textColor};
-                            text-shadow: rgb(249, 250, 251) 0 ${-1 / camera.scale}px 0,
-                                rgb(249, 250, 251) 0 ${1 / camera.scale}px 0,
-                                rgb(249, 250, 251) ${-1 / camera.scale}px ${-1 / camera.scale}px 0,
-                                rgb(249, 250, 251) ${1 / camera.scale}px ${-1 / camera.scale}px 0,
-                                rgb(249, 250, 251) ${-1 / camera.scale}px ${1 / camera.scale}px 0,
-                                rgb(249, 250, 251) ${1 / camera.scale}px ${1 / camera.scale}px 0;
+                        style={{
+                            color: editing ? 'transparent' : textColor,
+                            textShadow: `
+                            rgb(249, 250, 251) 0 ${-1 / camera.scale}px 0,
+                            rgb(249, 250, 251) 0 ${1 / camera.scale}px 0,
+                            rgb(249, 250, 251) ${-1 / camera.scale}px ${-1 / camera.scale}px 0,
+                            rgb(249, 250, 251) ${1 / camera.scale}px ${-1 / camera.scale}px 0,
+                            rgb(249, 250, 251) ${-1 / camera.scale}px ${1 / camera.scale}px 0,
+                            rgb(249, 250, 251) ${1 / camera.scale}px ${1 / camera.scale}px 0
+                            `,
+                        }}
+                        className={css`
+                            ${ENTITY_FONT_STYLES}
                         `}
                     >
                         {value + (value.endsWith('\n') ? '\u00A0' : '')}
                     </span>
                     {editing && (
                         <textarea
-                            css={css`
+                            className={css`
+                                ${ENTITY_FONT_STYLES};
                                 padding: 0;
                                 position: absolute;
                                 inset: 0;
@@ -121,9 +128,10 @@ export const EditableTextView = ({
                                 box-sizing: border-box;
                                 overflow: hidden;
                                 pointer-events: all;
-                                ${ENTITY_FONT_STYLES};
-                                color: ${textColor};
                             `}
+                            style={{
+                                color: textColor,
+                            }}
                             onMouseDown={(ev) => ev.stopPropagation()}
                             onMouseUp={(ev) => ev.stopPropagation()}
                             onKeyDown={(ev) => ev.stopPropagation()}
@@ -140,26 +148,26 @@ export const EditableTextView = ({
     );
 };
 
-const ENTITY_FONT_STYLES = css`
-    font-size: 28px;
-    font-family: inherit;
-    font-weight: inherit;
-    line-height: 1;
-    font-feature-settings: inherit;
-    font-variant: inherit;
-    font-style: inherit;
-    text-align: inherit;
-    letter-spacing: inherit;
-    text-shadow: inherit;
-    outline: none;
-    text-rendering: auto;
-    text-transform: none;
-    text-indent: 0;
-    display: inline-block;
-    appearance: auto;
-    column-count: auto !important;
-    writing-mode: horizontal-tb !important;
-    word-spacing: 0;
-    word-break: break-all;
-    white-space: pre-wrap;
-`;
+const ENTITY_FONT_STYLES: CSSProperties = {
+    fontSize: 28,
+    fontFamily: 'inherit',
+    fontWeight: 'inherit',
+    lineHeight: 1,
+    fontFeatureSettings: 'inherit',
+    fontVariant: 'inherit',
+    fontStyle: 'inherit',
+    textAlign: 'inherit',
+    letterSpacing: 'inherit',
+    textShadow: 'inherit',
+    outline: 'none',
+    textRendering: 'auto',
+    textTransform: 'none',
+    textIndent: 0,
+    display: 'inline-block',
+    appearance: 'auto',
+    columnCount: 'auto !important',
+    writingMode: 'horizontal-tb !important',
+    wordSpacing: 0,
+    wordBreak: 'break-all',
+    whiteSpace: 'pre-wrap',
+};

@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { Box } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
 import { LineEntity } from '../../../../model/entity/LineEntity';
@@ -21,7 +21,7 @@ export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: 
 
     return (
         <svg
-            css={css`
+            className={css`
                 position: absolute;
                 top: 0;
                 left: 0;

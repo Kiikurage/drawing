@@ -1,5 +1,5 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
+import { css } from '@linaria/core';
+import { styled } from '@linaria/react';
 import { memo } from 'react';
 import { Point } from '../../../model/Point';
 import { useSlice } from '../../hooks/useStore';
@@ -18,7 +18,7 @@ export const ContextMenuPopup = memo(() => {
     const { x: left, y: top } = Point.toDisplay(camera, contextMenu.point);
     return (
         <Popup.Base
-            css={css`
+            className={css`
                 z-index: 1000;
                 pointer-events: all;
                 position: absolute;
@@ -29,7 +29,7 @@ export const ContextMenuPopup = memo(() => {
             }}
         >
             <div
-                css={css`
+                className={css`
                     display: grid;
                     grid-template-columns: auto auto auto;
                     gap: 4px;
@@ -59,7 +59,7 @@ export const ColorButton = ({ palette }: { palette: ColorPaletteKey }) => {
 
     return (
         <Popup.Button
-            css={css`
+            className={css`
                 width: 40px;
                 height: 40px;
             `}
@@ -68,7 +68,7 @@ export const ColorButton = ({ palette }: { palette: ColorPaletteKey }) => {
             onClick={() => controller.setColor(palette)}
         >
             <div
-                css={css`
+                className={css`
                     width: 20px;
                     height: 20px;
                     border-radius: 50%;
@@ -76,8 +76,10 @@ export const ColorButton = ({ palette }: { palette: ColorPaletteKey }) => {
                     margin: 0;
                     display: block;
                     border: none;
-                    background: ${ColorPalette[palette].strokeColor};
                 `}
+                style={{
+                    background: ColorPalette[palette].strokeColor,
+                }}
             />
         </Popup.Button>
     );

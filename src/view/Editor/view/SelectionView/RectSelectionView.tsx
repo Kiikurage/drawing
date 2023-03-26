@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { Box } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
 import { COLOR_SELECTION } from '../../../styles';
@@ -18,7 +18,7 @@ export const RectSelectionView = ({ camera, selectedEntities }: { camera: Camera
 
     return (
         <svg
-            css={css`
+            className={css`
                 position: absolute;
                 top: 0;
                 left: 0;

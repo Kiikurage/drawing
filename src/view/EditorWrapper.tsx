@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Page } from '../model/Page';
@@ -37,7 +37,7 @@ export const EditorWrapper = () => {
 
     return (
         <div
-            css={css`
+            className={css`
                 position: fixed;
                 inset: 0;
             `}
@@ -48,7 +48,7 @@ export const EditorWrapper = () => {
                 <>
                     <Editor defaultValue={initialPage} />
                     <div
-                        css={css`
+                        className={css`
                             user-select: none;
                             position: fixed;
                             top: 0;

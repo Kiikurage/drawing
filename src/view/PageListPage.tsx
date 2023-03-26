@@ -1,4 +1,4 @@
-import { css } from '@emotion/react';
+import { css } from '@linaria/core';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppController } from './App/AppControllerContext';
@@ -14,12 +14,12 @@ export const PageListPage = () => {
 
     return (
         <div
-            css={css`
+            className={css`
                 padding: 0 32px;
             `}
         >
             <div
-                css={css`
+                className={css`
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
@@ -28,7 +28,7 @@ export const PageListPage = () => {
                 <h2>編集したページの一覧</h2>
                 <Link
                     to="/edit"
-                    css={css`
+                    className={css`
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -45,7 +45,7 @@ export const PageListPage = () => {
                 </Link>
             </div>
             <div
-                css={css`
+                className={css`
                     display: flex;
                     flex-direction: column;
                     align-items: stretch;
@@ -59,14 +59,14 @@ export const PageListPage = () => {
                     <Link
                         key={pageId}
                         to={`/edit?page=${pageId}`}
-                        css={css`
+                        className={css`
                             display: block;
                             text-decoration: none;
                             color: unset;
                         `}
                     >
                         <li
-                            css={css`
+                            className={css`
                                 padding: 8px 8px;
                                 min-height: 36px;
                                 box-sizing: border-box;
