@@ -5,7 +5,7 @@ import { CollaborationController } from './controller/CollaborationController/Co
 import { DummyCollaborationController } from './controller/CollaborationController/DummyCollaborationController';
 import { FirebaseCollaborationController } from './controller/CollaborationController/FirebaseCollaborationController';
 
-const USE_DUMMY_CONTROLLERS = true;
+const USE_DUMMY_CONTROLLERS = false;
 
 export function createCollaborationController(): CollaborationController {
     if (USE_DUMMY_CONTROLLERS && location.host.includes('localhost')) {

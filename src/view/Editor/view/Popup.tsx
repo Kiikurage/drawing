@@ -5,7 +5,7 @@ export module Popup {
     export const Base = styled.div`
         background: #fff;
         border-radius: 16px;
-        padding: 4px;
+        padding: 0 4px;
         border: 1px solid #ccc;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     `;
@@ -31,6 +31,14 @@ export module Popup {
         &[aria-pressed='true'] {
             color: #fff;
             background: ${COLOR_SELECTION};
+        }
+    `;
+
+    export const Section = styled.div`
+        padding: 4px 0;
+
+        & + & {
+            border-top: 1px solid #ccc;
         }
     `;
 }

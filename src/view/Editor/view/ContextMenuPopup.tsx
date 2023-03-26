@@ -1,6 +1,6 @@
 import { css } from '@linaria/core';
 import { styled } from '@linaria/react';
-import { memo } from 'react';
+import { ButtonHTMLAttributes, memo } from 'react';
 import { Point } from '../../../model/Point';
 import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
@@ -23,12 +23,9 @@ export const ContextMenuPopup = memo(() => {
                 pointer-events: all;
                 position: absolute;
             `}
-            style={{
-                top,
-                left,
-            }}
+            style={{ top, left }}
         >
-            <div
+            <Popup.Section
                 className={css`
                     display: grid;
                     grid-template-columns: auto auto auto;
@@ -46,10 +43,33 @@ export const ContextMenuPopup = memo(() => {
                 <ColorButton palette="GREEN" />
                 <ColorButton palette="ANY_COLOR" />
                 <ColorButton palette="BLUE" />
-            </div>
-            <MenuButton>Menu 1</MenuButton>
-            <MenuButton>Menu 2</MenuButton>
-            <MenuButton>Menu 3</MenuButton>
+            </Popup.Section>
+            <Popup.Section
+                className={css`
+                    display: grid;
+                    grid-template-columns: auto auto auto;
+                    gap: 4px;
+                `}
+            >
+                <IconButton onClick={() => controller.setHorizontalTextAlign('left')}>
+                    <span className="material-symbols-outlined">format_align_left</span>
+                </IconButton>
+                <IconButton onClick={() => controller.setHorizontalTextAlign('center')}>
+                    <span className="material-symbols-outlined">format_align_center</span>
+                </IconButton>
+                <IconButton onClick={() => controller.setHorizontalTextAlign('right')}>
+                    <span className="material-symbols-outlined">format_align_right</span>
+                </IconButton>
+                <IconButton onClick={() => controller.setVerticalTextAlign('top')}>
+                    <span className="material-symbols-outlined">vertical_align_top</span>
+                </IconButton>
+                <IconButton onClick={() => controller.setVerticalTextAlign('center')}>
+                    <span className="material-symbols-outlined">vertical_align_center</span>
+                </IconButton>
+                <IconButton onClick={() => controller.setVerticalTextAlign('bottom')}>
+                    <span className="material-symbols-outlined">vertical_align_bottom</span>
+                </IconButton>
+            </Popup.Section>
         </Popup.Base>
     );
 });
@@ -58,15 +78,7 @@ export const ColorButton = ({ palette }: { palette: ColorPaletteKey }) => {
     const controller = useEditorController();
 
     return (
-        <Popup.Button
-            className={css`
-                width: 40px;
-                height: 40px;
-            `}
-            onMouseDown={(ev) => ev.stopPropagation()}
-            onMouseUp={(ev) => ev.stopPropagation()}
-            onClick={() => controller.setColor(palette)}
-        >
+        <IconButton onClick={() => controller.setColor(palette)}>
             <div
                 className={css`
                     width: 20px;
@@ -81,9 +93,21 @@ export const ColorButton = ({ palette }: { palette: ColorPaletteKey }) => {
                     background: ColorPalette[palette].strokeColor,
                 }}
             />
-        </Popup.Button>
+        </IconButton>
     );
 };
+
+export const IconButton = (props: ButtonHTMLAttributes<HTMLButtonElement>) => (
+    <Popup.Button
+        className={css`
+            width: 40px;
+            height: 40px;
+        `}
+        onMouseDown={(ev) => ev.stopPropagation()}
+        onMouseUp={(ev) => ev.stopPropagation()}
+        {...props}
+    />
+);
 
 export const MenuButton = styled(Popup.Button)`
     display: flex;

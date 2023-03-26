@@ -7,6 +7,7 @@ import { LineEntity } from '../../../model/entity/LineEntity';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
+import { HorizontalAlign, VerticalAlign } from '../../../model/TextAlign';
 import { createCollaborationController } from '../dependency';
 import { Camera } from '../model/Camera';
 import { ColorPaletteKey } from '../model/ColorPalette';
@@ -145,6 +146,14 @@ export class EditorController {
         this.editController.setColor(palette);
     }
 
+    setVerticalTextAlign(align: VerticalAlign) {
+        this.editController.setVerticalTextAlign(align);
+    }
+
+    setHorizontalTextAlign(align: HorizontalAlign) {
+        this.editController.setHorizontalTextAlign(align);
+    }
+
     setSelection(entityIds: string[]) {
         this.setState({
             selectMode: {
@@ -235,6 +244,7 @@ export class EditorController {
     startTransform(entities: EntityMap, transformType: TransformType) {
         this.editController.saveSnapshot();
         this.transformSession = new TransformSessionController(this, entities, transformType);
+        this._store.setState({ selectMode: { transforming: true } });
     }
 
     startSingleLineTransform(entity: LineEntity, pointKey: 'p1' | 'p2') {

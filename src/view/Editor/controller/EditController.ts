@@ -4,6 +4,7 @@ import { CRDTPage, CRDTPageAction } from '../../../model/CRDTPage';
 import { Entity } from '../../../model/entity/Entity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
+import { HorizontalAlign, VerticalAlign } from '../../../model/TextAlign';
 import { ColorPaletteKey } from '../model/ColorPalette';
 import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
@@ -57,6 +58,22 @@ export class EditController {
         this.saveSnapshot();
         const actions = this.store.state.selectMode.entityIds.map((entityId) =>
             this.page.updateEntity(entityId, 'style', { palette })
+        );
+        this.dispatchActions(actions);
+    }
+
+    setVerticalTextAlign(verticalAlign: VerticalAlign) {
+        this.saveSnapshot();
+        const actions = this.store.state.selectMode.entityIds.map((entityId) =>
+            this.page.updateEntity(entityId, 'verticalAlign', { verticalAlign })
+        );
+        this.dispatchActions(actions);
+    }
+
+    setHorizontalTextAlign(horizontalAlign: HorizontalAlign) {
+        this.saveSnapshot();
+        const actions = this.store.state.selectMode.entityIds.map((entityId) =>
+            this.page.updateEntity(entityId, 'horizontalAlign', { horizontalAlign })
         );
         this.dispatchActions(actions);
     }

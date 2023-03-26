@@ -3,22 +3,24 @@ import { memo, useMemo } from 'react';
 import { Record } from '../../../lib/Record';
 import { Entity } from '../../../model/entity/Entity';
 import { Point } from '../../../model/Point';
-import { useStore } from '../../hooks/useStore';
+import { useSlice } from '../../hooks/useStore';
 import { useEditorController } from '../EditorControllerContext';
 import { getSnapPoints, snapPoint } from '../model/SnapUtil';
 
 export const SnapGuide = memo(() => {
     const controller = useEditorController();
-    const {
-        selectMode: { snapEnabled, entityIds, transforming },
-        camera,
-        page,
-    } = useStore(controller.store);
+    const { snapEnabled, selectedEntityIds, transforming, camera, page } = useSlice(controller.store, (state) => ({
+        snapEnabled: state.selectMode.snapEnabled,
+        selectedEntityIds: state.selectMode.entityIds,
+        transforming: state.selectMode.transforming,
+        camera: state.camera,
+        page: state.page,
+    }));
 
     const range = Entity.computeBoundingBox(controller.computeSelectedEntities());
     const snapTargets = useMemo(
-        () => Record.filter(page.entities, (entity) => !entityIds.includes(entity.id)),
-        [page.entities, entityIds]
+        () => Record.filter(page.entities, (entity) => !selectedEntityIds.includes(entity.id)),
+        [page.entities, selectedEntityIds]
     );
 
     const snapResults = useMemo(() => {

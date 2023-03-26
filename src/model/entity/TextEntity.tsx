@@ -6,6 +6,7 @@ import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
 import { ModelCordSize, Size } from '../Size';
+import { HorizontalAlign, VerticalAlign } from '../TextAlign';
 import { EntityDelegates } from './Entity';
 
 export interface TextEntity {
@@ -15,6 +16,8 @@ export interface TextEntity {
     palette: ColorPaletteKey;
     size: ModelCordSize;
     text: string;
+    horizontalAlign: HorizontalAlign;
+    verticalAlign: VerticalAlign;
 }
 
 export module TextEntity {
@@ -27,6 +30,8 @@ export module TextEntity {
                 palette: 'BLACK',
                 size: Size.model(100, 100),
                 text: '',
+                horizontalAlign: 'center',
+                verticalAlign: 'center',
             },
             data
         );

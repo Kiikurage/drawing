@@ -21,7 +21,7 @@ export const ToolBar = memo(() => {
             `}
         >
             <Popup.Base>
-                <div
+                <Popup.Section
                     className={css`
                         display: flex;
                         justify-content: center;
@@ -40,7 +40,7 @@ export const ToolBar = memo(() => {
                     <ModeButton aria-pressed={mode === 'text'} onClick={() => controller.setMode('text')}>
                         文字
                     </ModeButton>
-                </div>
+                </Popup.Section>
             </Popup.Base>
         </div>
     );

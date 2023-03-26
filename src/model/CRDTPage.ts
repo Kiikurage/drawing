@@ -60,7 +60,7 @@ export class CRDTPage {
         return [ActionType.ENTITY_DELETE, nextClock, entityId];
     }
 
-    updateEntity(entityId: string, type: 'transform' | 'style' | 'text', patch: Patch<Entity>): EntityUpdateAction {
+    updateEntity(entityId: string, type: string, patch: Patch<Entity>): EntityUpdateAction {
         const prevEntry = this.entries[entityId];
         const prevEntity = prevEntry?.entity;
         if (prevEntity === undefined) throw new Error('Impossible');
@@ -184,6 +184,6 @@ type EntityUpdateAction = [
     type: ActionType.ENTITY_UPDATE,
     clock: VectorClock,
     entityId: string,
-    updateType: 'transform' | 'style' | 'text',
+    updateType: string,
     patch: Patch<Entity>
 ];

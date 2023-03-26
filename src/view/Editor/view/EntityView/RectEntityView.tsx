@@ -24,11 +24,18 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
             fillColor={ColorPalette[entity.palette].fillColor}
             strokeColor={ColorPalette[entity.palette].strokeColor}
             textColor="#000"
+            horizontalAlign={entity.horizontalAlign}
+            verticalAlign={entity.verticalAlign}
             value={entity.text}
             onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
             onMouseLeave={controller.onUnhover}
             onChange={(ev) => controller.setEntityText(entity.id, ev.target.value)}
             onBlur={() => controller.completeTextEdit()}
+            onTextOverflow={(contentHeight) => {
+                controller.editController.updateEntities({
+                    [entity.id]: { size: { height: contentHeight } },
+                });
+            }}
         />
     );
 };

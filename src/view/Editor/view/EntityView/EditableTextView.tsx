@@ -1,6 +1,7 @@
 import { css, CSSProperties } from '@linaria/core';
-import { ChangeEventHandler, FocusEventHandler, MouseEventHandler } from 'react';
+import { ChangeEventHandler, FocusEventHandler, MouseEventHandler, useLayoutEffect, useRef } from 'react';
 import { ModelCordBox } from '../../../../model/Box';
+import { HorizontalAlign, VerticalAlign } from '../../../../model/TextAlign';
 import { COLOR_SELECTION } from '../../../styles';
 import { Camera } from '../../model/Camera';
 
@@ -12,11 +13,14 @@ export const EditableTextView = ({
     strokeColor,
     fillColor,
     textColor,
+    horizontalAlign,
+    verticalAlign,
     camera,
     onMouseOver,
     onMouseLeave,
     onChange,
     onBlur,
+    onTextOverflow,
 }: {
     box: ModelCordBox;
     value: string;
@@ -25,12 +29,28 @@ export const EditableTextView = ({
     strokeColor: string;
     fillColor: string;
     textColor: string;
+    verticalAlign: VerticalAlign;
+    horizontalAlign: HorizontalAlign;
     camera: Camera;
     onMouseOver: MouseEventHandler;
     onMouseLeave: MouseEventHandler;
     onChange: ChangeEventHandler<HTMLTextAreaElement>;
     onBlur: FocusEventHandler;
+    onTextOverflow?: (contentHeight: number) => void;
 }) => {
+    const PADDING = 10;
+
+    const ref = useRef<HTMLDivElement | null>(null);
+    useLayoutEffect(() => {
+        const content = ref.current;
+        if (content === null) return;
+
+        const contentHeight = content.getBoundingClientRect().height / camera.scale + PADDING * 2;
+        if (box.size.height < contentHeight) {
+            onTextOverflow?.(contentHeight);
+        }
+    });
+
     return (
         <div
             className={css`
@@ -80,23 +100,28 @@ export const EditableTextView = ({
             <div
                 className={css`
                     position: absolute;
-                    inset: 10px;
+                    inset: ${PADDING}px;
                     display: flex;
                     flex-direction: column;
                     align-items: stretch;
-                    justify-content: center;
-                    padding: 10px;
-                    overflow: visible;
+                    padding: ${PADDING}px;
                 `}
+                style={{
+                    justifyContent: verticalAlign === 'top' ? 'start' : verticalAlign === 'bottom' ? 'end' : 'center',
+                }}
             >
                 <div
                     className={css`
                         position: relative;
-                        text-align: center;
                         min-height: 28px;
+                        overflow: clip;
                     `}
+                    style={{
+                        textAlign: horizontalAlign,
+                    }}
                 >
-                    <span
+                    <div
+                        ref={ref}
                         style={{
                             color: editing ? 'transparent' : textColor,
                             textShadow: `
@@ -109,11 +134,12 @@ export const EditableTextView = ({
                             `,
                         }}
                         className={css`
-                            ${ENTITY_FONT_STYLES}
+                            ${ENTITY_FONT_STYLES};
+                            width: 100%;
                         `}
                     >
                         {value + (value.endsWith('\n') ? '\u00A0' : '')}
-                    </span>
+                    </div>
                     {editing && (
                         <textarea
                             className={css`
@@ -126,7 +152,6 @@ export const EditableTextView = ({
                                 background: transparent;
                                 border: none;
                                 box-sizing: border-box;
-                                overflow: hidden;
                                 pointer-events: all;
                             `}
                             style={{
@@ -149,10 +174,11 @@ export const EditableTextView = ({
 };
 
 const ENTITY_FONT_STYLES: CSSProperties = {
+    overflow: 'clip',
     fontSize: 28,
     fontFamily: 'inherit',
     fontWeight: 'inherit',
-    lineHeight: 1,
+    lineHeight: 1.5,
     fontFeatureSettings: 'inherit',
     fontVariant: 'inherit',
     fontStyle: 'inherit',
