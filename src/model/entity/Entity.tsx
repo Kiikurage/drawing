@@ -6,7 +6,7 @@ import { ModelCordPoint, Point } from '../Point';
 import { Size } from '../Size';
 import { LineEntity, LineEntityDelegate } from './LineEntity';
 import { RectEntity, RectEntityDelegate } from './RectEntity';
-import { TextEntity, TextEntityDelegate } from './TextEntity';
+import { TextEntity } from './TextEntity';
 
 export type Entity = RectEntity | TextEntity | LineEntity;
 
@@ -14,8 +14,6 @@ export interface EntityDelegates<T extends Entity> {
     getBoundingBox(entity: T): ModelCordBox;
 
     transform(entity: T, transform: Transform): Patch<T>;
-
-    getSnap(entity: T, offset: number, direction: 'x' | 'y'): number;
 
     isTextEditable(entity: T): boolean;
 
@@ -25,7 +23,7 @@ export interface EntityDelegates<T extends Entity> {
 export module Entity {
     const delegates: Record<Entity['type'], EntityDelegates<Entity>> = {
         rect: RectEntityDelegate,
-        text: TextEntityDelegate,
+        text: TextEntity,
         line: LineEntityDelegate,
     };
 

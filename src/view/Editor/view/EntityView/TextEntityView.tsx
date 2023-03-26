@@ -1,4 +1,3 @@
-import { Box } from '../../../../model/Box';
 import { TextEntity } from '../../../../model/entity/TextEntity';
 import { useSlice } from '../../../hooks/useStore';
 import { useEditorController } from '../../EditorControllerContext';
@@ -21,7 +20,7 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
 
     return (
         <EditableTextView
-            box={Box.model(entity.p1.x, entity.p1.y, entity.size.width, entity.size.height)}
+            box={TextEntity.getBoundingBox(entity)}
             camera={camera}
             editing={textEditing}
             highlighted={highlighted}
@@ -34,13 +33,10 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
             onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
             onMouseLeave={controller.onUnhover}
             onChange={(ev) => controller.setEntityText(entity.id, ev.target.value)}
-            onTextOverflow={(contentWidth, contentHeight) => {
+            onContentSizeChange={(width, height) => {
                 controller.editController.updateEntities({
                     [entity.id]: {
-                        size: {
-                            width: contentWidth,
-                            height: contentHeight,
-                        },
+                        contentSize: { width, height },
                     },
                 });
             }}

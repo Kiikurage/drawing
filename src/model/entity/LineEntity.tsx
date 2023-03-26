@@ -1,4 +1,3 @@
-import { getClosestValue } from '../../lib/getClosestValue';
 import { randomId } from '../../lib/randomId';
 import { ColorPaletteKey } from '../../view/Editor/model/ColorPalette';
 import { Transform } from '../../view/Editor/model/Transform';
@@ -51,13 +50,6 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
             p1: transform.apply(entity.p1),
             p2: transform.apply(entity.p2),
         };
-    },
-    getSnap(entity: LineEntity, offset: number, direction: 'x' | 'y'): number {
-        if (direction === 'x') {
-            return getClosestValue([entity.p1.x, (entity.p1.x + entity.p2.x) / 2, entity.p2.x], offset);
-        } else {
-            return getClosestValue([entity.p1.y, (entity.p1.y + entity.p2.y) / 2, entity.p2.y], offset);
-        }
     },
     isTextEditable(): boolean {
         return false;

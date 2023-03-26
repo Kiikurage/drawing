@@ -34,7 +34,7 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
             onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
             onMouseLeave={controller.onUnhover}
             onChange={(ev) => controller.setEntityText(entity.id, ev.target.value)}
-            onTextOverflow={(contentWidth, contentHeight) => {
+            onContentSizeChange={(contentWidth, contentHeight) => {
                 controller.editController.updateEntities({
                     [entity.id]: {
                         size: {

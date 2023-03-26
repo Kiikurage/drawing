@@ -1,4 +1,3 @@
-import { getClosestValue } from '../../lib/getClosestValue';
 import { randomId } from '../../lib/randomId';
 import { ColorPaletteKey } from '../../view/Editor/model/ColorPalette';
 import { Transform } from '../../view/Editor/model/Transform';
@@ -68,19 +67,6 @@ export const RectEntityDelegate: EntityDelegates<RectEntity> = {
         }
 
         return patch;
-    },
-    getSnap(entity: RectEntity, offset: number, direction: 'x' | 'y'): number {
-        if (direction === 'x') {
-            return getClosestValue(
-                [entity.p1.x, entity.p1.x + entity.size.width / 2, entity.p1.x + entity.size.width],
-                offset
-            );
-        } else {
-            return getClosestValue(
-                [entity.p1.y, entity.p1.y + entity.size.height / 2, entity.p1.y + entity.size.height],
-                offset
-            );
-        }
     },
     isTextEditable(): boolean {
         return true;

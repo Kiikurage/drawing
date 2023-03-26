@@ -19,7 +19,7 @@ export const EditableTextView = ({
     onMouseOver,
     onMouseLeave,
     onChange,
-    onTextOverflow,
+    onContentSizeChange,
 }: {
     box: ModelCordBox;
     value: string;
@@ -34,7 +34,7 @@ export const EditableTextView = ({
     onMouseOver: MouseEventHandler;
     onMouseLeave: MouseEventHandler;
     onChange: ChangeEventHandler<HTMLTextAreaElement>;
-    onTextOverflow?: (contentWidth: number, contentHeight: number) => void;
+    onContentSizeChange?: (contentWidth: number, contentHeight: number) => void;
 }) => {
     const PADDING = 10;
 
@@ -45,9 +45,7 @@ export const EditableTextView = ({
 
         const contentWidth = content.scrollWidth / camera.scale + PADDING * 2;
         const contentHeight = content.scrollHeight / camera.scale + PADDING * 2;
-        if (box.size.width < contentWidth || box.size.height < contentHeight) {
-            onTextOverflow?.(contentWidth, contentHeight);
-        }
+        onContentSizeChange?.(contentWidth, contentHeight);
     });
 
     return (
@@ -134,7 +132,6 @@ export const EditableTextView = ({
                         }}
                         className={css`
                             ${ENTITY_FONT_STYLES};
-                            width: 100%;
                         `}
                     >
                         {value + (value.endsWith('\n') ? '\u00A0' : '')}
