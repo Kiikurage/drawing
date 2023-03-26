@@ -55,7 +55,7 @@ export class EditController {
 
     setColor(palette: ColorPaletteKey) {
         this.saveSnapshot();
-        const actions = this.store.state.selectMode.selectedEntityIds.map((entityId) =>
+        const actions = this.store.state.selectMode.entityIds.map((entityId) =>
             this.page.updateEntity(entityId, 'style', { palette })
         );
         this.dispatchActions(actions);
@@ -79,7 +79,7 @@ export class EditController {
                 },
             },
             selectMode: {
-                selectedEntityIds: this.store.state.selectMode.selectedEntityIds.filter((id) => id in newEntities),
+                entityIds: this.store.state.selectMode.entityIds.filter((id) => id in newEntities),
             },
         });
     }

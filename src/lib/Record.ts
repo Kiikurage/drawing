@@ -22,6 +22,11 @@ export module Record {
         return Object.fromEntries(entries) as Record<K, V2>;
     }
 
+    export function filter<V1, V2 extends V1>(
+        record: Record<string, V1>,
+        fn: (value: V1, key: string) => value is V2
+    ): Record<string, V2>;
+    export function filter<V>(record: Record<string, V>, fn: (value: V, key: string) => boolean): Record<string, V>;
     export function filter<V>(record: Record<string, V>, fn: (value: V, key: string) => boolean): Record<string, V> {
         return Object.fromEntries((Object.entries(record) as [string, V][]).filter(([k, v]) => fn(v, k)));
     }

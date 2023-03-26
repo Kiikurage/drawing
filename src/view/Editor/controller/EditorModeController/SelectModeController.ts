@@ -20,7 +20,7 @@ export class SelectModeController extends EditorModeController {
 
                         this.rangeSelectSession = new RangeSelectSessionController(
                             this.controller,
-                            this.controller.state.selectMode.selectedEntityIds
+                            this.controller.state.selectMode.entityIds
                         );
                         return;
                     }

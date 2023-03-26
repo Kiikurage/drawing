@@ -1,20 +1,25 @@
 import { css } from '@linaria/core';
 import { Box } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
+import { useSlice } from '../../../hooks/useStore';
 import { COLOR_SELECTION } from '../../../styles';
 import { useEditorController } from '../../EditorControllerContext';
-import { Camera } from '../../model/Camera';
-import { EntityMap } from '../../model/EntityMap';
 import { HoverState } from '../../model/HoverState';
 import { InvisibleResizeHandle, ResizeHandle } from './ResizeHandle';
 
-export const RectSelectionView = ({ camera, selectedEntities }: { camera: Camera; selectedEntities: EntityMap }) => {
+export const RectSelectionView = () => {
     const controller = useEditorController();
+    const { x, y, width, height } = useSlice(controller.store, (state) => {
+        const selectedEntities = controller.computeSelectedEntities();
+        const box = Box.toDisplay(state.camera, Entity.computeBoundingBox(selectedEntities));
 
-    const {
-        point: { x, y },
-        size: { width, height },
-    } = Box.toDisplay(camera, Entity.computeBoundingBox(selectedEntities));
+        return {
+            x: box.point.x,
+            y: box.point.y,
+            width: box.size.width,
+            height: box.size.height,
+        };
+    });
 
     return (
         <svg

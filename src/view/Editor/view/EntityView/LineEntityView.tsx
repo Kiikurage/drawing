@@ -11,7 +11,7 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     const { camera, highlighted } = useSlice(controller.store, (state) => ({
         camera: state.camera,
         highlighted:
-            state.selectMode.selectedEntityIds.includes(entity.id) ||
+            state.selectMode.entityIds.includes(entity.id) ||
             (state.hover.type === 'entity' && state.hover.entityId === entity.id),
     }));
 

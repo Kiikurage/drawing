@@ -6,21 +6,21 @@ export type HoverState =
     | TransformHandleHoverState
     | SingleLineTransformHandleHoverState;
 
-export interface IdleHoverState {
+interface IdleHoverState {
     type: 'idle';
 }
 
-export interface EntityHoverState {
+interface EntityHoverState {
     type: 'entity';
     entityId: string;
 }
 
-export interface TransformHandleHoverState {
+interface TransformHandleHoverState {
     type: 'transformHandle';
     transformType: TransformType;
 }
 
-export interface SingleLineTransformHandleHoverState {
+interface SingleLineTransformHandleHoverState {
     type: 'singleLineTransformHandle';
     point: 'p1' | 'p2';
 }

@@ -10,15 +10,15 @@ import { getSnapPoints, snapPoint } from '../model/SnapUtil';
 export const SnapGuide = memo(() => {
     const controller = useEditorController();
     const {
-        selectMode: { snapEnabled, selectedEntityIds, transforming },
+        selectMode: { snapEnabled, entityIds, transforming },
         camera,
         page,
     } = useStore(controller.store);
 
     const range = Entity.computeBoundingBox(controller.computeSelectedEntities());
     const snapTargets = useMemo(
-        () => Record.filter(page.entities, (entity) => !selectedEntityIds.includes(entity.id)),
-        [page.entities, selectedEntityIds]
+        () => Record.filter(page.entities, (entity) => !entityIds.includes(entity.id)),
+        [page.entities, entityIds]
     );
 
     const snapResults = useMemo(() => {

@@ -8,6 +8,7 @@
         "outDir": "./build",
         "jsx": "react-jsx",
         "strict": true,
+        "noUncheckedIndexedAccess": true,
         "sourceMap": true,
         "moduleResolution": "node",
         "esModuleInterop": true

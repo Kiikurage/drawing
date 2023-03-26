@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { deepEqual } from '../../lib/deepEqual';
 import { ReadonlyStore } from '../../lib/Store';
 
 export function useStore<T extends object>(store: ReadonlyStore<T>): T {
@@ -19,12 +20,11 @@ export function useSlice<T extends object, U extends object>(store: ReadonlyStor
         const callback = (state: T) => {
             setCachedState((prevSlice) => {
                 const nextSlice = fn(state);
-                for (const key of Object.keys(nextSlice) as (keyof U)[]) {
-                    if (prevSlice[key] !== nextSlice[key]) {
-                        return nextSlice;
-                    }
+                if (deepEqual(prevSlice, nextSlice)) {
+                    return prevSlice;
+                } else {
+                    return nextSlice;
                 }
-                return prevSlice;
             });
         };
 

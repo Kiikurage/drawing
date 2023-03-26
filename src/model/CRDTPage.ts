@@ -13,8 +13,7 @@ export class CRDTPage {
         {
             entity?: Entity;
             clock: {
-                addDel: VectorClock;
-                [fieldType: string]: VectorClock | undefined;
+                [fieldType: string]: VectorClock;
             };
             deleted?: boolean;
         }
@@ -93,7 +92,8 @@ export class CRDTPage {
                         return;
                     case 'concurrent': {
                         // Value is concurrently updated by multiple replicas
-                        const entry = this.entries[entity.id].clock.addDel;
+                        const entry = this.entries[entity.id];
+                        if (!entry) throw new Error('Unreachable');
                         if (entry.deleted) return;
                         if (VectorClock.hardCompare(prevClock, clock) === 'lt') {
                             this.entries[entity.id] = {
@@ -137,6 +137,8 @@ export class CRDTPage {
                 const [, , entityId, updateType, patch] = action;
                 const prevClock = this.entries[entityId]?.clock?.[updateType] ?? VectorClock.empty();
                 const entry = this.entries[entityId];
+                if (!entry) throw new Error('Unreachable');
+
                 if (entry.deleted) return;
 
                 switch (VectorClock.compare(prevClock, clock)) {
@@ -148,23 +150,16 @@ export class CRDTPage {
                             this.entries[entityId] = {
                                 ...entry,
                                 entity: Patch.apply(entry.entity!, patch),
-                                clock: {
-                                    ...entry.clock,
-                                    [updateType]: clock,
-                                },
+                                clock: { ...entry.clock, [updateType]: clock },
                             };
                         }
                         return;
                     }
                     case 'lt': {
-                        const entry = this.entries[entityId];
                         this.entries[entityId] = {
                             ...entry,
                             entity: Patch.apply(entry.entity!, patch),
-                            clock: {
-                                ...entry.clock,
-                                [updateType]: clock,
-                            },
+                            clock: { ...entry.clock, [updateType]: clock },
                         };
                         return;
                     }

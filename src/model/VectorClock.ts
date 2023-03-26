@@ -49,8 +49,11 @@ export module VectorClock {
         if (v2NewIds.length === 0) return 'gt';
         if (v1NewIds.length === 0) return 'lt';
 
-        const firstV1NewId = v1NewIds.sort()[0];
-        const firstV2NewId = v1NewIds.sort()[0];
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const firstV1NewId = v1NewIds.sort()[0]!;
+
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const firstV2NewId = v2NewIds.sort()[0]!;
 
         return firstV1NewId.localeCompare(firstV2NewId) === -1 ? 'lt' : 'gt';
     }

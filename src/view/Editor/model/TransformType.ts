@@ -1,6 +1,6 @@
 import { ModelCordBox } from '../../../model/Box';
 import { ModelCordPoint } from '../../../model/Point';
-import { Transform } from './SnapUtil';
+import { Transform } from './Transform';
 
 export type SnapPointType = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight' | 'center';
 

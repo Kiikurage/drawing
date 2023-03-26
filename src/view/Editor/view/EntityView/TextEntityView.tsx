@@ -11,7 +11,7 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
         camera: state.camera,
         textEditing: state.textEditMode.editing && state.textEditMode.entityId === entity.id,
         highlighted:
-            state.selectMode.selectedEntityIds.includes(entity.id) ||
+            state.selectMode.entityIds.includes(entity.id) ||
             (state.hover.type === 'entity' && state.hover.entityId === entity.id),
     }));
 

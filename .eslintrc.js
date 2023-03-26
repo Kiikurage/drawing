@@ -17,6 +17,7 @@ module.exports = {
         '@typescript-eslint/no-empty-interface': 'off',
         '@typescript-eslint/prefer-namespace-keyword': 'off',
         '@typescript-eslint/no-namespace': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off'
     },
     overrides: [
         {

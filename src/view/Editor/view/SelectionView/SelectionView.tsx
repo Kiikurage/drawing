@@ -1,16 +1,30 @@
-import { Record } from '../../../../lib/Record';
 import { LineEntity } from '../../../../model/entity/LineEntity';
-import { Camera } from '../../model/Camera';
-import { EntityMap } from '../../model/EntityMap';
+import { useSlice } from '../../../hooks/useStore';
+import { useEditorController } from '../../EditorControllerContext';
 import { LineSelectionView } from './LineSelectionView';
 import { RectSelectionView } from './RectSelectionView';
 
-export const SelectionView = ({ camera, selectedEntities }: { camera: Camera; selectedEntities: EntityMap }) => {
-    if (Record.size(selectedEntities) === 0) return null;
+export const SelectionView = () => {
+    const controller = useEditorController();
+    const { camera, textEditMode, firstSelectedEntity, selectedEntityIds } = useSlice(controller.store, (state) => {
+        const firstSelectedEntityId = state.selectMode.entityIds[0];
+        const firstSelectedEntity =
+            firstSelectedEntityId === undefined ? undefined : state.page.entities[firstSelectedEntityId];
 
-    if (Record.size(selectedEntities) === 1 && Object.values(selectedEntities)[0].type === 'line') {
-        return <LineSelectionView entity={Object.values(selectedEntities)[0] as LineEntity} camera={camera} />;
+        return {
+            camera: state.camera,
+            textEditMode: state.textEditMode,
+            selectedEntityIds: state.selectMode.entityIds,
+            firstSelectedEntity,
+        };
+    });
+    if (textEditMode.editing) return null;
+
+    if (selectedEntityIds.length === 0) return null;
+
+    if (selectedEntityIds.length === 1 && firstSelectedEntity?.type === 'line') {
+        return <LineSelectionView entity={firstSelectedEntity as LineEntity} camera={camera} />;
     }
 
-    return <RectSelectionView selectedEntities={selectedEntities} camera={camera} />;
+    return <RectSelectionView />;
 };

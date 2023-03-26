@@ -1,7 +1,7 @@
 import { getClosestValue } from '../../lib/getClosestValue';
 import { randomId } from '../../lib/randomId';
 import { ColorPaletteKey } from '../../view/Editor/model/ColorPalette';
-import { Transform } from '../../view/Editor/model/SnapUtil';
+import { Transform } from '../../view/Editor/model/Transform';
 import { ModelCordBox } from '../Box';
 import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';

@@ -77,10 +77,15 @@ export class EditorController {
     }
 
     computeSelectedEntities(): EntityMap {
-        return Record.mapToRecord(this.state.selectMode.selectedEntityIds, (id) => [
-            id,
-            this.store.state.page.entities[id],
-        ]);
+        const result: EntityMap = {};
+
+        for (const id of this.state.selectMode.entityIds) {
+            const entity = this.store.state.page.entities[id];
+            if (!entity) continue;
+            result[id] = entity;
+        }
+
+        return result;
     }
 
     // Commands
@@ -97,7 +102,7 @@ export class EditorController {
 
         navigator.clipboard.writeText(JSON.stringify(selectedEntities));
 
-        this.deleteEntities(this.store.state.selectMode.selectedEntityIds);
+        this.deleteEntities(this.store.state.selectMode.entityIds);
     }
 
     copy() {
@@ -133,7 +138,7 @@ export class EditorController {
     }
 
     deleteSelectedEntities() {
-        this.deleteEntities(this.state.selectMode.selectedEntityIds);
+        this.deleteEntities(this.state.selectMode.entityIds);
     }
 
     setColor(palette: ColorPaletteKey) {
@@ -143,14 +148,14 @@ export class EditorController {
     setSelection(entityIds: string[]) {
         this.setState({
             selectMode: {
-                selectedEntityIds: entityIds.filter((entityId) => entityId in this.state.page.entities),
+                entityIds: entityIds.filter((entityId) => entityId in this.state.page.entities),
             },
             mode: 'select',
         });
     }
 
     addSelection(entityId: string) {
-        this.setSelection([...this.state.selectMode.selectedEntityIds, entityId]);
+        this.setSelection([...this.state.selectMode.entityIds, entityId]);
     }
 
     selectAll() {
@@ -287,7 +292,7 @@ export class EditorController {
 
     onDoubleClick = () => {
         if (this.checkIfHoveredEntityTextEditable()) {
-            this.startTextEdit(this.state.selectMode.selectedEntityIds[0]);
+            this.startTextEdit(this.state.selectMode.entityIds[0]!);
         }
     };
 
@@ -371,9 +376,9 @@ export class EditorController {
 
     private checkIfHoveredEntityTextEditable(): boolean {
         if (this.state.hover.type !== 'transformHandle') return false;
-        if (this.state.selectMode.selectedEntityIds.length !== 1) return false;
+        if (this.state.selectMode.entityIds.length !== 1) return false;
 
-        const selectedEntity = Object.values(this.computeSelectedEntities())[0];
+        const selectedEntity = Object.values(this.computeSelectedEntities())[0]!;
         if (!Entity.isTextEditable(selectedEntity)) return false;
 
         return true;

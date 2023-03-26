@@ -2,7 +2,7 @@ import { Box, ModelCordBox } from '../../../model/Box';
 import { Patch } from '../../../model/Patch';
 
 export interface SelectModeState {
-    selectedEntityIds: string[];
+    entityIds: string[];
     selecting: boolean;
     transforming: boolean;
     range: ModelCordBox;
@@ -13,7 +13,7 @@ export module SelectModeState {
     export function create(initialData: Patch<SelectModeState> = {}) {
         return Patch.apply<SelectModeState>(
             {
-                selectedEntityIds: [],
+                entityIds: [],
                 selecting: false,
                 transforming: false,
                 range: Box.model(0, 0, 0, 0),
