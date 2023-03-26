@@ -23,6 +23,7 @@ import { EditorModeController } from './EditorModeController/EditorModeControlle
 import { LineModeController } from './EditorModeController/LineModeController';
 import { RectModeController } from './EditorModeController/RectModeController';
 import { SelectModeController } from './EditorModeController/SelectModeController';
+import { TextEditModeController } from './EditorModeController/TextEditModeController';
 import { TextModeController } from './EditorModeController/TextModeController';
 import { ScrollSessionController } from './ScrollSessionController';
 import { SingleLineTransformSessionController } from './SingleLineTransformSessionController';
@@ -48,6 +49,7 @@ export class EditorController {
             select: new SelectModeController(this),
             line: new LineModeController(this),
             text: new TextModeController(this),
+            textEditing: new TextEditModeController(this),
         };
         this.editController = new EditController(this._store, this.collaborationController);
     }
@@ -155,12 +157,25 @@ export class EditorController {
     }
 
     setSelection(entityIds: string[]) {
-        this.setState({
-            selectMode: {
-                entityIds: entityIds.filter((entityId) => entityId in this.state.page.entities),
-            },
-            mode: 'select',
-        });
+        const prevEntityIds = this.state.selectMode.entityIds;
+        const nextEntityIds = entityIds.filter((entityId) => entityId in this.state.page.entities);
+
+        this.setState({ selectMode: { entityIds: nextEntityIds }, mode: 'select' });
+
+        const unselectedEntityIds = prevEntityIds.filter((entityId) => !nextEntityIds.includes(entityId));
+
+        for (const entityId of unselectedEntityIds) {
+            const entity = this.state.page.entities[entityId];
+            if (!entity) continue;
+
+            if (entity.type === 'text') {
+                if (entity.text.trim() === '') {
+                    this.editController.deleteEntities([entity.id]);
+                }
+            }
+        }
+
+        this.modeController.onSelectedEntityChange?.(prevEntityIds, nextEntityIds);
     }
 
     addSelection(entityId: string) {
@@ -226,11 +241,17 @@ export class EditorController {
         this._store.setState({ selectMode: { snapEnabled: false } });
     }
 
+    tryStartTextEditForSelectedEntity() {
+        if (this.checkIfHoveredEntityTextEditable()) {
+            this.startTextEdit(this.state.selectMode.entityIds[0]!);
+        }
+    }
+
     startTextEdit(entityId: string) {
         const entity = this.state.page.entities[entityId];
         if (entity === undefined) return;
 
-        this._store.setState({ textEditMode: { editing: true, entityId } });
+        this._store.setState({ mode: 'textEditing', textEditMode: { entityId } });
     }
 
     setEntityText(entityId: string, text: string) {
@@ -238,7 +259,7 @@ export class EditorController {
     }
 
     completeTextEdit() {
-        this._store.setState({ textEditMode: { editing: false } });
+        this._store.setState({ mode: 'select' });
     }
 
     startTransform(entities: EntityMap, transformType: TransformType) {
@@ -300,10 +321,12 @@ export class EditorController {
         this.modeController.onMouseUp?.();
     };
 
+    onClick = (info: MouseEventInfo) => {
+        this.modeController.onClick?.(info);
+    };
+
     onDoubleClick = () => {
-        if (this.checkIfHoveredEntityTextEditable()) {
-            this.startTextEdit(this.state.selectMode.entityIds[0]!);
-        }
+        this.tryStartTextEditForSelectedEntity();
     };
 
     onHover = (hover: HoverState) => {
@@ -324,55 +347,80 @@ export class EditorController {
         if (ev.ctrlKey) keys.push('Control');
 
         switch (Key.serialize(keys)) {
+            case Key.serialize(['Enter']): {
+                if (this.state.mode !== 'textEditing') {
+                    ev.preventDefault();
+                    this.tryStartTextEditForSelectedEntity();
+                }
+                return;
+            }
+            case Key.serialize(['Escape']): {
+                if (this.state.mode === 'textEditing') {
+                    ev.preventDefault();
+                    this.completeTextEdit();
+                }
+                return;
+            }
             case Key.serialize(['V']): {
+                if (this.state.mode === 'textEditing') return;
                 this.setMode('select');
                 return;
             }
             case Key.serialize(['R']): {
+                if (this.state.mode === 'textEditing') return;
                 this.setMode('rect');
                 return;
             }
             case Key.serialize(['L']): {
+                if (this.state.mode === 'textEditing') return;
                 this.setMode('line');
                 return;
             }
             case Key.serialize(['A']): {
+                if (this.state.mode === 'textEditing') return;
                 this.setMode('line');
                 return;
             }
             case Key.serialize(['Delete']):
             case Key.serialize(['Backspace']): {
+                if (this.state.mode === 'textEditing') return;
                 ev.preventDefault();
                 this.deleteSelectedEntities();
                 return;
             }
             case Key.serialize(['Control', 'A']): {
+                if (this.state.mode === 'textEditing') return;
                 ev.preventDefault();
                 this.selectAll();
                 return;
             }
             case Key.serialize(['Control', 'X']): {
+                if (this.state.mode === 'textEditing') return;
                 ev.preventDefault();
                 this.cut();
                 return;
             }
             case Key.serialize(['Control', 'C']): {
+                if (this.state.mode === 'textEditing') return;
                 ev.preventDefault();
                 this.copy();
                 return;
             }
             case Key.serialize(['Control', 'V']): {
+                if (this.state.mode === 'textEditing') return;
                 ev.preventDefault();
                 this.paste();
                 return;
             }
             case Key.serialize(['Control', 'Z']): {
+                if (this.state.mode === 'textEditing') return;
                 ev.preventDefault();
                 this.undo();
                 return;
             }
             case Key.serialize(['Control', 'Shift', 'Z']):
             case Key.serialize(['Control', 'Y']): {
+                if (this.state.mode === 'textEditing') return;
                 ev.preventDefault();
                 this.redo();
                 return;

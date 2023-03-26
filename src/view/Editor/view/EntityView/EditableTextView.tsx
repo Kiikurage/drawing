@@ -1,5 +1,5 @@
 import { css, CSSProperties } from '@linaria/core';
-import { ChangeEventHandler, FocusEventHandler, MouseEventHandler, useLayoutEffect, useRef } from 'react';
+import { ChangeEventHandler, MouseEventHandler, useLayoutEffect, useRef } from 'react';
 import { ModelCordBox } from '../../../../model/Box';
 import { HorizontalAlign, VerticalAlign } from '../../../../model/TextAlign';
 import { COLOR_SELECTION } from '../../../styles';
@@ -19,7 +19,6 @@ export const EditableTextView = ({
     onMouseOver,
     onMouseLeave,
     onChange,
-    onBlur,
     onTextOverflow,
 }: {
     box: ModelCordBox;
@@ -35,8 +34,7 @@ export const EditableTextView = ({
     onMouseOver: MouseEventHandler;
     onMouseLeave: MouseEventHandler;
     onChange: ChangeEventHandler<HTMLTextAreaElement>;
-    onBlur: FocusEventHandler;
-    onTextOverflow?: (contentHeight: number) => void;
+    onTextOverflow?: (contentWidth: number, contentHeight: number) => void;
 }) => {
     const PADDING = 10;
 
@@ -45,9 +43,10 @@ export const EditableTextView = ({
         const content = ref.current;
         if (content === null) return;
 
-        const contentHeight = content.getBoundingClientRect().height / camera.scale + PADDING * 2;
-        if (box.size.height < contentHeight) {
-            onTextOverflow?.(contentHeight);
+        const contentWidth = content.scrollWidth / camera.scale + PADDING * 2;
+        const contentHeight = content.scrollHeight / camera.scale + PADDING * 2;
+        if (box.size.width < contentWidth || box.size.height < contentHeight) {
+            onTextOverflow?.(contentWidth, contentHeight);
         }
     });
 
@@ -114,7 +113,7 @@ export const EditableTextView = ({
                     className={css`
                         position: relative;
                         min-height: 28px;
-                        overflow: clip;
+                        overflow: visible;
                     `}
                     style={{
                         textAlign: horizontalAlign,
@@ -153,17 +152,15 @@ export const EditableTextView = ({
                                 border: none;
                                 box-sizing: border-box;
                                 pointer-events: all;
+                                overflow: clip;
                             `}
                             style={{
                                 color: textColor,
                             }}
                             onMouseDown={(ev) => ev.stopPropagation()}
                             onMouseUp={(ev) => ev.stopPropagation()}
-                            onKeyDown={(ev) => ev.stopPropagation()}
-                            onKeyUp={(ev) => ev.stopPropagation()}
                             autoFocus
                             onChange={onChange}
-                            onBlur={onBlur}
                             value={value}
                         />
                     )}
@@ -174,7 +171,6 @@ export const EditableTextView = ({
 };
 
 const ENTITY_FONT_STYLES: CSSProperties = {
-    overflow: 'clip',
     fontSize: 28,
     fontFamily: 'inherit',
     fontWeight: 'inherit',
@@ -194,6 +190,6 @@ const ENTITY_FONT_STYLES: CSSProperties = {
     columnCount: 'auto !important',
     writingMode: 'horizontal-tb !important',
     wordSpacing: 0,
-    wordBreak: 'break-all',
-    whiteSpace: 'pre-wrap',
+    wordBreak: 'keep-all',
+    whiteSpace: 'pre',
 };

@@ -28,10 +28,10 @@ export module TextEntity {
                 type: 'text' as const,
                 p1: Point.model(0, 0),
                 palette: 'BLACK',
-                size: Size.model(100, 100),
+                size: Size.model(1, 1),
                 text: '',
-                horizontalAlign: 'center',
-                verticalAlign: 'center',
+                horizontalAlign: 'left',
+                verticalAlign: 'top',
             },
             data
         );

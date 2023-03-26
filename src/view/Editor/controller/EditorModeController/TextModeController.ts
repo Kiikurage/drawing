@@ -1,16 +1,21 @@
 import { TextEntity } from '../../../../model/entity/TextEntity';
-import { Size } from '../../../../model/Size';
+import { TransformType } from '../../model/TransformType';
 import { EditorModeController } from './EditorModeController';
 
 export class TextModeController extends EditorModeController {
+    private newEntity: TextEntity | null = null;
     onMouseDown = () => {
-        const newEntity = TextEntity.create({
+        this.newEntity = TextEntity.create({
             p1: this.controller.currentPoint,
-            size: Size.model(200, 100),
         });
-        const newEntityMap = { [newEntity.id]: newEntity };
+        const newEntityMap = { [this.newEntity.id]: this.newEntity };
         this.controller.addEntities(newEntityMap);
-        this.controller.setSelection([newEntity.id]);
-        this.controller.startTextEdit(newEntity.id);
+        this.controller.startTransform(newEntityMap, TransformType.RESIZE_BOTTOM_RIGHT);
+    };
+
+    onMouseUp = () => {
+        if (this.newEntity === null) return;
+        this.controller.startTextEdit(this.newEntity.id);
+        this.newEntity = null;
     };
 }

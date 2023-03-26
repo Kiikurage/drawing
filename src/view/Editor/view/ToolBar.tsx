@@ -12,6 +12,9 @@ export const ToolBar = memo(() => {
     }));
     return (
         <div
+            onMouseDown={(ev) => ev.stopPropagation()}
+            onMouseUp={(ev) => ev.stopPropagation()}
+            onClick={(ev) => ev.stopPropagation()}
             className={css`
                 position: absolute;
                 bottom: 32px;
@@ -28,7 +31,10 @@ export const ToolBar = memo(() => {
                         gap: 4px;
                     `}
                 >
-                    <ModeButton aria-pressed={mode === 'select'} onClick={() => controller.setMode('select')}>
+                    <ModeButton
+                        aria-pressed={mode === 'select' || mode === 'textEditing'}
+                        onClick={() => controller.setMode('select')}
+                    >
                         選択
                     </ModeButton>
                     <ModeButton aria-pressed={mode === 'rect'} onClick={() => controller.setMode('rect')}>

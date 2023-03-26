@@ -1,1 +1,1 @@
-export type EditorMode = 'select' | 'rect' | 'line' | 'text';
+export type EditorMode = 'select' | 'rect' | 'line' | 'text' | 'textEditing';

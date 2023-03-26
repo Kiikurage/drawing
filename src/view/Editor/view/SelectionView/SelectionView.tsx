@@ -6,19 +6,19 @@ import { RectSelectionView } from './RectSelectionView';
 
 export const SelectionView = () => {
     const controller = useEditorController();
-    const { camera, textEditMode, firstSelectedEntity, selectedEntityIds } = useSlice(controller.store, (state) => {
+    const { camera, textEditing, firstSelectedEntity, selectedEntityIds } = useSlice(controller.store, (state) => {
         const firstSelectedEntityId = state.selectMode.entityIds[0];
         const firstSelectedEntity =
             firstSelectedEntityId === undefined ? undefined : state.page.entities[firstSelectedEntityId];
 
         return {
             camera: state.camera,
-            textEditMode: state.textEditMode,
+            textEditing: state.mode === 'textEditing',
             selectedEntityIds: state.selectMode.entityIds,
             firstSelectedEntity,
         };
     });
-    if (textEditMode.editing) return null;
+    if (textEditing) return null;
 
     if (selectedEntityIds.length === 0) return null;
 

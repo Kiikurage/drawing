@@ -7,13 +7,17 @@ import { EditableTextView } from './EditableTextView';
 
 export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
     const controller = useEditorController();
-    const { camera, textEditing, highlighted } = useSlice(controller.store, (state) => ({
-        camera: state.camera,
-        textEditing: state.textEditMode.editing && state.textEditMode.entityId === entity.id,
-        highlighted:
-            state.selectMode.entityIds.includes(entity.id) ||
-            (state.hover.type === 'entity' && state.hover.entityId === entity.id),
-    }));
+    const { camera, textEditing, highlighted } = useSlice(controller.store, (state) => {
+        const textEditing = state.mode === 'textEditing' && state.textEditMode.entityId === entity.id;
+        return {
+            camera: state.camera,
+            textEditing,
+            highlighted:
+                textEditing ||
+                state.selectMode.entityIds.includes(entity.id) ||
+                (state.hover.type === 'entity' && state.hover.entityId === entity.id),
+        };
+    });
 
     return (
         <EditableTextView
@@ -30,11 +34,11 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
             onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
             onMouseLeave={controller.onUnhover}
             onChange={(ev) => controller.setEntityText(entity.id, ev.target.value)}
-            onBlur={() => controller.completeTextEdit()}
-            onTextOverflow={(contentHeight) => {
+            onTextOverflow={(contentWidth, contentHeight) => {
                 controller.editController.updateEntities({
                     [entity.id]: {
                         size: {
+                            width: contentWidth,
                             height: contentHeight,
                         },
                     },

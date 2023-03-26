@@ -19,7 +19,7 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
             ev.preventDefault();
 
             if (ev.ctrlKey) {
-                controller.onZoom(-0.005 * ev.deltaY);
+                controller.onZoom(-0.001 * ev.deltaY);
             } else if (ev.shiftKey) {
                 controller.onScroll(Size.display(ev.deltaY, ev.deltaX));
             } else {
@@ -41,9 +41,13 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
 
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', controller.onMouseUp);
+        window.addEventListener('keydown', controller.onKeyDown);
+        window.addEventListener('keyup', controller.onKeyUp);
         return () => {
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', controller.onMouseUp);
+            window.removeEventListener('keydown', controller.onKeyDown);
+            window.removeEventListener('keyup', controller.onKeyUp);
         };
     }, [controller]);
 
@@ -61,10 +65,8 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                         user-select: none;
                     }
                 `}
-                tabIndex={-1}
                 onMouseDown={controller.onMouseDown}
-                onKeyDown={controller.onKeyDown}
-                onKeyUp={controller.onKeyUp}
+                onClick={controller.onClick}
                 onContextMenu={(ev) => ev.preventDefault()}
                 onDoubleClick={controller.onDoubleClick}
             >
