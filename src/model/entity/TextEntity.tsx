@@ -68,10 +68,7 @@ export module TextEntity {
             nextP1.y -= nextSize.height;
         }
 
-        const patch: Patch<TextEntity> = { p1: nextP1 };
-        if (entity.size !== null) patch.size = nextSize;
-
-        return patch;
+        return { p1: nextP1, size: nextSize };
     }
 
     export function isTextEditable(): boolean {
