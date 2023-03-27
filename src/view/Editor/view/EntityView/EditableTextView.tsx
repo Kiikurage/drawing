@@ -127,6 +127,7 @@ export const EditableTextView = ({
                     <div
                         ref={ref}
                         style={{
+                            minWidth: 1,
                             color: editing ? 'transparent' : textColor,
                             textShadow: `
                             rgb(249, 250, 251) 0 ${-1 / camera.scale}px 0,
@@ -142,6 +143,7 @@ export const EditableTextView = ({
                         `}
                     >
                         {value + (value.endsWith('\n') ? '\u00A0' : '')}
+                        {value.length === 0 && '\u00A0'}
                     </div>
                     {editing && (
                         <textarea

@@ -227,12 +227,18 @@ export class EditorController {
 
     moveCamera(point: ModelCordPoint) {
         this.setState({ camera: { point } });
+        document.title = `(${this.state.camera.point.x.toFixed(1)},${this.state.camera.point.y.toFixed(
+            1
+        )}) ${Math.floor(this.state.camera.scale * 100).toFixed(1)}%`;
     }
 
     setCameraScale(focus: ModelCordPoint, scale: number) {
         this.setState({
             camera: Camera.setScale(this.state.camera, focus, scale),
         });
+        document.title = `(${this.state.camera.point.x.toFixed(1)},${this.state.camera.point.y.toFixed(
+            1
+        )}) ${Math.floor(this.state.camera.scale * 100).toFixed(1)}%`;
     }
 
     enableSnap() {
