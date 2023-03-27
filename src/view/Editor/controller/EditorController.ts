@@ -249,17 +249,17 @@ export class EditorController {
         this._store.setState({ selectMode: { snapEnabled: false } });
     }
 
-    tryStartTextEditForSelectedEntity() {
+    tryStartTextEditForSelectedEntity(editStartPoint = Point.display(0, 0)) {
         if (this.checkIfHoveredEntityTextEditable()) {
-            this.startTextEdit(this.state.selectMode.entityIds[0]!);
+            this.startTextEdit(this.state.selectMode.entityIds[0]!, editStartPoint);
         }
     }
 
-    startTextEdit(entityId: string) {
+    startTextEdit(entityId: string, editStartPoint = Point.display(0, 0)) {
         const entity = this.state.page.entities[entityId];
         if (entity === undefined) return;
 
-        this._store.setState({ textEditMode: { entityId } });
+        this._store.setState({ textEditMode: { entityId, editStartPoint } });
         this.setMode('textEditing');
     }
 
@@ -344,8 +344,8 @@ export class EditorController {
         this.modeController.onClick?.(info);
     };
 
-    onDoubleClick = () => {
-        this.tryStartTextEditForSelectedEntity();
+    onDoubleClick = (point: DisplayCordPoint) => {
+        this.tryStartTextEditForSelectedEntity(point);
     };
 
     onHover = (hover: HoverState) => {

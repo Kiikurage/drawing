@@ -68,7 +68,7 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                 onMouseDown={controller.onMouseDown}
                 onClick={controller.onClick}
                 onContextMenu={(ev) => ev.preventDefault()}
-                onDoubleClick={controller.onDoubleClick}
+                onDoubleClick={(ev) => controller.onDoubleClick(Point.display(ev.clientX, ev.clientY))}
             >
                 <ContentLayer />
                 <IndicatorLayer />

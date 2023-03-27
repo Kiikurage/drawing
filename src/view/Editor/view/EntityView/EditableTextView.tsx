@@ -1,6 +1,8 @@
 import { css, CSSProperties } from '@linaria/core';
-import { ChangeEventHandler, MouseEventHandler, useLayoutEffect, useRef } from 'react';
+import { ChangeEventHandler, MouseEventHandler, useCallback, useLayoutEffect, useRef } from 'react';
+import { caretRangeFromPoint } from '../../../../lib/caretRangeFromPoint';
 import { ModelCordBox } from '../../../../model/Box';
+import { DisplayCordPoint } from '../../../../model/Point';
 import { Size } from '../../../../model/Size';
 import { HorizontalAlign, VerticalAlign } from '../../../../model/TextAlign';
 import { COLOR_SELECTION } from '../../../styles';
@@ -9,6 +11,7 @@ import { Camera } from '../../model/Camera';
 export const EditableTextView = ({
     box,
     value,
+    editStartPoint,
     editing,
     highlighted,
     strokeColor,
@@ -24,6 +27,7 @@ export const EditableTextView = ({
 }: {
     box: ModelCordBox;
     value: string;
+    editStartPoint?: DisplayCordPoint;
     editing: boolean;
     highlighted: boolean;
     strokeColor: string;
@@ -39,11 +43,11 @@ export const EditableTextView = ({
 }) => {
     const PADDING = 10;
 
-    const ref = useRef<HTMLDivElement | null>(null);
+    const previewRef = useRef<HTMLDivElement | null>(null);
     const contentSizeRef = useRef(Size.model(0, 0));
 
     useLayoutEffect(() => {
-        const content = ref.current;
+        const content = previewRef.current;
         if (content === null) return;
 
         const contentWidth = content.scrollWidth + PADDING * 2;
@@ -54,6 +58,17 @@ export const EditableTextView = ({
             onContentSizeChange?.(contentWidth, contentHeight);
         }
     });
+
+    const textareaRef = useCallback(
+        (element: HTMLTextAreaElement) => {
+            if (previewRef.current === null || editStartPoint === undefined) return;
+            const caretPoint = caretRangeFromPoint(previewRef.current, editStartPoint.x, editStartPoint.y);
+            if (caretPoint === null) return;
+
+            element?.setSelectionRange(caretPoint.offset, caretPoint.offset);
+        },
+        [editStartPoint]
+    );
 
     return (
         <div
@@ -125,7 +140,7 @@ export const EditableTextView = ({
                     }}
                 >
                     <div
-                        ref={ref}
+                        ref={previewRef}
                         style={{
                             minWidth: 1,
                             color: editing ? 'transparent' : textColor,
@@ -147,6 +162,7 @@ export const EditableTextView = ({
                     </div>
                     {editing && (
                         <textarea
+                            ref={textareaRef}
                             className={css`
                                 ${ENTITY_FONT_STYLES};
                                 padding: 0;
