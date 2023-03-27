@@ -1,6 +1,7 @@
 import { css, CSSProperties } from '@linaria/core';
 import { ChangeEventHandler, MouseEventHandler, useLayoutEffect, useRef } from 'react';
 import { ModelCordBox } from '../../../../model/Box';
+import { Size } from '../../../../model/Size';
 import { HorizontalAlign, VerticalAlign } from '../../../../model/TextAlign';
 import { COLOR_SELECTION } from '../../../styles';
 import { Camera } from '../../model/Camera';
@@ -39,13 +40,19 @@ export const EditableTextView = ({
     const PADDING = 10;
 
     const ref = useRef<HTMLDivElement | null>(null);
+    const contentSizeRef = useRef(Size.model(0, 0));
+
     useLayoutEffect(() => {
         const content = ref.current;
         if (content === null) return;
 
-        const contentWidth = content.scrollWidth / camera.scale + PADDING * 2;
-        const contentHeight = content.scrollHeight / camera.scale + PADDING * 2;
-        onContentSizeChange?.(contentWidth, contentHeight);
+        const contentWidth = content.scrollWidth + PADDING * 2;
+        const contentHeight = content.scrollHeight + PADDING * 2;
+        if (contentSizeRef.current.width !== contentWidth || contentSizeRef.current.height !== contentHeight) {
+            contentSizeRef.current.width = contentWidth;
+            contentSizeRef.current.height = contentHeight;
+            onContentSizeChange?.(contentWidth, contentHeight);
+        }
     });
 
     return (
@@ -97,7 +104,7 @@ export const EditableTextView = ({
             <div
                 className={css`
                     position: absolute;
-                    inset: ${PADDING}px;
+                    inset: 10px;
                     display: flex;
                     flex-direction: column;
                     align-items: stretch;
