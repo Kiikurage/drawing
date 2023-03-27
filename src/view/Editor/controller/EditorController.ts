@@ -278,6 +278,7 @@ export class EditorController {
         }
 
         this.setMode('select');
+        this.clearSelection();
     }
 
     startTransform(entities: EntityMap, transformType: TransformType) {
