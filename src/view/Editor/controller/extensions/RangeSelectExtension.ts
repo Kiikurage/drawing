@@ -1,7 +1,8 @@
 import { Box, ModelCordBox } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
 import { ModelCordPoint } from '../../../../model/Point';
-import { EditorController, MouseEventButton, MouseEventInfo } from '../EditorController';
+import { EditorMode } from '../../model/EditorMode';
+import { EditorController, ModeChangeEvent, MouseEventButton, MouseEventInfo } from '../EditorController';
 import { Extension } from './Extension';
 
 export class RangeSelectExtension implements Extension {
@@ -9,16 +10,29 @@ export class RangeSelectExtension implements Extension {
     private startPoint: ModelCordPoint | null = null;
     private preSelectedEntityIds: string[] = [];
 
-    onActivate = (controller: EditorController) => {
+    onRegister = (controller: EditorController) => {
         this.controller = controller;
-        controller.onMouseDown.addListener(this.onMouseDown);
-        controller.onMouseMove.addListener(this.onMouseMove);
-        controller.onMouseUp.addListener(this.onMouseUp);
+        controller.onModeChange.addListener(this.onModeChange);
+        this.updateModeSpecificListener(controller.mode);
     };
 
-    private readonly onMouseDown = (ev: MouseEventInfo) => {
-        if (this.controller.mode !== 'select') return;
+    private readonly onModeChange = (ev: ModeChangeEvent) => {
+        this.updateModeSpecificListener(ev.nextMode);
+    };
 
+    private updateModeSpecificListener(mode: EditorMode) {
+        if (mode === 'select') {
+            this.controller.onMouseDown.addListener(this.onMouseDown);
+            this.controller.onMouseMove.addListener(this.onMouseMove);
+            this.controller.onMouseUp.addListener(this.onMouseUp);
+        } else {
+            this.controller.onMouseDown.removeListener(this.onMouseDown);
+            this.controller.onMouseMove.removeListener(this.onMouseMove);
+            this.controller.onMouseUp.removeListener(this.onMouseUp);
+        }
+    }
+
+    private readonly onMouseDown = (ev: MouseEventInfo) => {
         if (ev.button === MouseEventButton.PRIMARY) {
             if (this.controller.state.hover.type === 'idle') {
                 if (!ev.shiftKey) this.controller.clearSelection();
@@ -30,7 +44,6 @@ export class RangeSelectExtension implements Extension {
     };
 
     private readonly onMouseMove = (ev: MouseEventInfo) => {
-        if (this.controller.mode !== 'select') return;
         if (this.startPoint === null) return;
 
         const width = ev.point.x - this.startPoint.x;
@@ -47,8 +60,6 @@ export class RangeSelectExtension implements Extension {
     };
 
     private readonly onMouseUp = () => {
-        if (this.controller.mode !== 'select') return;
-
         this.controller.clearSelectingRange();
         this.startPoint = null;
     };

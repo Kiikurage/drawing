@@ -2,9 +2,10 @@ import { Record } from '../../../../lib/Record';
 import { Entity } from '../../../../model/entity/Entity';
 import { LineEntity } from '../../../../model/entity/LineEntity';
 import { ModelCordPoint, Point } from '../../../../model/Point';
+import { EditorMode } from '../../model/EditorMode';
 import { EntityMap } from '../../model/EntityMap';
 import { snapPoint } from '../../model/SnapUtil';
-import { EditorController, MouseEventButton, MouseEventInfo } from '../EditorController';
+import { EditorController, ModeChangeEvent, MouseEventButton, MouseEventInfo } from '../EditorController';
 import { Extension } from './Extension';
 
 export class LineModeExtension implements Extension {
@@ -15,31 +16,50 @@ export class LineModeExtension implements Extension {
     private entity: LineEntity | null = null;
     private pointKey: 'p1' | 'p2' = 'p1';
 
-    onActivate = (controller: EditorController) => {
+    onRegister = (controller: EditorController) => {
         this.controller = controller;
-        controller.onMouseDown.addListener(this.onMouseDown);
+        controller.onModeChange.addListener(this.onModeChange);
         controller.onMouseMove.addListener(this.onMouseMove);
         controller.onMouseUp.addListener(this.onMouseUp);
+        this.updateModeSpecificListener(controller.mode);
     };
 
-    private readonly onMouseDown = (ev: MouseEventInfo) => {
-        if (this.controller.mode === 'line') {
-            const newEntity = LineEntity.create({ p1: ev.point, p2: Point.model(ev.point.x + 1, ev.point.y + 1) });
-            const newEntityMap = { [newEntity.id]: newEntity };
+    private readonly onModeChange = (ev: ModeChangeEvent) => {
+        this.updateModeSpecificListener(ev.nextMode);
+    };
 
-            this.controller.addEntities(newEntityMap);
-            this.startSingleLineTransform(newEntity, ev.point, 'p2');
-        } else if (this.controller.mode === 'select') {
-            const { hover } = this.controller.state;
+    private updateModeSpecificListener(mode: EditorMode) {
+        if (mode === 'line') {
+            this.controller.onMouseDown.addListener(this.onMouseDownLineMode);
+        } else {
+            this.controller.onMouseDown.removeListener(this.onMouseDownLineMode);
+        }
 
-            if (ev.button === MouseEventButton.PRIMARY) {
-                if (hover.type === 'singleLineTransformHandle') {
-                    this.startSingleLineTransform(
-                        Object.values(this.controller.computeSelectedEntities())[0] as LineEntity,
-                        ev.point,
-                        hover.point
-                    );
-                }
+        if (mode === 'select') {
+            this.controller.onMouseDown.addListener(this.onMouseDownSelectMode);
+        } else {
+            this.controller.onMouseDown.removeListener(this.onMouseDownSelectMode);
+        }
+    }
+
+    private readonly onMouseDownLineMode = (ev: MouseEventInfo) => {
+        const newEntity = LineEntity.create({ p1: ev.point, p2: Point.model(ev.point.x + 1, ev.point.y + 1) });
+        const newEntityMap = { [newEntity.id]: newEntity };
+
+        this.controller.addEntities(newEntityMap);
+        this.startSingleLineTransform(newEntity, ev.point, 'p2');
+    };
+
+    private readonly onMouseDownSelectMode = (ev: MouseEventInfo) => {
+        const { hover } = this.controller.state;
+
+        if (ev.button === MouseEventButton.PRIMARY) {
+            if (hover.type === 'singleLineTransformHandle') {
+                this.startSingleLineTransform(
+                    Object.values(this.controller.computeSelectedEntities())[0] as LineEntity,
+                    ev.point,
+                    hover.point
+                );
             }
         }
     };
@@ -79,8 +99,11 @@ export class LineModeExtension implements Extension {
     };
 
     private readonly onMouseUp = () => {
+        if (this.startPoint === null || this.entity === null) return;
+
         this.entity = null;
         this.startPoint = null;
+        this.controller.setMode('select');
     };
 
     private startSingleLineTransform(entity: LineEntity, startPoint: ModelCordPoint, pointKey: 'p1' | 'p2') {

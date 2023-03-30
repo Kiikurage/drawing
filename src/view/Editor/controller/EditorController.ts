@@ -31,7 +31,7 @@ export class EditorController {
     }
 
     addExtension(extension: Extension): this {
-        extension.onActivate(this);
+        extension.onRegister(this);
         return this;
     }
 

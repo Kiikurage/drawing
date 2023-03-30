@@ -7,7 +7,7 @@ export class CameraExtension implements Extension {
     private controller: EditorController = null as never;
     private dragStartPosition: ModelCordPoint | null = null;
 
-    onActivate(controller: EditorController) {
+    onRegister(controller: EditorController) {
         this.controller = controller;
         controller.onZoom.addListener(this.onZoom);
         controller.onScroll.addListener(this.onScroll);

@@ -1,13 +1,29 @@
+import { EditorMode } from '../../model/EditorMode';
 import { EditorController, ModeChangeEvent, MouseEventButton, MouseEventInfo } from '../EditorController';
 import { Extension } from './Extension';
 
 export class ContextMenuExtension implements Extension {
     private controller: EditorController = null as never;
 
-    onActivate(controller: EditorController) {
+    onRegister(controller: EditorController) {
         this.controller = controller;
-        controller.onMouseDown.addListener(this.onMouseDown);
         controller.onModeChange.addListener(this.onModeChange);
+        this.updateModeSpecificListener(controller.mode);
+    }
+
+    private readonly onModeChange = (ev: ModeChangeEvent) => {
+        this.updateModeSpecificListener(ev.nextMode);
+        if (ev.nextMode !== 'select') {
+            this.controller.closeContextMenu();
+        }
+    };
+
+    private updateModeSpecificListener(mode: EditorMode) {
+        if (mode === 'select') {
+            this.controller.onMouseDown.addListener(this.onMouseDown);
+        } else {
+            this.controller.onMouseDown.removeListener(this.onMouseDown);
+        }
     }
 
     private readonly onMouseDown = (ev: MouseEventInfo) => {
@@ -25,12 +41,6 @@ export class ContextMenuExtension implements Extension {
                     return;
                 }
             }
-        }
-    };
-
-    private readonly onModeChange = (ev: ModeChangeEvent) => {
-        if (ev.prevMode === 'select') {
-            this.controller.closeContextMenu();
         }
     };
 }

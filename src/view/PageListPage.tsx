@@ -1,5 +1,5 @@
 import { css } from '@linaria/core';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppController } from './App/AppControllerContext';
 import { COLOR_SELECTION } from './styles';

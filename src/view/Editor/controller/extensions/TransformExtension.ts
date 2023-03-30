@@ -1,3 +1,4 @@
+import { EventDispatcher } from '../../../../lib/EventDispatcher';
 import { Record } from '../../../../lib/Record';
 import { ModelCordBox } from '../../../../model/Box';
 import { Entity } from '../../../../model/entity/Entity';
@@ -42,11 +43,13 @@ export class TransformExtension implements Extension {
         }
     }
 
-    onActivate = (controller: EditorController) => {
+    onRegister = (controller: EditorController) => {
         this.controller = controller;
         controller.onMouseMove.addListener(this.onMouseMove);
         controller.onMouseUp.addListener(this.onMouseUp);
     };
+
+    readonly onTransformEnd = EventDispatcher(() => {});
 
     private readonly onMouseMove = (ev: MouseEventInfo) => {
         const { point: nextPoint } = ev;
@@ -92,5 +95,6 @@ export class TransformExtension implements Extension {
         this.entities = null;
         this.startBox = null;
         this.transformType = null;
+        this.onTransformEnd();
     };
 }

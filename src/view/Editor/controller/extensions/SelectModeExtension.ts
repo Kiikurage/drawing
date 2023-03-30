@@ -1,5 +1,6 @@
+import { EditorMode } from '../../model/EditorMode';
 import { TransformType } from '../../model/TransformType';
-import { EditorController, MouseEventButton, MouseEventInfo } from '../EditorController';
+import { EditorController, ModeChangeEvent, MouseEventButton, MouseEventInfo } from '../EditorController';
 import { Extension } from './Extension';
 import { TransformExtension } from './TransformExtension';
 
@@ -8,14 +9,25 @@ export class SelectModeExtension implements Extension {
 
     constructor(private readonly transformExtension: TransformExtension) {}
 
-    onActivate = (controller: EditorController) => {
+    onRegister = (controller: EditorController) => {
         this.controller = controller;
-        controller.onMouseDown.addListener(this.onMouseDown);
+        controller.onModeChange.addListener(this.onModeChange);
+        this.updateModeSpecificListener(controller.mode);
     };
 
-    private readonly onMouseDown = (ev: MouseEventInfo) => {
-        if (this.controller.mode !== 'select') return;
+    private readonly onModeChange = (ev: ModeChangeEvent) => {
+        this.updateModeSpecificListener(ev.nextMode);
+    };
 
+    private updateModeSpecificListener(mode: EditorMode) {
+        if (mode === 'select') {
+            this.controller.onMouseDown.addListener(this.onMouseDown);
+        } else {
+            this.controller.onMouseDown.removeListener(this.onMouseDown);
+        }
+    }
+
+    private readonly onMouseDown = (ev: MouseEventInfo) => {
         const { hover } = this.controller.state;
 
         switch (ev.button) {
