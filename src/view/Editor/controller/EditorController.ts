@@ -4,12 +4,11 @@ import { Record } from '../../../lib/Record';
 import { ReadonlyStore, Store } from '../../../lib/Store';
 import { ModelCordBox } from '../../../model/Box';
 import { Entity } from '../../../model/entity/Entity';
-import { LineEntity } from '../../../model/entity/LineEntity';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, ModelCordSize, Size } from '../../../model/Size';
 import { HorizontalAlign, VerticalAlign } from '../../../model/TextAlign';
-import { createCollaborationController } from '../dependency';
+import { deps } from '../dependency';
 import { Camera } from '../model/Camera';
 import { ColorPaletteKey } from '../model/ColorPalette';
 import { EditorMode } from '../model/EditorMode';
@@ -17,38 +16,17 @@ import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
-import { KeyboardEventInfo, MouseEventInfo, UIMouseEvent } from '../model/MouseEventInfo';
-import { TransformType } from '../model/TransformType';
 import { EditorControllerCore } from './EditorControllerCore';
-import { EditorModeController } from './EditorModeController/EditorModeController';
-import { LineModeController } from './EditorModeController/LineModeController';
-import { RectModeController } from './EditorModeController/RectModeController';
-import { SelectModeController } from './EditorModeController/SelectModeController';
-import { TextEditModeController } from './EditorModeController/TextEditModeController';
-import { TextModeController } from './EditorModeController/TextModeController';
-import { Extension } from './Extension';
-import { SingleLineTransformSessionController } from './SingleLineTransformSessionController';
-import { TransformSessionController } from './TransformSessionController';
+import { Extension } from './extensions/Extension';
 
 /**
  * Root controller for Editor view
  */
 export class EditorController {
-    readonly collaborationController = createCollaborationController();
+    readonly collaborationController = deps.createCollaborationController();
     readonly core: EditorControllerCore;
-    private _currentPoint = Point.display(0, 0);
-    private readonly modeControllers: Record<EditorMode, EditorModeController>;
-    private transformSession: TransformSessionController | null = null;
-    private singleLineTransformSession: SingleLineTransformSessionController | null = null;
 
     constructor(initialData: Patch<EditorState>) {
-        this.modeControllers = {
-            rect: new RectModeController(this),
-            select: new SelectModeController(this),
-            line: new LineModeController(this),
-            text: new TextModeController(this),
-            textEditing: new TextEditModeController(this),
-        };
         this.core = new EditorControllerCore(new Store(EditorState.create(initialData)), this.collaborationController);
     }
 
@@ -66,16 +44,8 @@ export class EditorController {
         return this.store.state;
     }
 
-    get currentPoint(): ModelCordPoint {
-        return Point.toModel(this.state.camera, this._currentPoint);
-    }
-
-    private set currentPoint(point: ModelCordPoint) {
-        this._currentPoint = Point.toDisplay(this.state.camera, point);
-    }
-
-    get modeController(): EditorModeController {
-        return this.modeControllers[this.state.mode];
+    get mode(): EditorMode {
+        return this.state.mode;
     }
 
     get camera(): Camera {
@@ -97,10 +67,8 @@ export class EditorController {
     // Commands
 
     setMode(mode: EditorMode) {
-        this.modeController.onBeforeDeactivate?.();
         this.onModeChange(mode);
         this.core.setMode(mode);
-        this.modeController.onAfterActivate?.();
     }
 
     cut() {
@@ -184,7 +152,7 @@ export class EditorController {
             }
         }
 
-        this.modeController.onSelectedEntityChange?.(prevEntityIds, nextEntityIds);
+        // this.modeController.onSelectedEntityChange?.(prevEntityIds, nextEntityIds);
     }
 
     addSelection(entityId: string) {
@@ -253,69 +221,44 @@ export class EditorController {
         this.core.completeTextEdit();
     }
 
-    startTransform(entities: EntityMap, transformType: TransformType) {
-        this.transformSession = new TransformSessionController(this, entities, transformType);
-        this.core.startTransform(entities, transformType);
-    }
-
-    startSingleLineTransform(entity: LineEntity, pointKey: 'p1' | 'p2') {
-        this.singleLineTransformSession = new SingleLineTransformSessionController(this, entity, pointKey);
-        this.core.startSingleLineTransform(entity, pointKey);
-    }
-
     // Event handlers
 
-    readonly onZoom = EventDispatcher((diff: number) => {
-        return { diff };
+    readonly onZoom = EventDispatcher((ev: UIZoomEvent) => {
+        return {
+            ...ev,
+            point: Point.toModel(this.state.camera, ev.pointInDisplay),
+        } satisfies ZoomEvent;
     });
 
     readonly onScroll = EventDispatcher((diffInDisplay: DisplayCordSize) => {
         return {
             diff: Size.toModel(this.state.camera, diffInDisplay),
             diffInDisplay,
-        };
+        } satisfies ScrollEvent;
     });
 
-    onMouseDown = EventDispatcher((ev: UIMouseEvent) => {
-        const mouseEventInfo: MouseEventInfo = {
+    readonly onMouseDown = EventDispatcher((ev: UIMouseEvent) => {
+        return {
+            ...ev,
+            point: Point.toModel(this.state.camera, ev.pointInDisplay),
+        } satisfies MouseEventInfo;
+    });
+
+    readonly onMouseMove = EventDispatcher((ev: UIMouseEvent) => {
+        return {
             ...ev,
             point: Point.toModel(this.state.camera, ev.pointInDisplay),
         };
-
-        this.modeController.onMouseDown?.(mouseEventInfo);
-        return mouseEventInfo;
     });
 
-    onMouseMove = EventDispatcher((ev: UIMouseEvent) => {
-        const prevPoint = this.currentPoint;
-        const nextPoint = Point.toModel(this.state.camera, ev.pointInDisplay);
-        this.currentPoint = nextPoint;
-
-        this.transformSession?.onMouseMove(prevPoint, nextPoint);
-        this.singleLineTransformSession?.onMouseMove(prevPoint, nextPoint);
-        this.modeController.onMouseMove?.(prevPoint, nextPoint);
+    readonly onMouseUp = EventDispatcher((ev: UIMouseEvent) => {
+        this.core.completeTransform();
 
         return {
             ...ev,
-            point: nextPoint,
+            point: Point.toModel(this.camera, ev.pointInDisplay),
         };
     });
-
-    onMouseUp = EventDispatcher(() => {
-        this.core.completeTransform();
-
-        this.transformSession = null;
-        this.singleLineTransformSession = null;
-
-        this.modeController.onMouseUp?.();
-    });
-
-    onClick = (ev: UIMouseEvent) => {
-        this.modeController.onClick?.({
-            ...ev,
-            point: Point.toModel(this.camera, ev.pointInDisplay),
-        });
-    };
 
     onDoubleClick = (point: DisplayCordPoint) => {
         this.tryStartTextEditForSelectedEntity(point);
@@ -422,7 +365,7 @@ export class EditorController {
         if (ev.key === 'Control') this.disableSnap();
     };
 
-    onModeChange = EventDispatcher((nextMode: EditorMode) => {
+    readonly onModeChange = EventDispatcher((nextMode: EditorMode) => {
         const prevMode = this.state.mode;
 
         return { prevMode, nextMode } satisfies ModeChangeEvent;
@@ -439,18 +382,50 @@ export class EditorController {
     }
 }
 
+export interface UIMouseEvent {
+    pointInDisplay: DisplayCordPoint;
+    shiftKey: boolean;
+    button: number;
+}
+
+export interface MouseEventInfo {
+    point: ModelCordPoint;
+    pointInDisplay: DisplayCordPoint;
+    shiftKey: boolean;
+    button: number;
+}
+
+export module MouseEventButton {
+    export const PRIMARY = 0;
+    export const WHEEL = 1;
+    export const SECONDARY = 2;
+}
+export type MouseEventButton =
+    | typeof MouseEventButton.PRIMARY
+    | typeof MouseEventButton.WHEEL
+    | typeof MouseEventButton.SECONDARY;
+
+export interface KeyboardEventInfo {
+    preventDefault: () => void;
+    shiftKey: boolean;
+    ctrlKey: boolean;
+    key: string;
+}
+
+export interface UIZoomEvent {
+    pointInDisplay: DisplayCordPoint;
+    diff: number;
+}
+
 export interface ZoomEvent {
+    point: ModelCordPoint;
+    pointInDisplay: DisplayCordPoint;
     diff: number;
 }
 
 export interface ScrollEvent {
     diff: ModelCordSize;
     diffInDisplay: DisplayCordSize;
-}
-
-export interface MouseEvent {
-    point: ModelCordPoint;
-    pointInDisplay: DisplayCordPoint;
 }
 
 export interface ModeChangeEvent {

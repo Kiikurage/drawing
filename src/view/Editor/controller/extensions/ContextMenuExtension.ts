@@ -1,5 +1,4 @@
-import { MouseEventButton, MouseEventInfo } from '../model/MouseEventInfo';
-import { EditorController, ModeChangeEvent } from './EditorController';
+import { EditorController, ModeChangeEvent, MouseEventButton, MouseEventInfo } from '../EditorController';
 import { Extension } from './Extension';
 
 export class ContextMenuExtension implements Extension {
@@ -17,12 +16,12 @@ export class ContextMenuExtension implements Extension {
             switch (this.controller.state.hover.type) {
                 case 'entity': {
                     this.controller.setSelection([this.controller.state.hover.entityId]);
-                    this.controller.openContextMenu(this.controller.currentPoint);
+                    this.controller.openContextMenu(ev.point);
                     return;
                 }
 
                 case 'transformHandle': {
-                    this.controller.openContextMenu(this.controller.currentPoint);
+                    this.controller.openContextMenu(ev.point);
                     return;
                 }
             }

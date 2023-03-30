@@ -1,7 +1,6 @@
-import { ModelCordPoint, Point } from '../../../model/Point';
-import { Camera } from '../model/Camera';
-import { MouseEventButton, MouseEventInfo } from '../model/MouseEventInfo';
-import { EditorController, ScrollEvent, ZoomEvent } from './EditorController';
+import { ModelCordPoint, Point } from '../../../../model/Point';
+import { Camera } from '../../model/Camera';
+import { EditorController, MouseEventButton, MouseEventInfo, ScrollEvent, ZoomEvent } from '../EditorController';
 import { Extension } from './Extension';
 
 export class CameraExtension implements Extension {
@@ -19,7 +18,7 @@ export class CameraExtension implements Extension {
 
     private readonly onZoom = (ev: ZoomEvent) => {
         const camera = this.controller.camera;
-        const currentPoint = this.controller.currentPoint;
+        const currentPoint = ev.point;
         const newScale = Math.max(0.1, Math.min(camera.scale + ev.diff, 5));
 
         this.controller.setCamera(Camera.setScale(camera, currentPoint, newScale));
@@ -34,7 +33,7 @@ export class CameraExtension implements Extension {
 
     private readonly onMouseDown = (ev: MouseEventInfo) => {
         if (ev.button === MouseEventButton.WHEEL) {
-            this.dragStartPosition = this.controller.currentPoint;
+            this.dragStartPosition = ev.point;
         }
     };
 

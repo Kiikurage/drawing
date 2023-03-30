@@ -1,4 +1,4 @@
-import { EditorController } from './EditorController';
+import { EditorController } from '../EditorController';
 
 export interface Extension {
     //Extension登録時に呼ばれるハンドラ

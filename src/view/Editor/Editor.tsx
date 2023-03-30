@@ -3,9 +3,8 @@ import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'rea
 import { Page } from '../../model/Page';
 import { Point } from '../../model/Point';
 import { Size } from '../../model/Size';
-import { CameraExtension } from './controller/CameraExtension';
-import { ContextMenuExtension } from './controller/ContextMenuExtension';
 import { EditorController } from './controller/EditorController';
+import { deps } from './dependency';
 import { EditorControllerContextProvider } from './EditorControllerContext';
 import { ContentLayer } from './view/ContentLayer';
 import { ContextMenuPopup } from './view/ContextMenuPopup';
@@ -15,8 +14,15 @@ import { ToolBar } from './view/ToolBar';
 export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
     const [controller] = useState(() =>
         new EditorController({ page: defaultValue ?? Page.create() })
-            .addExtension(new CameraExtension())
-            .addExtension(new ContextMenuExtension())
+            .addExtension(deps.cameraExtension())
+            .addExtension(deps.contextMenuExtension())
+            .addExtension(deps.lineModeExtension())
+            .addExtension(deps.rangeSelectExtension())
+            .addExtension(deps.rectModeExtension())
+            .addExtension(deps.selectModeExtension())
+            .addExtension(deps.textEditModeExtension())
+            .addExtension(deps.textModeExtension())
+            .addExtension(deps.transformExtension())
     );
 
     const ref = useRef<HTMLDivElement>(null);
@@ -25,7 +31,10 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
             ev.preventDefault();
 
             if (ev.ctrlKey) {
-                controller.onZoom(-0.001 * ev.deltaY);
+                controller.onZoom({
+                    diff: -0.001 * ev.deltaY,
+                    pointInDisplay: Point.display(ev.clientX, ev.clientY),
+                });
             } else if (ev.shiftKey) {
                 controller.onScroll(Size.display(ev.deltaY, ev.deltaX));
             } else {
@@ -52,13 +61,22 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
             });
         };
 
+        const onMouseUp = (ev: MouseEvent) => {
+            const pointInDisplay = Point.display(ev.clientX, ev.clientY);
+            controller.onMouseUp({
+                button: ev.button,
+                shiftKey: ev.shiftKey,
+                pointInDisplay,
+            });
+        };
+
         window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', controller.onMouseUp);
+        window.addEventListener('mouseup', onMouseUp);
         window.addEventListener('keydown', controller.onKeyDown);
         window.addEventListener('keyup', controller.onKeyUp);
         return () => {
             window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', controller.onMouseUp);
+            window.removeEventListener('mouseup', onMouseUp);
             window.removeEventListener('keydown', controller.onKeyDown);
             window.removeEventListener('keyup', controller.onKeyUp);
         };
@@ -67,17 +85,6 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
     const onMouseDown: MouseEventHandler = useCallback(
         (ev) => {
             controller.onMouseDown({
-                button: ev.button,
-                shiftKey: ev.shiftKey,
-                pointInDisplay: Point.display(ev.clientX, ev.clientY),
-            });
-        },
-        [controller]
-    );
-
-    const onClick: MouseEventHandler = useCallback(
-        (ev) => {
-            controller.onClick({
                 button: ev.button,
                 shiftKey: ev.shiftKey,
                 pointInDisplay: Point.display(ev.clientX, ev.clientY),
@@ -101,7 +108,6 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                     }
                 `}
                 onMouseDown={onMouseDown}
-                onClick={onClick}
                 onContextMenu={(ev) => ev.preventDefault()}
                 onDoubleClick={(ev) => controller.onDoubleClick(Point.display(ev.clientX, ev.clientY))}
             >
