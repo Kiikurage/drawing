@@ -36,7 +36,7 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
             onMouseLeave={controller.onUnhover}
             onChange={(ev) => controller.setEntityText(entity.id, ev.target.value)}
             onContentSizeChange={(width, height) => {
-                controller.editController.updateEntities({
+                controller.updateEntities({
                     [entity.id]: {
                         contentSize: { width, height },
                     },

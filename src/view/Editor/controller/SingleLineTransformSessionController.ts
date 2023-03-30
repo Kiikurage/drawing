@@ -35,7 +35,7 @@ export class SingleLineTransformSessionController {
 
         const linkedEntity = this.findLinkTarget(nextLinePoint, this.controller.state.page.entities);
 
-        this.controller.editController.updateEntities({
+        this.controller.updateEntities({
             [this.entity.id]: {
                 [this.pointKey]: nextLinePoint,
                 linkedEntityId1: this.pointKey === 'p1' ? linkedEntity?.id ?? null : this.entity.linkedEntityId1,

@@ -4,13 +4,11 @@ import { ReadonlyStore, Store } from '../../../lib/Store';
 import { ModelCordBox } from '../../../model/Box';
 import { Entity } from '../../../model/entity/Entity';
 import { LineEntity } from '../../../model/entity/LineEntity';
-import { TextEntity } from '../../../model/entity/TextEntity';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, Size } from '../../../model/Size';
 import { HorizontalAlign, VerticalAlign } from '../../../model/TextAlign';
 import { createCollaborationController } from '../dependency';
-import { Camera } from '../model/Camera';
 import { ColorPaletteKey } from '../model/ColorPalette';
 import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
@@ -19,7 +17,7 @@ import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
 import { KeyboardEventInfo, MouseEventButton, MouseEventInfo } from '../model/MouseEventInfo';
 import { TransformType } from '../model/TransformType';
-import { EditController } from './EditController';
+import { EditorControllerCore } from './EditorControllerCore';
 import { EditorModeController } from './EditorModeController/EditorModeController';
 import { LineModeController } from './EditorModeController/LineModeController';
 import { RectModeController } from './EditorModeController/RectModeController';
@@ -35,16 +33,14 @@ import { TransformSessionController } from './TransformSessionController';
  */
 export class EditorController {
     readonly collaborationController = createCollaborationController();
-    readonly editController: EditController;
+    readonly core: EditorControllerCore;
     private _currentPoint = Point.display(0, 0);
-    private readonly _store: Store<EditorState>;
     private readonly modeControllers: Record<EditorMode, EditorModeController>;
     private scrollSession: ScrollSessionController | null = null;
     private transformSession: TransformSessionController | null = null;
     private singleLineTransformSession: SingleLineTransformSessionController | null = null;
 
     constructor(initialData: Patch<EditorState>) {
-        this._store = new Store(EditorState.create(initialData));
         this.modeControllers = {
             rect: new RectModeController(this),
             select: new SelectModeController(this),
@@ -52,24 +48,20 @@ export class EditorController {
             text: new TextModeController(this),
             textEditing: new TextEditModeController(this),
         };
-        this.editController = new EditController(this._store, this.collaborationController);
+        this.core = new EditorControllerCore(new Store(EditorState.create(initialData)), this.collaborationController);
     }
 
     // Utility getters
     get store(): ReadonlyStore<EditorState> {
-        return this._store;
+        return this.core.store;
     }
 
     get state(): EditorState {
         return this.store.state;
     }
 
-    private setState(patch: Patch<EditorState>) {
-        this._store.setState(patch);
-    }
-
     get currentPoint(): ModelCordPoint {
-        return Point.toModel(this.store.state.camera, this._currentPoint);
+        return Point.toModel(this.state.camera, this._currentPoint);
     }
 
     private set currentPoint(point: ModelCordPoint) {
@@ -77,14 +69,14 @@ export class EditorController {
     }
 
     get modeController(): EditorModeController {
-        return this.modeControllers[this.store.state.mode];
+        return this.modeControllers[this.state.mode];
     }
 
     computeSelectedEntities(): EntityMap {
         const result: EntityMap = {};
 
         for (const id of this.state.selectMode.entityIds) {
-            const entity = this.store.state.page.entities[id];
+            const entity = this.state.page.entities[id];
             if (!entity) continue;
             result[id] = entity;
         }
@@ -96,7 +88,7 @@ export class EditorController {
 
     setMode(mode: EditorMode) {
         this.modeController.onBeforeDeactivate?.();
-        this.setState({ mode });
+        this.core.setMode(mode);
         this.modeController.onAfterActivate?.();
     }
 
@@ -106,7 +98,7 @@ export class EditorController {
 
         navigator.clipboard.writeText(JSON.stringify(selectedEntities));
 
-        this.deleteEntities(this.store.state.selectMode.entityIds);
+        this.deleteEntities(this.state.selectMode.entityIds);
     }
 
     copy() {
@@ -134,11 +126,15 @@ export class EditorController {
     }
 
     addEntities(entities: EntityMap) {
-        this.editController.addEntities(entities);
+        this.core.addEntities(entities);
     }
 
     deleteEntities(entityIds: string[]) {
-        this.editController.deleteEntities(entityIds);
+        this.core.deleteEntities(entityIds);
+    }
+
+    updateEntities(patches: Record<string, Patch<Entity>>) {
+        this.core.updateEntities(patches);
     }
 
     deleteSelectedEntities() {
@@ -146,22 +142,22 @@ export class EditorController {
     }
 
     setColor(palette: ColorPaletteKey) {
-        this.editController.setColor(palette);
+        this.core.setColor(palette);
     }
 
     setVerticalTextAlign(align: VerticalAlign) {
-        this.editController.setVerticalTextAlign(align);
+        this.core.setVerticalTextAlign(align);
     }
 
     setHorizontalTextAlign(align: HorizontalAlign) {
-        this.editController.setHorizontalTextAlign(align);
+        this.core.setHorizontalTextAlign(align);
     }
 
     setSelection(entityIds: string[]) {
         const prevEntityIds = this.state.selectMode.entityIds;
         const nextEntityIds = entityIds.filter((entityId) => entityId in this.state.page.entities);
 
-        this.setState({ selectMode: { entityIds: nextEntityIds } });
+        this.core.setSelection(entityIds);
         this.setMode('select');
 
         const unselectedEntityIds = prevEntityIds.filter((entityId) => !nextEntityIds.includes(entityId));
@@ -172,7 +168,7 @@ export class EditorController {
 
             if (entity.type === 'text') {
                 if (entity.text.trim() === '') {
-                    this.editController.deleteEntities([entity.id]);
+                    this.core.deleteEntities([entity.id]);
                 }
             }
         }
@@ -185,7 +181,7 @@ export class EditorController {
     }
 
     selectAll() {
-        this.setSelection(Object.keys(this.store.state.page.entities));
+        this.setSelection(Object.keys(this.state.page.entities));
     }
 
     clearSelection() {
@@ -193,60 +189,43 @@ export class EditorController {
     }
 
     setSelectingRange(range: ModelCordBox) {
-        return this._store.setState({
-            selectMode: {
-                selecting: true,
-                range,
-            },
-        });
+        return this.core.setSelectingRange(range);
     }
 
     clearSelectingRange() {
-        return this._store.setState({
-            selectMode: {
-                selecting: false,
-            },
-        });
+        return this.core.clearSelectingRange();
     }
 
     openContextMenu(point: ModelCordPoint) {
-        this.setState({ contextMenu: { open: true, point } });
+        this.core.openContextMenu(point);
     }
 
     closeContextMenu() {
-        this.setState({ contextMenu: { open: false } });
+        this.core.closeContextMenu();
     }
 
     undo() {
-        this.editController.undo();
+        this.core.undo();
     }
 
     redo() {
-        this.editController.redo();
+        this.core.redo();
     }
 
     moveCamera(point: ModelCordPoint) {
-        this.setState({ camera: { point } });
-        document.title = `(${this.state.camera.point.x.toFixed(1)},${this.state.camera.point.y.toFixed(
-            1
-        )}) ${Math.floor(this.state.camera.scale * 100).toFixed(1)}%`;
+        this.core.moveCamera(point);
     }
 
     setCameraScale(focus: ModelCordPoint, scale: number) {
-        this.setState({
-            camera: Camera.setScale(this.state.camera, focus, scale),
-        });
-        document.title = `(${this.state.camera.point.x.toFixed(1)},${this.state.camera.point.y.toFixed(
-            1
-        )}) ${Math.floor(this.state.camera.scale * 100).toFixed(1)}%`;
+        this.core.setCameraScale(focus, scale);
     }
 
     enableSnap() {
-        this._store.setState({ selectMode: { snapEnabled: true } });
+        this.core.enableSnap();
     }
 
     disableSnap() {
-        this._store.setState({ selectMode: { snapEnabled: false } });
+        this.core.disableSnap();
     }
 
     tryStartTextEditForSelectedEntity(editStartPoint = Point.display(0, 0)) {
@@ -256,41 +235,25 @@ export class EditorController {
     }
 
     startTextEdit(entityId: string, editStartPoint = Point.display(0, 0)) {
-        const entity = this.state.page.entities[entityId];
-        if (entity === undefined) return;
-
-        this._store.setState({ textEditMode: { entityId, editStartPoint } });
-        this.setMode('textEditing');
+        this.core.startTextEdit(entityId, editStartPoint);
     }
 
     setEntityText(entityId: string, text: string) {
-        this.editController.setEntityText(entityId, text);
+        this.core.setEntityText(entityId, text);
     }
 
     completeTextEdit() {
-        const entity = this.state.page.entities[this.state.textEditMode.entityId];
-        if (entity) {
-            if (!this.state.selectMode.entityIds.includes(entity.id)) {
-                if ((entity as TextEntity).text.trim() === '') {
-                    this.editController.deleteEntities([entity.id]);
-                }
-            }
-        }
-
-        this.setMode('select');
-        this.clearSelection();
+        this.core.completeTextEdit();
     }
 
     startTransform(entities: EntityMap, transformType: TransformType) {
-        this.editController.saveSnapshot();
         this.transformSession = new TransformSessionController(this, entities, transformType);
-        this._store.setState({ selectMode: { transforming: true } });
+        this.core.startTransform(entities, transformType);
     }
 
     startSingleLineTransform(entity: LineEntity, pointKey: 'p1' | 'p2') {
-        this.editController.saveSnapshot();
         this.singleLineTransformSession = new SingleLineTransformSessionController(this, entity, pointKey);
-        this._store.setState({ selectMode: { transforming: true } });
+        this.core.startSingleLineTransform(entity, pointKey);
     }
 
     // Event handlers
@@ -302,7 +265,7 @@ export class EditorController {
     };
 
     onScroll = (diff: DisplayCordSize) => {
-        const diffInModel = Size.toModel(this.store.state.camera, diff);
+        const diffInModel = Size.toModel(this.state.camera, diff);
 
         const point = Point.model(
             this.state.camera.point.x + diffInModel.width,
@@ -321,7 +284,7 @@ export class EditorController {
 
     onMouseMove = (point: DisplayCordPoint) => {
         const prevPoint = this.currentPoint;
-        const nextPoint = Point.toModel(this.store.state.camera, point);
+        const nextPoint = Point.toModel(this.state.camera, point);
         this.currentPoint = nextPoint;
 
         this.scrollSession?.onMouseMove(prevPoint, nextPoint);
@@ -331,7 +294,7 @@ export class EditorController {
     };
 
     onMouseUp = () => {
-        this._store.setState({ selectMode: { transforming: false } });
+        this.core.completeTransform();
 
         this.scrollSession = null;
         this.transformSession = null;
@@ -349,13 +312,11 @@ export class EditorController {
     };
 
     onHover = (hover: HoverState) => {
-        this.setState({ hover });
+        this.core.setHover(hover);
     };
 
     onUnhover = () => {
-        if (this.store.state.hover === HoverState.IDLE) return;
-
-        this.setState({ hover: HoverState.IDLE });
+        this.core.setHover(undefined);
     };
 
     onKeyDown = (ev: KeyboardEventInfo) => {

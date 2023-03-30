@@ -68,6 +68,6 @@ export class TransformSessionController {
             }
         }
 
-        this.controller.editController.updateEntities(patches);
+        this.controller.updateEntities(patches);
     }
 }
