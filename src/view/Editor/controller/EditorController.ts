@@ -1,3 +1,4 @@
+import { EventDispatcher } from '../../../lib/EventDispatcher';
 import { randomId } from '../../../lib/randomId';
 import { Record } from '../../../lib/Record';
 import { ReadonlyStore, Store } from '../../../lib/Store';
@@ -6,16 +7,17 @@ import { Entity } from '../../../model/entity/Entity';
 import { LineEntity } from '../../../model/entity/LineEntity';
 import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
-import { DisplayCordSize, Size } from '../../../model/Size';
+import { DisplayCordSize, ModelCordSize, Size } from '../../../model/Size';
 import { HorizontalAlign, VerticalAlign } from '../../../model/TextAlign';
 import { createCollaborationController } from '../dependency';
+import { Camera } from '../model/Camera';
 import { ColorPaletteKey } from '../model/ColorPalette';
 import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
-import { KeyboardEventInfo, MouseEventButton, MouseEventInfo } from '../model/MouseEventInfo';
+import { KeyboardEventInfo, MouseEventInfo } from '../model/MouseEventInfo';
 import { TransformType } from '../model/TransformType';
 import { EditorControllerCore } from './EditorControllerCore';
 import { EditorModeController } from './EditorModeController/EditorModeController';
@@ -24,7 +26,7 @@ import { RectModeController } from './EditorModeController/RectModeController';
 import { SelectModeController } from './EditorModeController/SelectModeController';
 import { TextEditModeController } from './EditorModeController/TextEditModeController';
 import { TextModeController } from './EditorModeController/TextModeController';
-import { ScrollSessionController } from './ScrollSessionController';
+import { Extension } from './Extension';
 import { SingleLineTransformSessionController } from './SingleLineTransformSessionController';
 import { TransformSessionController } from './TransformSessionController';
 
@@ -36,7 +38,6 @@ export class EditorController {
     readonly core: EditorControllerCore;
     private _currentPoint = Point.display(0, 0);
     private readonly modeControllers: Record<EditorMode, EditorModeController>;
-    private scrollSession: ScrollSessionController | null = null;
     private transformSession: TransformSessionController | null = null;
     private singleLineTransformSession: SingleLineTransformSessionController | null = null;
 
@@ -49,6 +50,11 @@ export class EditorController {
             textEditing: new TextEditModeController(this),
         };
         this.core = new EditorControllerCore(new Store(EditorState.create(initialData)), this.collaborationController);
+    }
+
+    addExtension(extension: Extension): this {
+        extension.onActivate(this);
+        return this;
     }
 
     // Utility getters
@@ -70,6 +76,10 @@ export class EditorController {
 
     get modeController(): EditorModeController {
         return this.modeControllers[this.state.mode];
+    }
+
+    get camera(): Camera {
+        return this.state.camera;
     }
 
     computeSelectedEntities(): EntityMap {
@@ -212,12 +222,8 @@ export class EditorController {
         this.core.redo();
     }
 
-    moveCamera(point: ModelCordPoint) {
-        this.core.moveCamera(point);
-    }
-
-    setCameraScale(focus: ModelCordPoint, scale: number) {
-        this.core.setCameraScale(focus, scale);
+    setCamera(camera: Camera) {
+        this.core.setCamera(camera);
     }
 
     enableSnap() {
@@ -258,50 +264,45 @@ export class EditorController {
 
     // Event handlers
 
-    onZoom = (diff: number) => {
-        const newScale = Math.max(0.1, Math.min(this.state.camera.scale + diff, 5));
+    readonly onZoom = EventDispatcher((diff: number) => {
+        return { diff };
+    });
 
-        this.setCameraScale(this.currentPoint, newScale);
-    };
+    readonly onScroll = EventDispatcher((diffInDisplay: DisplayCordSize) => {
+        return {
+            diff: Size.toModel(this.state.camera, diffInDisplay),
+            diffInDisplay,
+        };
+    });
 
-    onScroll = (diff: DisplayCordSize) => {
-        const diffInModel = Size.toModel(this.state.camera, diff);
-
-        const point = Point.model(
-            this.state.camera.point.x + diffInModel.width,
-            this.state.camera.point.y + diffInModel.height
-        );
-
-        this.moveCamera(point);
-    };
-
-    onMouseDown = (info: MouseEventInfo) => {
-        if (info.button === MouseEventButton.WHEEL) {
-            this.scrollSession = new ScrollSessionController(this);
-        }
+    onMouseDown = EventDispatcher((info: MouseEventInfo) => {
         this.modeController.onMouseDown?.(info);
-    };
+        return info;
+    });
 
-    onMouseMove = (point: DisplayCordPoint) => {
+    onMouseMove = EventDispatcher((pointInDisplay: DisplayCordPoint) => {
         const prevPoint = this.currentPoint;
-        const nextPoint = Point.toModel(this.state.camera, point);
+        const nextPoint = Point.toModel(this.state.camera, pointInDisplay);
         this.currentPoint = nextPoint;
 
-        this.scrollSession?.onMouseMove(prevPoint, nextPoint);
         this.transformSession?.onMouseMove(prevPoint, nextPoint);
         this.singleLineTransformSession?.onMouseMove(prevPoint, nextPoint);
         this.modeController.onMouseMove?.(prevPoint, nextPoint);
-    };
 
-    onMouseUp = () => {
+        return {
+            point: nextPoint,
+            pointInDisplay,
+        };
+    });
+
+    onMouseUp = EventDispatcher(() => {
         this.core.completeTransform();
 
-        this.scrollSession = null;
         this.transformSession = null;
         this.singleLineTransformSession = null;
 
         this.modeController.onMouseUp?.();
-    };
+    });
 
     onClick = (info: MouseEventInfo) => {
         this.modeController.onClick?.(info);
@@ -421,4 +422,18 @@ export class EditorController {
 
         return true;
     }
+}
+
+export interface ZoomEvent {
+    diff: number;
+}
+
+export interface ScrollEvent {
+    diff: ModelCordSize;
+    diffInDisplay: DisplayCordSize;
+}
+
+export interface MouseEvent {
+    point: ModelCordPoint;
+    pointInDisplay: DisplayCordPoint;
 }

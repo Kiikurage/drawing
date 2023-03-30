@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Page } from '../../model/Page';
 import { Point } from '../../model/Point';
 import { Size } from '../../model/Size';
+import { CameraExtension } from './controller/CameraExtension';
 import { EditorController } from './controller/EditorController';
 import { EditorControllerContextProvider } from './EditorControllerContext';
 import { ContentLayer } from './view/ContentLayer';
@@ -11,7 +12,9 @@ import { IndicatorLayer } from './view/IndicatorLayer';
 import { ToolBar } from './view/ToolBar';
 
 export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
-    const [controller] = useState(() => new EditorController({ page: defaultValue ?? Page.create() }));
+    const [controller] = useState(() =>
+        new EditorController({ page: defaultValue ?? Page.create() }).addExtension(new CameraExtension())
+    );
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
