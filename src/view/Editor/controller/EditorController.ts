@@ -17,7 +17,7 @@ import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
-import { KeyboardEventInfo, MouseEventInfo } from '../model/MouseEventInfo';
+import { KeyboardEventInfo, MouseEventInfo, UIMouseEvent } from '../model/MouseEventInfo';
 import { TransformType } from '../model/TransformType';
 import { EditorControllerCore } from './EditorControllerCore';
 import { EditorModeController } from './EditorModeController/EditorModeController';
@@ -98,6 +98,7 @@ export class EditorController {
 
     setMode(mode: EditorMode) {
         this.modeController.onBeforeDeactivate?.();
+        this.onModeChange(mode);
         this.core.setMode(mode);
         this.modeController.onAfterActivate?.();
     }
@@ -275,14 +276,19 @@ export class EditorController {
         };
     });
 
-    onMouseDown = EventDispatcher((info: MouseEventInfo) => {
-        this.modeController.onMouseDown?.(info);
-        return info;
+    onMouseDown = EventDispatcher((ev: UIMouseEvent) => {
+        const mouseEventInfo: MouseEventInfo = {
+            ...ev,
+            point: Point.toModel(this.state.camera, ev.pointInDisplay),
+        };
+
+        this.modeController.onMouseDown?.(mouseEventInfo);
+        return mouseEventInfo;
     });
 
-    onMouseMove = EventDispatcher((pointInDisplay: DisplayCordPoint) => {
+    onMouseMove = EventDispatcher((ev: UIMouseEvent) => {
         const prevPoint = this.currentPoint;
-        const nextPoint = Point.toModel(this.state.camera, pointInDisplay);
+        const nextPoint = Point.toModel(this.state.camera, ev.pointInDisplay);
         this.currentPoint = nextPoint;
 
         this.transformSession?.onMouseMove(prevPoint, nextPoint);
@@ -290,8 +296,8 @@ export class EditorController {
         this.modeController.onMouseMove?.(prevPoint, nextPoint);
 
         return {
+            ...ev,
             point: nextPoint,
-            pointInDisplay,
         };
     });
 
@@ -304,8 +310,11 @@ export class EditorController {
         this.modeController.onMouseUp?.();
     });
 
-    onClick = (info: MouseEventInfo) => {
-        this.modeController.onClick?.(info);
+    onClick = (ev: UIMouseEvent) => {
+        this.modeController.onClick?.({
+            ...ev,
+            point: Point.toModel(this.camera, ev.pointInDisplay),
+        });
     };
 
     onDoubleClick = (point: DisplayCordPoint) => {
@@ -413,6 +422,12 @@ export class EditorController {
         if (ev.key === 'Control') this.disableSnap();
     };
 
+    onModeChange = EventDispatcher((nextMode: EditorMode) => {
+        const prevMode = this.state.mode;
+
+        return { prevMode, nextMode } satisfies ModeChangeEvent;
+    });
+
     private checkIfHoveredEntityTextEditable(): boolean {
         if (this.state.hover.type !== 'transformHandle') return false;
         if (this.state.selectMode.entityIds.length !== 1) return false;
@@ -436,4 +451,9 @@ export interface ScrollEvent {
 export interface MouseEvent {
     point: ModelCordPoint;
     pointInDisplay: DisplayCordPoint;
+}
+
+export interface ModeChangeEvent {
+    prevMode: EditorMode;
+    nextMode: EditorMode;
 }

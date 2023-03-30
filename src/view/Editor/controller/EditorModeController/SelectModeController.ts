@@ -9,7 +9,6 @@ export class SelectModeController extends EditorModeController {
     public rangeSelectSession: RangeSelectSessionController | null = null;
 
     onMouseDown = (ev: MouseEventInfo) => {
-        this.controller.closeContextMenu();
         const { hover } = this.controller.state;
 
         switch (ev.button) {
@@ -48,25 +47,6 @@ export class SelectModeController extends EditorModeController {
                 }
                 return;
             }
-
-            case MouseEventButton.SECONDARY: {
-                switch (hover.type) {
-                    case 'idle': {
-                        return;
-                    }
-
-                    case 'entity': {
-                        this.controller.setSelection([hover.entityId]);
-                        this.controller.openContextMenu(this.controller.currentPoint);
-                        return;
-                    }
-
-                    case 'transformHandle': {
-                        this.controller.openContextMenu(this.controller.currentPoint);
-                        return;
-                    }
-                }
-            }
         }
     };
 
@@ -77,10 +57,6 @@ export class SelectModeController extends EditorModeController {
     onMouseUp = () => {
         this.rangeSelectSession?.onMouseUp();
         this.rangeSelectSession = null;
-    };
-
-    onBeforeDeactivate = () => {
-        this.controller.closeContextMenu();
     };
 
     private startTransformSelectedEntities(type: TransformType) {

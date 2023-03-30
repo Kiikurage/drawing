@@ -1,5 +1,14 @@
+import { DisplayCordPoint, ModelCordPoint } from '../../../model/Point';
+
+export interface UIMouseEvent {
+    pointInDisplay: DisplayCordPoint;
+    shiftKey: boolean;
+    button: number;
+}
+
 export interface MouseEventInfo {
-    preventDefault: () => void;
+    point: ModelCordPoint;
+    pointInDisplay: DisplayCordPoint;
     shiftKey: boolean;
     button: number;
 }
