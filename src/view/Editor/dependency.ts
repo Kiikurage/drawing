@@ -16,7 +16,7 @@ import { TextModeExtension } from './controller/extensions/TextModeExtension';
 import { TransformExtension } from './controller/extensions/TransformExtension';
 
 export module deps {
-    const USE_DUMMY_CONTROLLERS = true;
+    const USE_DUMMY_CONTROLLERS = false;
 
     export const cameraExtension = singleton(() => new CameraExtension());
     export const contextMenuExtension = singleton(() => new ContextMenuExtension());

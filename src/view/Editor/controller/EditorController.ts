@@ -133,6 +133,10 @@ export class EditorController {
         this.core.setArrowHeadType(this.state.selectMode.entityIds, point, type);
     }
 
+    setLineLabelText(entityId: string, label: string) {
+        this.core.setLineLabelText(entityId, label);
+    }
+
     setVerticalTextAlign(align: VerticalAlign) {
         this.core.setVerticalTextAlign(align);
     }
@@ -212,12 +216,6 @@ export class EditorController {
         this.core.disableSnap();
     }
 
-    tryStartTextEditForSelectedEntity(editStartPoint = Point.display(0, 0)) {
-        if (this.checkIfHoveredEntityTextEditable()) {
-            this.startTextEdit(this.state.selectMode.entityIds[0]!, editStartPoint);
-        }
-    }
-
     startTextEdit(entityId: string, editStartPoint = Point.display(0, 0)) {
         this.core.startTextEdit(entityId, editStartPoint);
     }
@@ -261,17 +259,18 @@ export class EditorController {
     });
 
     readonly onMouseUp = EventDispatcher((ev: UIMouseEvent) => {
-        this.core.completeTransform();
-
         return {
             ...ev,
             point: Point.toModel(this.camera, ev.pointInDisplay),
         };
     });
 
-    onDoubleClick = (point: DisplayCordPoint) => {
-        this.tryStartTextEditForSelectedEntity(point);
-    };
+    readonly onDoubleClick = EventDispatcher((ev: UIMouseEvent) => {
+        return {
+            ...ev,
+            point: Point.toModel(this.camera, ev.pointInDisplay),
+        };
+    });
 
     onHover = (hover: HoverState) => {
         this.core.setHover(hover);
@@ -289,13 +288,13 @@ export class EditorController {
         if (ev.ctrlKey) keys.push('Control');
 
         switch (Key.serialize(keys)) {
-            case Key.serialize(['Enter']): {
-                if (this.state.mode !== 'textEditing') {
-                    ev.preventDefault();
-                    this.tryStartTextEditForSelectedEntity();
-                }
-                return;
-            }
+            // case Key.serialize(['Enter']): {
+            //     if (this.state.mode !== 'textEditing') {
+            //         ev.preventDefault();
+            //         this.tryStartTextEditForSelectedEntity();
+            //     }
+            //     return;
+            // }
             case Key.serialize(['Escape']): {
                 if (this.state.mode === 'textEditing') {
                     ev.preventDefault();
@@ -379,16 +378,6 @@ export class EditorController {
 
         return { prevMode, nextMode } satisfies ModeChangeEvent;
     });
-
-    private checkIfHoveredEntityTextEditable(): boolean {
-        if (this.state.hover.type !== 'transformHandle') return false;
-        if (this.state.selectMode.entityIds.length !== 1) return false;
-
-        const selectedEntity = Object.values(this.computeSelectedEntities())[0]!;
-        if (!Entity.isTextEditable(selectedEntity)) return false;
-
-        return true;
-    }
 }
 
 export interface UIMouseEvent {

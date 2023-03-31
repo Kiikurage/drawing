@@ -109,7 +109,13 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                 `}
                 onMouseDown={onMouseDown}
                 onContextMenu={(ev) => ev.preventDefault()}
-                onDoubleClick={(ev) => controller.onDoubleClick(Point.display(ev.clientX, ev.clientY))}
+                onDoubleClick={(ev) =>
+                    controller.onDoubleClick({
+                        button: ev.button,
+                        shiftKey: ev.shiftKey,
+                        pointInDisplay: Point.display(ev.clientX, ev.clientY),
+                    })
+                }
             >
                 <ContentLayer />
                 <IndicatorLayer />

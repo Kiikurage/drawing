@@ -7,15 +7,20 @@ import { useEditorController } from '../../EditorControllerContext';
 import { ModelCordPoint, Point } from '../../../../model/Point';
 import { ReactNode, useMemo } from 'react';
 import { ColorPalette } from '../../model/ColorPalette';
+import { EditableTextView2 } from './EditableTextView2';
 
 export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     const controller = useEditorController();
-    const { camera, highlighted } = useSlice(controller.store, (state) => ({
-        camera: state.camera,
-        highlighted:
-            state.selectMode.entityIds.includes(entity.id) ||
-            (state.hover.type === 'entity' && state.hover.entityId === entity.id),
-    }));
+    const { camera, textEditing, highlighted } = useSlice(controller.store, (state) => {
+        const textEditing = state.mode === 'textEditing' && state.textEditMode.entityId === entity.id;
+        return {
+            camera: state.camera,
+            textEditing,
+            highlighted:
+                state.selectMode.entityIds.includes(entity.id) ||
+                (state.hover.type === 'entity' && state.hover.entityId === entity.id),
+        };
+    });
 
     const { id, p1, p2, palette } = entity;
 
@@ -68,33 +73,69 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     }, [entity.arrowHeadType1, entity.arrowHeadType2, origin.x, origin.y, p1, p2, palette]);
 
     return (
-        <svg
+        <div
             className={css`
                 position: absolute;
             `}
             style={{
-                left: origin.x - 100,
-                top: origin.y - 100,
+                width: width,
+                height: height,
+                left: origin.x,
+                top: origin.y,
             }}
-            width={Math.abs(width) + 200}
-            height={Math.abs(height) + 200}
         >
-            <g
-                transform="translate(100,100)"
-                pointerEvents="all"
-                onMouseOver={() => controller.onHover({ type: 'entity', entityId: id })}
-                onMouseLeave={controller.onUnhover}
+            <svg
+                className={css`
+                    position: absolute;
+                `}
+                style={{
+                    left: -100,
+                    top: -100,
+                }}
+                width={width + 200}
+                height={height + 200}
             >
-                {content}
-                {highlighted && (
-                    <path
-                        d={`M${p1.x - origin.x},${p1.y - origin.y} L${p2.x - origin.x},${p2.y - origin.y}`}
-                        stroke={COLOR_SELECTION}
-                        strokeWidth={2 / camera.scale}
+                <g
+                    transform="translate(100,100)"
+                    pointerEvents="all"
+                    onMouseOver={() => controller.onHover({ type: 'entity', entityId: id })}
+                    onMouseLeave={controller.onUnhover}
+                >
+                    {content}
+                    {highlighted && (
+                        <path
+                            d={`M${p1.x - origin.x},${p1.y - origin.y} L${p2.x - origin.x},${p2.y - origin.y}`}
+                            stroke={COLOR_SELECTION}
+                            strokeWidth={2 / camera.scale}
+                        />
+                    )}
+                </g>
+            </svg>
+            {(textEditing || entity.label !== '') && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        left: width / 2,
+                        top: height / 2,
+                        transform: `translate(-50%, -50%)`,
+                        background: '#fff',
+                        borderRadius: 8,
+                    }}
+                >
+                    <EditableTextView2
+                        value={entity.label}
+                        editing={textEditing}
+                        textColor="#000"
+                        verticalAlign="center"
+                        horizontalAlign="center"
+                        camera={camera}
+                        onChange={(ev) => {
+                            controller.setLineLabelText(entity.id, ev.target.value);
+                        }}
                     />
-                )}
-            </g>
-        </svg>
+                </div>
+            )}
+        </div>
     );
 };
 
@@ -120,8 +161,4 @@ function computeArrowHeadPoint(p1: ModelCordPoint, p2: ModelCordPoint): [ModelCo
     const p4 = Point.model(p1.x + v4x, p1.y + v4y);
 
     return [p3, p4];
-}
-
-function path(p1: ModelCordPoint, p2: ModelCordPoint, origin: ModelCordPoint) {
-    return ``;
 }

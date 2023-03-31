@@ -14,6 +14,7 @@ export interface LineEntity {
     p1: ModelCordPoint;
     palette: ColorPaletteKey;
     p2: ModelCordPoint;
+    label: string;
     linkedEntityId1: string | null;
     linkedEntityId2: string | null;
     arrowHeadType1: ArrowHeadType;
@@ -28,6 +29,7 @@ export module LineEntity {
                 type: 'line',
                 p1: Point.model(0, 0),
                 p2: Point.model(100, 100),
+                label: '',
                 palette: 'BLACK',
                 linkedEntityId1: null,
                 linkedEntityId2: null,
@@ -57,7 +59,7 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
         };
     },
     isTextEditable(): boolean {
-        return false;
+        return true;
     },
     includes(): boolean {
         return false;

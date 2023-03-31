@@ -3,7 +3,6 @@ import { ReadonlyStore, Store } from '../../../lib/Store';
 import { ModelCordBox } from '../../../model/Box';
 import { CRDTPage, CRDTPageAction } from '../../../model/CRDTPage';
 import { Entity } from '../../../model/entity/Entity';
-import { LineEntity } from '../../../model/entity/LineEntity';
 import { TextEntity } from '../../../model/entity/TextEntity';
 import { Page } from '../../../model/Page';
 import { Patch } from '../../../model/Patch';
@@ -15,7 +14,6 @@ import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
-import { TransformType } from '../model/TransformType';
 import { CollaborationController } from './CollaborationController/CollaborationController';
 import { ArrowHeadType } from '../../../model/ArrowHeadType';
 import { nonNull } from '../../../lib/nonNull';
@@ -101,6 +99,12 @@ export class EditorControllerCore {
             })
             .filter(nonNull);
         this.dispatchActions(actions);
+    }
+
+    setLineLabelText(entityId: string, label: string) {
+        this.saveSnapshot();
+        const action = this.page.updateEntity(entityId, 'label', { label });
+        this.dispatchActions([action]);
     }
 
     setVerticalTextAlign(verticalAlign: VerticalAlign) {
@@ -226,20 +230,6 @@ export class EditorControllerCore {
 
         this.setMode('select');
         this.setSelection([]);
-    }
-
-    startTransform(entities: EntityMap, transformType: TransformType) {
-        this.saveSnapshot();
-        this._store.setState({ selectMode: { transforming: true } });
-    }
-
-    startSingleLineTransform(entity: LineEntity, pointKey: 'p1' | 'p2') {
-        this.saveSnapshot();
-        this._store.setState({ selectMode: { transforming: true } });
-    }
-
-    completeTransform() {
-        this._store.setState({ selectMode: { transforming: false } });
     }
 
     setHover(hover: HoverState = HoverState.IDLE) {
