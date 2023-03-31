@@ -6,6 +6,7 @@ import { Patch } from '../Patch';
 import { ModelCordPoint, Point } from '../Point';
 import { Size } from '../Size';
 import { Entity, EntityDelegates } from './Entity';
+import { ArrowHeadType } from '../ArrowHeadType';
 
 export interface LineEntity {
     id: string;
@@ -15,6 +16,8 @@ export interface LineEntity {
     p2: ModelCordPoint;
     linkedEntityId1: string | null;
     linkedEntityId2: string | null;
+    arrowHeadType1: ArrowHeadType;
+    arrowHeadType2: ArrowHeadType;
 }
 
 export module LineEntity {
@@ -28,6 +31,8 @@ export module LineEntity {
                 palette: 'BLACK',
                 linkedEntityId1: null,
                 linkedEntityId2: null,
+                arrowHeadType1: 'none',
+                arrowHeadType2: 'arrow',
             },
             data
         );

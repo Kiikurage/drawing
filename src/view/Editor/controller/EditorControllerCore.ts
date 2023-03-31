@@ -17,6 +17,8 @@ import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
 import { TransformType } from '../model/TransformType';
 import { CollaborationController } from './CollaborationController/CollaborationController';
+import { ArrowHeadType } from '../../../model/ArrowHeadType';
+import { nonNull } from '../../../lib/nonNull';
 
 export class EditorControllerCore {
     private page = new CRDTPage();
@@ -82,6 +84,22 @@ export class EditorControllerCore {
         const actions = this._store.state.selectMode.entityIds.map((entityId) =>
             this.page.updateEntity(entityId, 'style', { palette })
         );
+        this.dispatchActions(actions);
+    }
+
+    setArrowHeadType(entityIds: string[], point: 'p1' | 'p2', type: ArrowHeadType) {
+        this.saveSnapshot();
+        const actions = this._store.state.selectMode.entityIds
+            .map((entityId) => {
+                const entity = this.state.page.entities[entityId];
+                if (entity?.type !== 'line') return null;
+
+                return this.page.updateEntity(entityId, 'arrowHeadType', {
+                    arrowHeadType1: point === 'p1' ? type : entity.arrowHeadType1,
+                    arrowHeadType2: point === 'p2' ? type : entity.arrowHeadType2,
+                });
+            })
+            .filter(nonNull);
         this.dispatchActions(actions);
     }
 

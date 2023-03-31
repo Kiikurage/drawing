@@ -18,6 +18,7 @@ import { HoverState } from '../model/HoverState';
 import { Key } from '../model/Key';
 import { EditorControllerCore } from './EditorControllerCore';
 import { Extension } from './extensions/Extension';
+import { ArrowHeadType } from '../../../model/ArrowHeadType';
 
 /**
  * Root controller for Editor view
@@ -122,6 +123,14 @@ export class EditorController {
 
     setColor(palette: ColorPaletteKey) {
         this.core.setColor(palette);
+    }
+
+    setArrowHeadType(entityIds: string[], point: 'p1' | 'p2', type: ArrowHeadType) {
+        this.core.setArrowHeadType(entityIds, point, type);
+    }
+
+    setArrowHeadTypeForSelectedEntities(point: 'p1' | 'p2', type: ArrowHeadType) {
+        this.core.setArrowHeadType(this.state.selectMode.entityIds, point, type);
     }
 
     setVerticalTextAlign(align: VerticalAlign) {
