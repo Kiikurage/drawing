@@ -9,16 +9,17 @@ export module Patch {
 
         const nextState = { ...prevState };
 
-        for (const [key, value] of entries) {
-            if (value === undefined) {
+        for (const [key, nextValue] of entries) {
+            const prevValue = prevState[key];
+            if (nextValue === undefined) {
                 delete nextState[key];
-            } else if (prevState[key] === undefined || prevState[key] === null) {
-                nextState[key] = value;
-            } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            } else if (prevValue === undefined || prevValue === null) {
+                nextState[key] = nextValue;
+            } else if (typeof nextValue === 'object' && nextValue !== null && !Array.isArray(nextValue)) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                nextState[key] = Patch.apply(prevState[key] as any, value);
+                nextState[key] = Patch.apply(prevValue as any, nextValue);
             } else {
-                nextState[key] = value;
+                nextState[key] = nextValue;
             }
         }
 

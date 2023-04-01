@@ -46,13 +46,15 @@ export class CRDTPage implements Page {
         const { page = Page.create(), collaborationController = new DummyCollaborationController() } = options;
 
         this.id = page.id;
-        this.entities = page.entities;
+        this.entities = { ...page.entities };
         this.metadata = Record.mapValue(page.entities, () => ({
             clock: { addDel: VectorClock.inc({}, this.replicaId) },
         }));
         this.collaborationController = collaborationController;
 
-        this.collaborationController.addActionListener(this.id, (action) => this.applyActions([action]));
+        this.collaborationController.addActionListener(this.id, (action) => {
+            this.applyActions([action]);
+        });
     }
 
     private add(entity: Entity): EntityAddAction {
@@ -64,7 +66,7 @@ export class CRDTPage implements Page {
             clock: { addDel: nextClock },
         };
 
-        return [ActionType.ENTITY_ADD, nextClock, entity];
+        return { type: 'add', clock: nextClock, entity };
     }
 
     private delete(entityId: string): EntityDeleteAction {
@@ -79,7 +81,7 @@ export class CRDTPage implements Page {
             deleted: true,
         };
 
-        return [ActionType.ENTITY_DELETE, nextClock, entityId];
+        return { type: 'delete', clock: nextClock, entityId };
     }
 
     private update(entityId: string, type: string, patch: Patch<Entity>): EntityUpdateAction {
@@ -99,15 +101,15 @@ export class CRDTPage implements Page {
             },
         };
 
-        return [ActionType.ENTITY_UPDATE, nextClock, entityId, type, patch];
+        return { type: 'update', clock: nextClock, entityId, updateType: type, patch };
     }
 
     private apply(action: CRDTPageAction) {
-        const [type, clock] = action;
+        const { type, clock } = action;
 
         switch (type) {
-            case ActionType.ENTITY_ADD: {
-                const entity = action[2];
+            case 'add': {
+                const entity = action.entity;
                 const prevClock = this.metadata[entity.id]?.clock?.addDel ?? VectorClock.empty();
                 switch (VectorClock.compare(prevClock, clock)) {
                     case 'gt':
@@ -132,8 +134,8 @@ export class CRDTPage implements Page {
                 break;
             }
 
-            case ActionType.ENTITY_DELETE: {
-                const entityId = action[2];
+            case 'delete': {
+                const entityId = action.entityId;
                 const prevClock = this.metadata[entityId]?.clock?.addDel ?? VectorClock.empty();
                 switch (VectorClock.compare(prevClock, clock)) {
                     case 'gt':
@@ -152,8 +154,8 @@ export class CRDTPage implements Page {
                 break;
             }
 
-            case ActionType.ENTITY_UPDATE: {
-                const [, , entityId, updateType, patch] = action;
+            case 'update': {
+                const { entityId, updateType, patch } = action;
                 const prevClock = this.metadata[entityId]?.clock?.[updateType] ?? VectorClock.empty();
                 const metadata = this.metadata[entityId];
                 if (!metadata) throw new Error('Unreachable');
@@ -166,7 +168,9 @@ export class CRDTPage implements Page {
                     case 'concurrent': {
                         // Value is concurrently updated by multiple replicas
                         if (VectorClock.hardCompare(prevClock, clock) === 'lt') {
-                            const prevEntity = this.entities[entityId]!;
+                            const prevEntity = this.entities[entityId];
+                            if (!prevEntity) throw new Error('Unreachable');
+
                             this.entities[entityId] = Patch.apply(prevEntity, patch);
                             this.metadata[entityId] = {
                                 ...metadata,
@@ -176,7 +180,9 @@ export class CRDTPage implements Page {
                         return;
                     }
                     case 'lt': {
-                        const prevEntity = this.entities[entityId]!;
+                        const prevEntity = this.entities[entityId];
+                        if (!prevEntity) throw new Error('Unreachable');
+
                         this.entities[entityId] = Patch.apply(prevEntity, patch);
                         this.metadata[entityId] = {
                             ...metadata,
@@ -200,13 +206,12 @@ export class CRDTPage implements Page {
         };
 
         fn(dataModifier);
+        this.onChange?.();
 
         this.dispatchActions(actions);
     }
 
     private dispatchActions(actions: CRDTPageAction[]) {
-        this.applyActions(actions);
-
         // TODO
         this.collaborationController.dispatchActions(this.id, actions);
         this.collaborationController.savePage({
@@ -218,10 +223,10 @@ export class CRDTPage implements Page {
     private applyActions(actions: CRDTPageAction[]) {
         for (const action of actions) this.apply(action);
 
-        this.onChangeByRemote?.();
+        this.onChange?.();
     }
 
-    onChangeByRemote?: () => void;
+    onChange?: () => void;
 }
 
 interface Transaction {
@@ -234,18 +239,22 @@ interface Transaction {
 
 export type CRDTPageAction = EntityAddAction | EntityDeleteAction | EntityUpdateAction;
 
-enum ActionType {
-    ENTITY_ADD = 0,
-    ENTITY_DELETE = 1,
-    ENTITY_UPDATE = 2,
+interface EntityAddAction {
+    type: 'add';
+    clock: VectorClock;
+    entity: Entity;
 }
 
-type EntityAddAction = [type: ActionType.ENTITY_ADD, clock: VectorClock, entity: Entity];
-type EntityDeleteAction = [type: ActionType.ENTITY_DELETE, clock: VectorClock, entityId: string];
-type EntityUpdateAction = [
-    type: ActionType.ENTITY_UPDATE,
-    clock: VectorClock,
-    entityId: string,
-    updateType: string,
-    patch: Patch<Entity>
-];
+interface EntityDeleteAction {
+    type: 'delete';
+    clock: VectorClock;
+    entityId: string;
+}
+
+interface EntityUpdateAction {
+    type: 'update';
+    clock: VectorClock;
+    entityId: string;
+    updateType: string;
+    patch: Patch<Entity>;
+}

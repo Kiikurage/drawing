@@ -30,17 +30,13 @@ export class EditorControllerCore {
             page: this._store.state.page,
             collaborationController: this.collaborationController,
         });
-        this.page.onChangeByRemote = () => {
-            const newEntities = this.page.entities;
+        this.page.onChange = () => {
             this._store.setState({
                 page: {
-                    entities: {
-                        ...Record.mapValue(this._store.state.page.entities, () => undefined),
-                        ...newEntities,
-                    },
+                    entities: { ...this.page.entities },
                 },
                 selectMode: {
-                    entityIds: this._store.state.selectMode.entityIds.filter((id) => id in newEntities),
+                    entityIds: this._store.state.selectMode.entityIds.filter((id) => id in this.page.entities),
                 },
             });
         };
