@@ -15,38 +15,44 @@ import { TextEditModeExtension } from '../view/Editor/controller/extensions/Text
 import { TextModeExtension } from '../view/Editor/controller/extensions/TextModeExtension';
 import { TransformExtension } from '../view/Editor/controller/extensions/TransformExtension';
 import { initializeApp } from 'firebase/app';
+import { LivePage } from '../view/Editor/model/LivePage/LivePage';
+import { CRDTLivePage } from '../view/Editor/model/LivePage/CRDTLivePage';
+import { Page } from '../model/Page';
 
 export module deps {
-    const USE_DUMMY_CONTROLLERS = false;
+    const USE_FIREBASE = true;
+    const ENV = location.host.includes('localhost') ? 'qa' : 'prod';
+    const LIVE_PAGE_IMPL: 'crdt' | 'liveblock' = 'crdt';
 
     export function getFirebaseApp() {
         return initializeApp(getFirebaseConfig());
     }
 
     export const getFirebaseConfig = singleton(() => {
-        if (location.host.includes('localhost')) {
-            return {
-                apiKey: 'AIzaSyBnI9_5RIfnPMH9fr14Jwf3FmWmAXOgPjs',
-                authDomain: 'fir-qa-907fa.firebaseapp.com',
-                projectId: 'fir-qa-907fa',
-                storageBucket: 'fir-qa-907fa.appspot.com',
-                messagingSenderId: '368939233132',
-                appId: '1:368939233132:web:12098b89a90c6195eb0d49',
-                measurementId: 'G-NC24LYNMK5',
-                databaseURL: 'https://fir-qa-907fa-default-rtdb.asia-southeast1.firebasedatabase.app/',
-            };
-        } else {
-            return {
-                apiKey: 'AIzaSyDutIBJK2Mj6AGi7v7RmMMv2xjjMuj_h6c',
-                authDomain: 'drawing-e3c7b.firebaseapp.com',
-                projectId: 'drawing-e3c7b',
-                storageBucket: 'drawing-e3c7b.appspot.com',
-                messagingSenderId: '687442118487',
-                appId: '1:687442118487:web:9c3c5709cd3374b002a012',
-                measurementId: 'G-6H14S5XYBZ',
+        switch (ENV) {
+            case 'qa':
+                return {
+                    apiKey: 'AIzaSyBnI9_5RIfnPMH9fr14Jwf3FmWmAXOgPjs',
+                    authDomain: 'fir-qa-907fa.firebaseapp.com',
+                    projectId: 'fir-qa-907fa',
+                    storageBucket: 'fir-qa-907fa.appspot.com',
+                    messagingSenderId: '368939233132',
+                    appId: '1:368939233132:web:12098b89a90c6195eb0d49',
+                    measurementId: 'G-NC24LYNMK5',
+                    databaseURL: 'https://fir-qa-907fa-default-rtdb.asia-southeast1.firebasedatabase.app/',
+                };
 
-                databaseURL: 'https://drawing-e3c7b-default-rtdb.asia-southeast1.firebasedatabase.app',
-            };
+            case 'prod':
+                return {
+                    apiKey: 'AIzaSyDutIBJK2Mj6AGi7v7RmMMv2xjjMuj_h6c',
+                    authDomain: 'drawing-e3c7b.firebaseapp.com',
+                    projectId: 'drawing-e3c7b',
+                    storageBucket: 'drawing-e3c7b.appspot.com',
+                    messagingSenderId: '687442118487',
+                    appId: '1:687442118487:web:9c3c5709cd3374b002a012',
+                    measurementId: 'G-6H14S5XYBZ',
+                    databaseURL: 'https://drawing-e3c7b-default-rtdb.asia-southeast1.firebasedatabase.app',
+                };
         }
     });
     export const cameraExtension = singleton(() => new CameraExtension());
@@ -61,19 +67,29 @@ export module deps {
 
     export const transformExtension = singleton(() => new TransformExtension());
 
+    export function createLivePage(page?: Page): LivePage {
+        switch (LIVE_PAGE_IMPL) {
+            case 'crdt':
+                return new CRDTLivePage({ page, collaborationController: createCollaborationController() });
+
+            case 'liveblock':
+                throw new Error('Not implemented yet');
+        }
+    }
+
     export function createCollaborationController(): CollaborationController {
-        if (USE_DUMMY_CONTROLLERS && location.host.includes('localhost')) {
-            return new DummyCollaborationController();
-        } else {
+        if (ENV === 'prod' || USE_FIREBASE) {
             return new FirebaseCollaborationController();
+        } else {
+            return new DummyCollaborationController();
         }
     }
 
     export function createSessionInitController(): AppController {
-        if (USE_DUMMY_CONTROLLERS && location.host.includes('localhost')) {
-            return new DummyAppController();
-        } else {
+        if (ENV === 'prod' || USE_FIREBASE) {
             return new FirebaseAppController();
+        } else {
+            return new DummyAppController();
         }
     }
 }

@@ -1,4 +1,4 @@
-import { CRDTPageAction } from '../../../../model/CRDTPage';
+import { CRDTPageAction } from '../../model/LivePage/CRDTLivePage';
 import { Page } from '../../../../model/Page';
 
 export interface CollaborationController {

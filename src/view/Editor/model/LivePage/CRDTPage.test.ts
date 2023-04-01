@@ -1,14 +1,14 @@
-import { CRDTPage, CRDTPageWithTestVisibility } from './CRDTPage';
-import { LineEntity } from './entity/LineEntity';
-import { RectEntity } from './entity/RectEntity';
-import { Patch } from './Patch';
-import { Point } from './Point';
+import { CRDTLivePage, CRDTLivePageWithTestVisibility } from './CRDTLivePage';
+import { LineEntity } from '../../../../model/entity/LineEntity';
+import { RectEntity } from '../../../../model/entity/RectEntity';
+import { Patch } from '../../../../model/Patch';
+import { Point } from '../../../../model/Point';
 
 describe('CRDTPage', () => {
     it('Add and delete entities with no concurrent updates', () => {
-        const page1 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page2 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page3 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
+        const page1 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page2 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page3 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
         const entity1 = RectEntity.create();
         const entity2 = LineEntity.create();
 
@@ -44,9 +44,9 @@ describe('CRDTPage', () => {
     });
 
     it('Add and delete entities with concurrent updates', () => {
-        const page1 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page2 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page3 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
+        const page1 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page2 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page3 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
         const entity1 = RectEntity.create();
         const entity2 = LineEntity.create();
 
@@ -90,8 +90,8 @@ describe('CRDTPage', () => {
     });
 
     it('Deleted entity can be re-added by user who deleted it', () => {
-        const page1 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page2 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
+        const page1 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page2 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
         const entity1 = RectEntity.create();
 
         const action1 = page1.add(entity1); // page1=[1, 0], page2=[0, 0], action1=[1, 0]
@@ -116,9 +116,9 @@ describe('CRDTPage', () => {
     });
 
     it('Transform and style update must be accepted independently', () => {
-        const page1 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page2 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page3 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
+        const page1 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page2 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page3 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
         const entity1 = RectEntity.create();
 
         const action1 = page1.add(entity1);
@@ -150,9 +150,9 @@ describe('CRDTPage', () => {
     });
 
     it('Delete action must be prioritized than transform or style update', () => {
-        const page1 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page2 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
-        const page3 = new CRDTPage() as unknown as CRDTPageWithTestVisibility;
+        const page1 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page2 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
+        const page3 = new CRDTLivePage() as unknown as CRDTLivePageWithTestVisibility;
         const entity1 = RectEntity.create();
 
         const action1 = page1.add(entity1);

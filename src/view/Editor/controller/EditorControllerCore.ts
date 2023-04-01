@@ -1,7 +1,6 @@
 import { Record } from '../../../lib/Record';
 import { ReadonlyStore, Store } from '../../../lib/Store';
 import { ModelCordBox } from '../../../model/Box';
-import { CRDTPage } from '../../../model/CRDTPage';
 import { Entity } from '../../../model/entity/Entity';
 import { TextEntity } from '../../../model/entity/TextEntity';
 import { Page } from '../../../model/Page';
@@ -14,22 +13,16 @@ import { EditorMode } from '../model/EditorMode';
 import { EditorState } from '../model/EditorState';
 import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
-import { CollaborationController } from './CollaborationController/CollaborationController';
 import { ArrowHeadType } from '../../../model/ArrowHeadType';
+import { deps } from '../../../config/dependency';
 
 export class EditorControllerCore {
     private readonly page;
     private readonly undoStack: Page[] = [];
     private readonly redoStack: Page[] = [];
 
-    constructor(
-        private readonly _store: Store<EditorState>,
-        private readonly collaborationController: CollaborationController
-    ) {
-        this.page = new CRDTPage({
-            page: this._store.state.page,
-            collaborationController: this.collaborationController,
-        });
+    constructor(private readonly _store: Store<EditorState>) {
+        this.page = deps.createLivePage(this._store.state.page);
         this.page.onChange = () => {
             this._store.setState({
                 page: {

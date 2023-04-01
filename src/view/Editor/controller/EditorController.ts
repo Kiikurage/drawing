@@ -8,7 +8,6 @@ import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, ModelCordSize, Size } from '../../../model/Size';
 import { HorizontalAlign, VerticalAlign } from '../../../model/TextAlign';
-import { deps } from '../../../config/dependency';
 import { Camera } from '../model/Camera';
 import { ColorPaletteKey } from '../model/ColorPalette';
 import { EditorMode } from '../model/EditorMode';
@@ -24,11 +23,10 @@ import { ArrowHeadType } from '../../../model/ArrowHeadType';
  * Root controller for Editor view
  */
 export class EditorController {
-    readonly collaborationController = deps.createCollaborationController();
     readonly core: EditorControllerCore;
 
     constructor(initialData: Patch<EditorState>) {
-        this.core = new EditorControllerCore(new Store(EditorState.create(initialData)), this.collaborationController);
+        this.core = new EditorControllerCore(new Store(EditorState.create(initialData)));
     }
 
     addExtension(extension: Extension): this {

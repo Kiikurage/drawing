@@ -1,35 +1,15 @@
-import { randomId } from '../lib/randomId';
-import { Record } from '../lib/Record';
-import { EntityMap } from '../view/Editor/model/EntityMap';
-import { Entity } from './entity/Entity';
-import { Page } from './Page';
-import { Patch } from './Patch';
-import { VectorClock } from './VectorClock';
-import { CollaborationController } from '../view/Editor/controller/CollaborationController/CollaborationController';
-import { DummyCollaborationController } from '../view/Editor/controller/CollaborationController/DummyCollaborationController';
+import { randomId } from '../../../../lib/randomId';
+import { Record } from '../../../../lib/Record';
+import { EntityMap } from '../EntityMap';
+import { Entity } from '../../../../model/entity/Entity';
+import { Page } from '../../../../model/Page';
+import { Patch } from '../../../../model/Patch';
+import { VectorClock } from '../../../../model/VectorClock';
+import { CollaborationController } from '../../controller/CollaborationController/CollaborationController';
+import { DummyCollaborationController } from '../../controller/CollaborationController/DummyCollaborationController';
+import { LivePage, Transaction } from './LivePage';
 
-export interface CRDTPageWithTestVisibility {
-    readonly id: string;
-    readonly entities: EntityMap;
-
-    add(entity: Entity): EntityAddAction;
-
-    delete(entityId: string): EntityDeleteAction;
-
-    update(entityId: string, type: string, patch: Patch<Entity>): EntityUpdateAction;
-
-    apply(action: CRDTPageAction): void;
-
-    transaction(fn: (transaction: Transaction) => void): void;
-
-    dispatchActions(actions: CRDTPageAction[]): void;
-
-    applyActions(actions: CRDTPageAction[]): void;
-
-    onChangeByRemote?: () => void;
-}
-
-export class CRDTPage implements Page {
+export class CRDTLivePage implements Page, LivePage {
     readonly id: string;
     readonly entities: EntityMap;
     private readonly metadata: Record<
@@ -66,7 +46,7 @@ export class CRDTPage implements Page {
             clock: { addDel: nextClock },
         };
 
-        return { type: 'add', clock: nextClock, entity };
+        return { type: 'add', clock: nextClock, entityId: entity.id, body: entity };
     }
 
     private delete(entityId: string): EntityDeleteAction {
@@ -101,15 +81,13 @@ export class CRDTPage implements Page {
             },
         };
 
-        return { type: 'update', clock: nextClock, entityId, updateType: type, patch };
+        return { type, clock: nextClock, entityId, body: patch };
     }
 
     private apply(action: CRDTPageAction) {
-        const { type, clock } = action;
-
-        switch (type) {
+        switch (action.type) {
             case 'add': {
-                const entity = action.entity;
+                const { clock, body: entity } = action as EntityAddAction;
                 const prevClock = this.metadata[entity.id]?.clock?.addDel ?? VectorClock.empty();
                 switch (VectorClock.compare(prevClock, clock)) {
                     case 'gt':
@@ -135,7 +113,7 @@ export class CRDTPage implements Page {
             }
 
             case 'delete': {
-                const entityId = action.entityId;
+                const { clock, entityId } = action as EntityDeleteAction;
                 const prevClock = this.metadata[entityId]?.clock?.addDel ?? VectorClock.empty();
                 switch (VectorClock.compare(prevClock, clock)) {
                     case 'gt':
@@ -154,8 +132,8 @@ export class CRDTPage implements Page {
                 break;
             }
 
-            case 'update': {
-                const { entityId, updateType, patch } = action;
+            default: {
+                const { clock, entityId, type: updateType, body: patch } = action as EntityUpdateAction;
                 const prevClock = this.metadata[entityId]?.clock?.[updateType] ?? VectorClock.empty();
                 const metadata = this.metadata[entityId];
                 if (!metadata) throw new Error('Unreachable');
@@ -206,6 +184,7 @@ export class CRDTPage implements Page {
         };
 
         fn(dataModifier);
+
         this.onChange?.();
 
         this.dispatchActions(actions);
@@ -229,12 +208,25 @@ export class CRDTPage implements Page {
     onChange?: () => void;
 }
 
-interface Transaction {
-    add(entity: Entity): void;
+export interface CRDTLivePageWithTestVisibility extends Page, LivePage {
+    readonly id: string;
+    readonly entities: EntityMap;
 
-    delete(entityId: string): void;
+    add(entity: Entity): EntityAddAction;
 
-    update(entityId: string, type: string, patch: Patch<Entity>): void;
+    delete(entityId: string): EntityDeleteAction;
+
+    update(entityId: string, type: string, patch: Patch<Entity>): EntityUpdateAction;
+
+    apply(action: CRDTPageAction): void;
+
+    transaction(fn: (transaction: Transaction) => void): void;
+
+    dispatchActions(actions: CRDTPageAction[]): void;
+
+    applyActions(actions: CRDTPageAction[]): void;
+
+    onChangeByRemote?: () => void;
 }
 
 export type CRDTPageAction = EntityAddAction | EntityDeleteAction | EntityUpdateAction;
@@ -242,19 +234,20 @@ export type CRDTPageAction = EntityAddAction | EntityDeleteAction | EntityUpdate
 interface EntityAddAction {
     type: 'add';
     clock: VectorClock;
-    entity: Entity;
+    entityId: string;
+    body: Entity;
 }
 
 interface EntityDeleteAction {
     type: 'delete';
     clock: VectorClock;
     entityId: string;
+    body?: undefined;
 }
 
 interface EntityUpdateAction {
-    type: 'update';
+    type: string;
     clock: VectorClock;
     entityId: string;
-    updateType: string;
-    patch: Patch<Entity>;
+    body: Patch<Entity>;
 }
