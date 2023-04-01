@@ -1,7 +1,7 @@
 import { Record } from '../../../lib/Record';
 import { ReadonlyStore, Store } from '../../../lib/Store';
 import { ModelCordBox } from '../../../model/Box';
-import { CRDTPage, CRDTPageAction } from '../../../model/CRDTPage';
+import { CRDTPage } from '../../../model/CRDTPage';
 import { Entity } from '../../../model/entity/Entity';
 import { TextEntity } from '../../../model/entity/TextEntity';
 import { Page } from '../../../model/Page';
@@ -16,10 +16,9 @@ import { EntityMap } from '../model/EntityMap';
 import { HoverState } from '../model/HoverState';
 import { CollaborationController } from './CollaborationController/CollaborationController';
 import { ArrowHeadType } from '../../../model/ArrowHeadType';
-import { nonNull } from '../../../lib/nonNull';
 
 export class EditorControllerCore {
-    private page = new CRDTPage();
+    private readonly page;
     private readonly undoStack: Page[] = [];
     private readonly redoStack: Page[] = [];
 
@@ -27,10 +26,24 @@ export class EditorControllerCore {
         private readonly _store: Store<EditorState>,
         private readonly collaborationController: CollaborationController
     ) {
-        this.page = new CRDTPage(this._store.state.page);
-        this.collaborationController.addActionListener(this._store.state.page.id, (action) =>
-            this.applyActions([action])
-        );
+        this.page = new CRDTPage({
+            page: this._store.state.page,
+            collaborationController: this.collaborationController,
+        });
+        this.page.onChangeByRemote = () => {
+            const newEntities = this.page.entities;
+            this._store.setState({
+                page: {
+                    entities: {
+                        ...Record.mapValue(this._store.state.page.entities, () => undefined),
+                        ...newEntities,
+                    },
+                },
+                selectMode: {
+                    entityIds: this._store.state.selectMode.entityIds.filter((id) => id in newEntities),
+                },
+            });
+        };
     }
 
     /**
@@ -50,21 +63,28 @@ export class EditorControllerCore {
 
     addEntities(entities: EntityMap) {
         this.saveSnapshot();
-        const actions = Object.values(entities).map((entity) => this.page.addEntity(entity));
-        this.dispatchActions(actions);
+        this.page.transaction((transaction) => {
+            for (const entity of Object.values(entities)) {
+                transaction.add(entity);
+            }
+        });
     }
 
     deleteEntities(entityIds: string[]) {
         this.saveSnapshot();
-        const actions = entityIds.map((entityId) => this.page.deleteEntity(entityId));
-        this.dispatchActions(actions);
+        this.page.transaction((transaction) => {
+            for (const entityId of Object.values(entityIds)) {
+                transaction.delete(entityId);
+            }
+        });
     }
 
     updateEntities(patches: Record<string, Patch<Entity>>) {
-        const actions = Object.entries(patches).map(([entityId, patch]) =>
-            this.page.updateEntity(entityId, 'transform', patch)
-        );
-        this.dispatchActions(actions);
+        this.page.transaction((transaction) => {
+            for (const [entityId, patch] of Object.entries(patches)) {
+                transaction.update(entityId, 'transform', patch);
+            }
+        });
     }
 
     setEntityText(entityId: string, text: string) {
@@ -73,76 +93,57 @@ export class EditorControllerCore {
         if (entity === undefined) return;
         if (!Entity.isTextEditable(entity)) return;
 
-        const actions = this.page.updateEntity(entityId, 'text', { text });
-        this.dispatchActions([actions]);
+        this.page.transaction((transaction) => {
+            transaction.update(entityId, 'text', { text });
+        });
     }
 
-    setColor(palette: ColorPaletteKey) {
+    setColor(entityIds: string[], palette: ColorPaletteKey) {
         this.saveSnapshot();
-        const actions = this._store.state.selectMode.entityIds.map((entityId) =>
-            this.page.updateEntity(entityId, 'style', { palette })
-        );
-        this.dispatchActions(actions);
+        this.page.transaction((transaction) => {
+            for (const entityId of entityIds) {
+                transaction.update(entityId, 'style', { palette });
+            }
+        });
     }
 
     setArrowHeadType(entityIds: string[], point: 'p1' | 'p2', type: ArrowHeadType) {
         this.saveSnapshot();
-        const actions = this._store.state.selectMode.entityIds
-            .map((entityId) => {
+        this.page.transaction((transaction) => {
+            for (const entityId of entityIds) {
                 const entity = this.state.page.entities[entityId];
                 if (entity?.type !== 'line') return null;
 
-                return this.page.updateEntity(entityId, 'arrowHeadType', {
+                transaction.update(entityId, 'arrowHeadType', {
                     arrowHeadType1: point === 'p1' ? type : entity.arrowHeadType1,
                     arrowHeadType2: point === 'p2' ? type : entity.arrowHeadType2,
                 });
-            })
-            .filter(nonNull);
-        this.dispatchActions(actions);
+            }
+        });
     }
 
     setLineLabelText(entityId: string, label: string) {
         this.saveSnapshot();
-        const action = this.page.updateEntity(entityId, 'label', { label });
-        this.dispatchActions([action]);
+        this.page.transaction((transaction) => {
+            transaction.update(entityId, 'label', { label });
+        });
     }
 
-    setVerticalTextAlign(verticalAlign: VerticalAlign) {
+    setVerticalTextAlign(entityIds: string[], verticalAlign: VerticalAlign) {
         this.saveSnapshot();
-        const actions = this._store.state.selectMode.entityIds.map((entityId) =>
-            this.page.updateEntity(entityId, 'verticalAlign', { verticalAlign })
-        );
-        this.dispatchActions(actions);
+        this.page.transaction((transaction) => {
+            for (const entityId of entityIds) {
+                transaction.update(entityId, 'verticalAlign', { verticalAlign });
+            }
+        });
     }
 
-    setHorizontalTextAlign(horizontalAlign: HorizontalAlign) {
+    setHorizontalTextAlign(entityIds: string[], horizontalAlign: HorizontalAlign) {
         this.saveSnapshot();
-        const actions = this._store.state.selectMode.entityIds.map((entityId) =>
-            this.page.updateEntity(entityId, 'horizontalAlign', { horizontalAlign })
-        );
-        this.dispatchActions(actions);
-    }
-
-    dispatchActions(actions: CRDTPageAction[]) {
-        this.applyActions(actions);
-        this.collaborationController.dispatchActions(this._store.state.page.id, actions);
-        this.collaborationController.savePage(this._store.state.page);
-    }
-
-    applyActions(actions: CRDTPageAction[]) {
-        for (const action of actions) this.page.apply(action);
-
-        const newEntities = this.page.entities;
-        this._store.setState({
-            page: {
-                entities: {
-                    ...Record.mapValue(this._store.state.page.entities, () => undefined),
-                    ...newEntities,
-                },
-            },
-            selectMode: {
-                entityIds: this._store.state.selectMode.entityIds.filter((id) => id in newEntities),
-            },
+        this.page.transaction((transaction) => {
+            for (const entityId of entityIds) {
+                transaction.update(entityId, 'horizontalAlign', { horizontalAlign });
+            }
         });
     }
 

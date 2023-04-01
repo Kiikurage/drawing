@@ -122,7 +122,7 @@ export class EditorController {
     }
 
     setColor(palette: ColorPaletteKey) {
-        this.core.setColor(palette);
+        this.core.setColor(this.state.selectMode.entityIds, palette);
     }
 
     setArrowHeadType(entityIds: string[], point: 'p1' | 'p2', type: ArrowHeadType) {
@@ -138,11 +138,11 @@ export class EditorController {
     }
 
     setVerticalTextAlign(align: VerticalAlign) {
-        this.core.setVerticalTextAlign(align);
+        this.core.setVerticalTextAlign(this.state.selectMode.entityIds, align);
     }
 
     setHorizontalTextAlign(align: HorizontalAlign) {
-        this.core.setHorizontalTextAlign(align);
+        this.core.setHorizontalTextAlign(this.state.selectMode.entityIds, align);
     }
 
     setSelection(entityIds: string[]) {
