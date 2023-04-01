@@ -126,7 +126,6 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                         value={entity.label}
                         editing={textEditing}
                         textColor="#000"
-                        verticalAlign="center"
                         horizontalAlign="center"
                         camera={camera}
                         onChange={(ev) => {

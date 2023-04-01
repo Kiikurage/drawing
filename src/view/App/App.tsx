@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
-import { deps } from '../Editor/dependency';
+import { deps } from '../../config/dependency';
 import { routes } from '../routes';
 import { AppControllerProvider } from './AppControllerContext';
 

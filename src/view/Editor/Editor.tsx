@@ -4,7 +4,7 @@ import { Page } from '../../model/Page';
 import { Point } from '../../model/Point';
 import { Size } from '../../model/Size';
 import { EditorController } from './controller/EditorController';
-import { deps } from './dependency';
+import { deps } from '../../config/dependency';
 import { EditorControllerContextProvider } from './EditorControllerContext';
 import { ContentLayer } from './view/ContentLayer';
 import { ContextMenuPopup } from './view/ContextMenuPopup';

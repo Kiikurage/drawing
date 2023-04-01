@@ -3,7 +3,7 @@ import { ChangeEventHandler, useCallback, useLayoutEffect, useRef } from 'react'
 import { caretRangeFromPoint } from '../../../../lib/caretRangeFromPoint';
 import { DisplayCordPoint } from '../../../../model/Point';
 import { Size } from '../../../../model/Size';
-import { HorizontalAlign, VerticalAlign } from '../../../../model/TextAlign';
+import { HorizontalAlign } from '../../../../model/TextAlign';
 import { Camera } from '../../model/Camera';
 
 export const EditableTextView2 = ({
@@ -12,7 +12,6 @@ export const EditableTextView2 = ({
     editing,
     textColor,
     horizontalAlign,
-    verticalAlign,
     camera,
     onChange,
     onContentSizeChange,
@@ -21,7 +20,6 @@ export const EditableTextView2 = ({
     editStartPoint?: DisplayCordPoint;
     editing: boolean;
     textColor: string;
-    verticalAlign: VerticalAlign;
     horizontalAlign: HorizontalAlign;
     camera: Camera;
     onChange: ChangeEventHandler<HTMLTextAreaElement>;

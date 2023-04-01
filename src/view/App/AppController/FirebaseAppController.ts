@@ -1,6 +1,6 @@
 import * as firebaseAuth from 'firebase/auth';
 import { get, ref } from 'firebase/database';
-import { getAuth, getDatabase } from '../../../firebaseConfig';
+import { getAuth, getDatabase } from '../../../config/firebaseConfig';
 import { Page } from '../../../model/Page';
 import { User } from '../../Editor/model/User';
 import { AppController } from './AppController';

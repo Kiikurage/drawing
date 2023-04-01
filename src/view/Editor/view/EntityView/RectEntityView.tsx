@@ -37,6 +37,7 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
             onMouseLeave={controller.onUnhover}
             onChange={(ev) => controller.setEntityText(entity.id, ev.target.value)}
             onContentSizeChange={(contentWidth, contentHeight) => {
+                console.log('!');
                 controller.updateEntities({
                     [entity.id]: {
                         size: {

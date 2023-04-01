@@ -8,7 +8,7 @@ import { Patch } from '../../../model/Patch';
 import { DisplayCordPoint, ModelCordPoint, Point } from '../../../model/Point';
 import { DisplayCordSize, ModelCordSize, Size } from '../../../model/Size';
 import { HorizontalAlign, VerticalAlign } from '../../../model/TextAlign';
-import { deps } from '../dependency';
+import { deps } from '../../../config/dependency';
 import { Camera } from '../model/Camera';
 import { ColorPaletteKey } from '../model/ColorPalette';
 import { EditorMode } from '../model/EditorMode';

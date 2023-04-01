@@ -69,7 +69,7 @@ export class EditorControllerCore {
 
     setEntityText(entityId: string, text: string) {
         this.saveSnapshot();
-        const entity = this.page.entities()[entityId];
+        const entity = this.page.entities[entityId];
         if (entity === undefined) return;
         if (!Entity.isTextEditable(entity)) return;
 
@@ -132,7 +132,7 @@ export class EditorControllerCore {
     applyActions(actions: CRDTPageAction[]) {
         for (const action of actions) this.page.apply(action);
 
-        const newEntities = this.page.entities();
+        const newEntities = this.page.entities;
         this._store.setState({
             page: {
                 entities: {

@@ -6,7 +6,8 @@ import { Page } from './Page';
 import { Patch } from './Patch';
 import { VectorClock } from './VectorClock';
 
-export class CRDTPage {
+export class CRDTPage implements Page {
+    readonly id: string;
     private readonly replicaId = randomId();
     private readonly entries: Record<
         string,
@@ -20,13 +21,14 @@ export class CRDTPage {
     >;
 
     constructor(page?: Page) {
+        this.id = page?.id ?? randomId();
         this.entries = Record.mapValue(page?.entities ?? {}, (entity) => ({
             entity,
             clock: { addDel: VectorClock.inc({}, this.replicaId) },
         }));
     }
 
-    entities(): EntityMap {
+    get entities(): EntityMap {
         return Record.mapValue(
             Record.filter(this.entries, (entry) => !entry.deleted),
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

@@ -102,7 +102,6 @@ export const EditableTextView = ({
                     value={value}
                     editing={editing}
                     textColor={textColor}
-                    verticalAlign={verticalAlign}
                     horizontalAlign={horizontalAlign}
                     onChange={onChange}
                     camera={camera}
