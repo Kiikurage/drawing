@@ -212,11 +212,19 @@ export class EditorControllerCore {
     }
 
     enableSnap() {
-        this._store.setState({ selectMode: { snapEnabled: true } });
+        this._store.setState({ snap: { enabled: true } });
     }
 
     disableSnap() {
-        this._store.setState({ selectMode: { snapEnabled: false } });
+        this._store.setState({ snap: { enabled: false } });
+    }
+
+    showSnapGuide() {
+        this._store.setState({ snap: { visible: true } });
+    }
+
+    hideSnapGuide() {
+        this._store.setState({ snap: { visible: false } });
     }
 
     startTextEdit(entityId: string, editStartPoint = Point.display(0, 0)) {

@@ -222,6 +222,14 @@ export class EditorController {
         this.core.disableSnap();
     }
 
+    showSnapGuide() {
+        this.core.showSnapGuide();
+    }
+
+    hideSnapGuide() {
+        this.core.hideSnapGuide();
+    }
+
     startTextEdit(entityId: string, editStartPoint = Point.display(0, 0)) {
         this.core.startTextEdit(entityId, editStartPoint);
     }

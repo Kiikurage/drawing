@@ -6,10 +6,9 @@ import { css } from '@linaria/core';
 
 export const SnapGuide = memo(() => {
     const controller = useEditorController();
-    const { snapEnabled, selectedEntityIds, transforming, camera, page } = useSlice(controller.store, (state) => ({
-        snapEnabled: state.selectMode.snapEnabled,
+    const { visible, selectedEntityIds, camera, page } = useSlice(controller.store, (state) => ({
+        visible: state.snap.enabled && state.snap.visible,
         selectedEntityIds: state.selectMode.entityIds,
-        transforming: state.selectMode.transforming,
         camera: state.camera,
         page: state.page,
     }));
@@ -27,7 +26,7 @@ export const SnapGuide = memo(() => {
         });
     }, [range, snapTargets]);
 
-    if (!snapEnabled || !transforming) return null;
+    if (!visible) return null;
 
     return (
         <svg

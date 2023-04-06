@@ -43,6 +43,8 @@ export class TransformExtension implements Extension {
                 );
             }
         }
+
+        this.controller.showSnapGuide();
     }
 
     onRegister = (controller: EditorController) => {
@@ -51,7 +53,9 @@ export class TransformExtension implements Extension {
         controller.onMouseUp.addListener(this.onMouseUp);
     };
 
-    readonly onTransformEnd = EventDispatcher(() => {});
+    readonly onTransformEnd = EventDispatcher(() => {
+        this.controller.hideSnapGuide();
+    });
 
     private readonly onMouseMove = (ev: MouseEventInfo) => {
         const { point: nextPoint } = ev;
@@ -60,7 +64,7 @@ export class TransformExtension implements Extension {
 
         const transform = transformType(startBox, startPoint, nextPoint);
 
-        if (this.controller.state.selectMode.snapEnabled) {
+        if (this.controller.state.snap.enabled) {
             const { transform: snapTransform } = snapBox(
                 transform.apply(startBox),
                 Record.filter(this.controller.state.page.entities, (entity) => !(entity.id in entities)),

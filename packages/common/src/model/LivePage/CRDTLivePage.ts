@@ -45,6 +45,7 @@ export class CRDTLivePage implements Page, LivePage {
         this.metadata[entity.id] = {
             clock: { addDel: nextClock },
         };
+        this.onAddEntity(entity);
 
         return { type: 'add', clock: nextClock, entityId: entity.id, body: entity };
     }
@@ -60,6 +61,7 @@ export class CRDTLivePage implements Page, LivePage {
             },
             deleted: true,
         };
+        this.onDeleteEntity(entityId);
 
         return { type: 'delete', clock: nextClock, entityId };
     }
@@ -72,7 +74,8 @@ export class CRDTLivePage implements Page, LivePage {
         const prevClock = prevMetadata?.clock?.[type] ?? VectorClock.empty();
         const nextClock = VectorClock.inc(prevClock, this.replicaId);
 
-        this.entities[entityId] = Patch.apply(prevEntity, patch);
+        const nextEntity = Patch.apply(prevEntity, patch);
+        this.entities[entityId] = nextEntity;
         this.metadata[entityId] = {
             ...this.metadata[entityId],
             clock: {
@@ -80,6 +83,7 @@ export class CRDTLivePage implements Page, LivePage {
                 [type]: nextClock,
             },
         };
+        this.onUpdateEntity(nextEntity);
 
         return { type, clock: nextClock, entityId, body: patch };
     }
@@ -100,12 +104,14 @@ export class CRDTLivePage implements Page, LivePage {
                         if (VectorClock.hardCompare(prevClock, clock) === 'lt') {
                             this.entities[entity.id] = entity;
                             this.metadata[entity.id] = { clock: { addDel: clock } };
+                            this.onAddEntity(entity);
                         }
                         return;
                     }
                     case 'lt': {
                         this.entities[entity.id] = entity;
                         this.metadata[entity.id] = { clock: { addDel: clock } };
+                        this.onAddEntity(entity);
                         return;
                     }
                 }
@@ -126,6 +132,7 @@ export class CRDTLivePage implements Page, LivePage {
                             clock: { addDel: clock },
                             deleted: true,
                         };
+                        this.onDeleteEntity(entityId);
                         return;
                     }
                 }
@@ -149,11 +156,13 @@ export class CRDTLivePage implements Page, LivePage {
                             const prevEntity = this.entities[entityId];
                             if (!prevEntity) throw new Error('Unreachable');
 
-                            this.entities[entityId] = Patch.apply(prevEntity, patch);
+                            const nextEntity = Patch.apply(prevEntity, patch);
+                            this.entities[entityId] = nextEntity;
                             this.metadata[entityId] = {
                                 ...metadata,
                                 clock: { ...metadata.clock, [updateType]: clock },
                             };
+                            this.onUpdateEntity(nextEntity);
                         }
                         return;
                     }
@@ -161,11 +170,13 @@ export class CRDTLivePage implements Page, LivePage {
                         const prevEntity = this.entities[entityId];
                         if (!prevEntity) throw new Error('Unreachable');
 
-                        this.entities[entityId] = Patch.apply(prevEntity, patch);
+                        const nextEntity = Patch.apply(prevEntity, patch);
+                        this.entities[entityId] = nextEntity;
                         this.metadata[entityId] = {
                             ...metadata,
                             clock: { ...metadata.clock, [updateType]: clock },
                         };
+                        this.onUpdateEntity(nextEntity);
                         return;
                     }
                 }
@@ -185,8 +196,6 @@ export class CRDTLivePage implements Page, LivePage {
 
         fn(dataModifier);
 
-        this.onChange?.();
-
         this.dispatchActions(actions);
     }
 
@@ -201,11 +210,11 @@ export class CRDTLivePage implements Page, LivePage {
 
     private applyActions(actions: CRDTPageAction[]) {
         for (const action of actions) this.apply(action);
-
-        this.onChange?.();
     }
 
-    onChange?: () => void;
+    onAddEntity = (entity: Entity) => {};
+    onDeleteEntity = (entityId: string) => {};
+    onUpdateEntity = (entity: Entity) => {};
 }
 
 export interface CRDTLivePageWithTestVisibility extends Page, LivePage {

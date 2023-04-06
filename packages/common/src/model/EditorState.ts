@@ -6,6 +6,7 @@ import { SelectModeState } from './SelectModeState';
 import { TextEditModeState } from './TextEditModeState';
 import { Page } from './Page';
 import { Patch } from './Patch';
+import { SnapState } from './SnapState';
 
 export interface EditorState {
     page: Page;
@@ -15,6 +16,7 @@ export interface EditorState {
     contextMenu: ContextMenuState;
     textEditMode: TextEditModeState;
     selectMode: SelectModeState;
+    snap: SnapState;
 }
 
 export module EditorState {
@@ -28,6 +30,7 @@ export module EditorState {
                 contextMenu: ContextMenuState.create(),
                 textEditMode: TextEditModeState.create(),
                 selectMode: SelectModeState.create(),
+                snap: SnapState.create(),
             },
             initialData
         );

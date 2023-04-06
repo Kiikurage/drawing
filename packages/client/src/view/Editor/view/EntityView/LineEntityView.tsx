@@ -115,7 +115,7 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                         left: width / 2,
                         top: height / 2,
                         transform: `translate(-50%, -50%)`,
-                        background: '#fff',
+                        // background: '#fff',
                         borderRadius: 8,
                     }}
                 >

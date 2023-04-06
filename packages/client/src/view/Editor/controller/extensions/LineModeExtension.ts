@@ -72,7 +72,7 @@ export class LineModeExtension implements Extension {
             prevLinePoint.y + (nextPoint.y - startPoint.y)
         );
 
-        if (this.controller.state.selectMode.snapEnabled) {
+        if (this.controller.state.snap.enabled) {
             const { transform } = snapPoint(
                 nextLinePoint,
                 Record.filter(this.controller.state.page.entities, (entity) => entity.id !== entity.id),

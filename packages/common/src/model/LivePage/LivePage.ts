@@ -5,7 +5,11 @@ import { Patch } from '../Patch';
 export interface LivePage extends Readonly<Page> {
     transaction(fn: (transaction: Transaction) => void): void;
 
-    onChange?: () => void;
+    onAddEntity: (entity: Entity) => void;
+
+    onDeleteEntity: (entityId: string) => void;
+
+    onUpdateEntity: (entity: Entity) => void;
 }
 
 export interface Transaction {

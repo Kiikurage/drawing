@@ -11,38 +11,38 @@ export module ColorPalette {
         fillColor: 'transparent',
     };
     export const RED: ColorPalette = {
-        strokeColor: '#C62828',
-        fillColor: lighten(0.3, '#C62828'),
+        strokeColor: '#E53935',
+        fillColor: lighten(0.35, '#E53935'),
     };
 
     export const PINK: ColorPalette = {
-        strokeColor: '#AD1457',
-        fillColor: lighten(0.3, '#AD1457'),
+        strokeColor: '#EC407A',
+        fillColor: lighten(0.3, '#EC407A'),
     };
 
     export const ORANGE: ColorPalette = {
         strokeColor: '#EF6C00',
-        fillColor: lighten(0.3, '#EF6C00'),
+        fillColor: lighten(0.45, '#EF6C00'),
     };
     export const GRAY: ColorPalette = {
         strokeColor: '#546E7A',
-        fillColor: lighten(0.3, '#546E7A'),
+        fillColor: lighten(0.45, '#546E7A'),
     };
     export const PURPLE: ColorPalette = {
-        strokeColor: '#4527A0',
-        fillColor: lighten(0.3, '#4527A0'),
+        strokeColor: '#7B1FA2',
+        fillColor: lighten(0.5, '#7B1FA2'),
     };
     export const GREEN: ColorPalette = {
         strokeColor: '#2E7D32',
-        fillColor: lighten(0.3, '#2E7D32'),
+        fillColor: lighten(0.55, '#2E7D32'),
     };
     export const ANY_COLOR: ColorPalette = {
-        strokeColor: '#00695C',
-        fillColor: lighten(0.3, '#00695C'),
+        strokeColor: '#039BE5',
+        fillColor: lighten(0.4, '#039BE5'),
     };
     export const BLUE: ColorPalette = {
-        strokeColor: '#1565C0',
-        fillColor: lighten(0.3, '#1565C0'),
+        strokeColor: '#3949AB',
+        fillColor: lighten(0.45, '#3949AB'),
     };
 }
 
