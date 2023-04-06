@@ -35,15 +35,15 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
             onMouseLeave={controller.onUnhover}
             onChange={(ev) => controller.setEntityText(entity.id, ev.target.value)}
             onContentSizeChange={(contentWidth, contentHeight) => {
-                console.log('!');
-                controller.updateEntities({
-                    [entity.id]: {
-                        size: {
-                            width: Math.max(contentWidth, entity.size.width),
-                            height: Math.max(contentHeight, entity.size.height),
-                        },
-                    },
-                });
+                // console.log('!');
+                // controller.updateEntities({
+                //     [entity.id]: {
+                //         size: {
+                //             width: Math.max(contentWidth, entity.size.width),
+                //             height: Math.max(contentHeight, entity.size.height),
+                //         },
+                //     },
+                // });
             }}
         />
     );

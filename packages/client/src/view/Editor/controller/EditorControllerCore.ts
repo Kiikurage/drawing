@@ -28,13 +28,27 @@ export class EditorControllerCore {
 
     constructor(private readonly _store: Store<EditorState>) {
         this.page = deps.createLivePage(this._store.state.page);
-        this.page.onChange = () => {
+        this.page.onAddEntity = (entity: Entity) => {
             this._store.setState({
                 page: {
-                    entities: { ...this.page.entities },
+                    entities: { [entity.id]: entity },
+                },
+            });
+        };
+        this.page.onDeleteEntity = (entityId: string) => {
+            this._store.setState({
+                page: {
+                    entities: { [entityId]: undefined },
                 },
                 selectMode: {
-                    entityIds: this._store.state.selectMode.entityIds.filter((id) => id in this.page.entities),
+                    entityIds: this._store.state.selectMode.entityIds.filter((id) => id !== entityId),
+                },
+            });
+        };
+        this.page.onUpdateEntity = (entity: Entity) => {
+            this._store.setState({
+                page: {
+                    entities: { [entity.id]: entity },
                 },
             });
         };
