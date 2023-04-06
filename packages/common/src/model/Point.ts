@@ -20,16 +20,16 @@ export module Point {
 
 declare const displayCordPoint: unique symbol;
 
-export type DisplayCordPoint = {
+export interface DisplayCordPoint {
     [displayCordPoint]: never;
     x: number;
     y: number;
-};
+}
 
 declare const modelCordPoint: unique symbol;
 
-export type ModelCordPoint = {
+export interface ModelCordPoint {
     [modelCordPoint]: never;
     x: number;
     y: number;
-};
+}

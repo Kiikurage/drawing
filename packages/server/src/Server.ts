@@ -1,5 +1,7 @@
 import * as http from 'http';
 import { connection as WebsocketConnection, server as WebsocketServer } from 'websocket';
+import { ReconciliationService } from './ReconciliationService';
+import { JoinRoomMessage, randomId, SharedMessage } from '@drawing/common';
 
 export interface ServerOptions {
     host: string;
@@ -9,14 +11,23 @@ export interface ServerOptions {
 export class Server {
     private httpServer: http.Server | null = null;
     private websocketServer: WebsocketServer | null = null;
-    private readonly websocketConnections: WebsocketConnection[] = [];
+    private websocketConnections: Record<string, WebsocketConnection> = {};
     private readonly options: ServerOptions;
+    private readonly reconciliationService = new ReconciliationService();
 
     constructor(options: Partial<ServerOptions> = {}) {
         this.options = {
             host: 'localhost',
             port: 12893,
             ...options,
+        };
+        this.reconciliationService.onNotifyUpdate = (clientId: string, message: SharedMessage) => {
+            const connection = this.websocketConnections[clientId];
+            // if (connection === undefined) {
+            //     this.reconciliationService.removeClient('ROOM', clientId);
+            //     return;
+            // }
+            connection.send(JSON.stringify(message));
         };
     }
 
@@ -31,8 +42,8 @@ export class Server {
     }
 
     private cleanUpWebsocketServer() {
-        this.websocketConnections.forEach((connection) => connection.close());
-        this.websocketConnections.length = 0;
+        Object.values(this.websocketConnections).forEach((connection) => connection.close());
+        this.websocketConnections = {};
         this.websocketServer?.shutDown();
         this.websocketServer = null;
     }
@@ -61,7 +72,25 @@ export class Server {
     }
 
     onWebsocketConnect = (connection: WebsocketConnection) => {
-        console.log('New connection opened');
-        this.websocketConnections.push(connection);
+        const clientId = randomId();
+        let roomId: string | null = null;
+
+        connection.on('message', (ev) => {
+            if (ev.type !== 'utf8') return;
+            const message = JSON.parse(ev.utf8Data) as SharedMessage | JoinRoomMessage;
+            if ('type' in message && message.type === 'JOIN') {
+                roomId = message.roomId;
+                this.reconciliationService.addClient(roomId, clientId);
+            } else {
+                if (roomId === null) return;
+                this.reconciliationService.applyMessage(roomId, clientId, message as SharedMessage);
+            }
+        });
+        connection.on('close', () => {
+            if (roomId === null) return;
+            this.reconciliationService.removeClient(roomId, clientId);
+        });
+
+        this.websocketConnections[clientId] = connection;
     };
 }

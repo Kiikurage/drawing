@@ -10,6 +10,7 @@ module.exports = {
     plugins: ['@typescript-eslint'],
     root: true,
     rules: {
+        'no-constant-condition': 'off',
         'no-inner-declarations': 'off',
         'react/display-name': 'off',
         'react/no-unknown-property': ['error', { ignore: ['css'] }],
