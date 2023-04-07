@@ -27,6 +27,7 @@ import { Extension } from './Extension';
 import { ShortcutController } from './ShortcutController';
 import { ExtensionConstructor } from './ExtensionHost';
 import { EditorState } from '../model/EditorState';
+import { CoreExtensions } from '../extensions/coreExtensions';
 
 /**
  * Root controller for Editor view
@@ -42,6 +43,8 @@ export class EditorController implements IEditorController {
         this.store = new Store(EditorState.create(initialData));
         this.core = new PageEditController(this.store, this.historyManager);
         this.initializeShortcuts();
+
+        CoreExtensions.forEach((extension) => this.addExtension(extension));
     }
 
     // Extension

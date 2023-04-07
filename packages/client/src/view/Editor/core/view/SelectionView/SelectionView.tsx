@@ -3,8 +3,8 @@ import { useSlice } from '../../../../hooks/useStore';
 import { LineSelectionView } from './LineSelectionView';
 import { LineEntity } from '@drawing/common';
 import { RectSelectionView } from './RectSelectionView';
-import { TextEditExtension } from '../../../features/textEdit/TextEditExtension';
-import { SelectExtension } from '../../../features/select/SelectExtension';
+import { TextEditExtension } from '../../extensions/textEdit/TextEditExtension';
+import { SelectExtension } from '../../extensions/select/SelectExtension';
 
 export const SelectionView = () => {
     const controller = useEditorController();

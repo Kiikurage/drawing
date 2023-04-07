@@ -4,17 +4,17 @@ import { EditorController } from './core/controller/EditorController';
 import { EditorControllerContextProvider } from './core/view/EditorControllerContext';
 import { css } from '@linaria/core';
 import { ContentLayer } from './core/view/ContentLayer';
-import { ToolBar } from './core/view/ToolBar';
-import { ContextMenuPopup } from './features/contextMenu/ContextMenuPopup';
-import { extensions } from './extensions';
+import { Toolbar } from './core/extensions/toolbar/Toolbar';
+import { ContextMenuPopup } from './core/extensions/contextMenu/ContextMenuPopup';
+import { Extensions } from './extensions';
 import { SelectionView } from './core/view/SelectionView/SelectionView';
-import { SelectingRangeView } from './features/select/SelectingRangeView';
-import { SnapGuide } from './features/snap/SnapGuide';
+import { SelectingRangeView } from './core/extensions/select/SelectingRangeView';
+import { SnapGuide } from './extensions/snap/SnapGuide';
 
 export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
     const [controller] = useState(() => {
         const controller = new EditorController({ page: defaultValue ?? Page.create() });
-        extensions.forEach((extension) => controller.addExtension(extension));
+        Extensions.forEach((extension) => controller.addExtension(extension));
 
         return controller;
     });
@@ -115,7 +115,7 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                 <SelectionView />
                 <SelectingRangeView />
                 <SnapGuide />
-                <ToolBar />
+                <Toolbar />
                 <ContextMenuPopup />
             </div>
         </EditorControllerContextProvider>

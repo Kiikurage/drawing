@@ -2,7 +2,7 @@
   "name": "@drawing/common",
   "version": "0.0.1",
   "description": "",
-  "main": "src",
+  "main": "src/index.ts",
   "scripts": {
     "test": "jest"
   },

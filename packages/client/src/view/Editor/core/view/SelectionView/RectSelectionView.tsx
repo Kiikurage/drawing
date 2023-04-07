@@ -4,7 +4,7 @@ import { Box, Entity, HoverState } from '@drawing/common';
 import { css } from '@linaria/core';
 import { COLOR_SELECTION } from '../../../../styles';
 import { InvisibleResizeHandle, ResizeHandle } from './ResizeHandle';
-import { SelectExtension } from '../../../features/select/SelectExtension';
+import { SelectExtension } from '../../extensions/select/SelectExtension';
 import { useMemo } from 'react';
 
 export const RectSelectionView = () => {

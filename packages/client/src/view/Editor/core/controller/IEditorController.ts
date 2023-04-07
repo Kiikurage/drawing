@@ -31,8 +31,6 @@ export interface IEditorController extends ExtensionHost {
 
     readonly camera: Camera;
 
-    // computeSelectedEntities(): EntityMap;
-
     // Core Edit
 
     addEntities(entities: EntityMap): void;

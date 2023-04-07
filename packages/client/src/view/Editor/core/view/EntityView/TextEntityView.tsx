@@ -2,8 +2,8 @@ import { ColorPalette, TextEntity } from '@drawing/common';
 import { useEditorController, useExtension } from '../EditorControllerContext';
 import { useSlice } from '../../../../hooks/useStore';
 import { EditableTextView } from './EditableTextView';
-import { TextEditExtension } from '../../../features/textEdit/TextEditExtension';
-import { SelectExtension } from '../../../features/select/SelectExtension';
+import { TextEditExtension } from '../../extensions/textEdit/TextEditExtension';
+import { SelectExtension } from '../../extensions/select/SelectExtension';
 
 export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
     const controller = useEditorController();

@@ -5,13 +5,16 @@ import { ReactNode, useMemo } from 'react';
 import { css } from '@linaria/core';
 import { COLOR_SELECTION } from '../../../../styles';
 import { EditableTextView2 } from './EditableTextView2';
-import { TextEditExtension } from '../../../features/textEdit/TextEditExtension';
-import { SelectExtension } from '../../../features/select/SelectExtension';
+import { TextEditExtension } from '../../extensions/textEdit/TextEditExtension';
+import { SelectExtension } from '../../extensions/select/SelectExtension';
+import { getLineIntersectPoint } from '@drawing/common/src/model/entity/lineUtil';
 
 export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     const controller = useEditorController();
-    const { camera, hovered } = useSlice(controller.store, (state) => {
+    const { linkedEntity1, linkedEntity2, camera, hovered } = useSlice(controller.store, (state) => {
         return {
+            linkedEntity1: entity.linkedEntityId1 === null ? null : state.page.entities[entity.linkedEntityId1],
+            linkedEntity2: entity.linkedEntityId2 === null ? null : state.page.entities[entity.linkedEntityId2],
             camera: state.camera,
             hovered: state.hover.type === 'entity' && state.hover.entityId === entity.id,
         };
@@ -28,7 +31,36 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     });
 
     const highlighted = hovered || selected;
-    const { id, p1, p2, palette } = entity;
+    const { id, palette } = entity;
+    let { p1, p2 } = entity;
+    if (linkedEntity1 !== null) {
+        console.log(linkedEntity1);
+        const box = Entity.getBoundingBox(linkedEntity1);
+        const linkedEntity1p11 = box.point;
+        const linkedEntity1p12 = Point.model(box.point.x, box.point.y + box.size.height);
+        const linkedEntity1p21 = Point.model(box.point.x + box.size.width, box.point.y);
+        const linkedEntity1p22 = Point.model(box.point.x + box.size.width, box.point.y + box.size.height);
+        p1 =
+            getLineIntersectPoint(p1, p2, linkedEntity1p11, linkedEntity1p12) ??
+            getLineIntersectPoint(p1, p2, linkedEntity1p12, linkedEntity1p22) ??
+            getLineIntersectPoint(p1, p2, linkedEntity1p22, linkedEntity1p21) ??
+            getLineIntersectPoint(p1, p2, linkedEntity1p21, linkedEntity1p11) ??
+            p1;
+    }
+    if (linkedEntity2 !== null) {
+        console.log(linkedEntity2);
+        const box = Entity.getBoundingBox(linkedEntity2);
+        const linkedEntity2p11 = box.point;
+        const linkedEntity2p12 = Point.model(box.point.x, box.point.y + box.size.height);
+        const linkedEntity2p21 = Point.model(box.point.x + box.size.width, box.point.y);
+        const linkedEntity2p22 = Point.model(box.point.x + box.size.width, box.point.y + box.size.height);
+        p2 =
+            getLineIntersectPoint(p1, p2, linkedEntity2p11, linkedEntity2p12) ??
+            getLineIntersectPoint(p1, p2, linkedEntity2p12, linkedEntity2p22) ??
+            getLineIntersectPoint(p1, p2, linkedEntity2p22, linkedEntity2p21) ??
+            getLineIntersectPoint(p1, p2, linkedEntity2p21, linkedEntity2p11) ??
+            p2;
+    }
 
     const {
         point: origin,
@@ -41,7 +73,8 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                 key="main"
                 d={`M${p1.x - origin.x},${p1.y - origin.y} L${p2.x - origin.x},${p2.y - origin.y}`}
                 stroke={ColorPalette[palette].strokeColor}
-                strokeWidth={4}
+                strokeLinecap="round"
+                strokeWidth={8}
             />,
         ];
 
@@ -54,8 +87,9 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                         p4.x - origin.x
                     },${p4.y - origin.y}`}
                     fill="none"
+                    strokeLinecap="round"
                     stroke={ColorPalette[palette].strokeColor}
-                    strokeWidth={4}
+                    strokeWidth={8}
                 />
             );
         }
@@ -69,8 +103,9 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                         p4.x - origin.x
                     },${p4.y - origin.y}`}
                     fill="none"
+                    strokeLinecap="round"
                     stroke={ColorPalette[palette].strokeColor}
-                    strokeWidth={4}
+                    strokeWidth={8}
                 />
             );
         }
@@ -147,8 +182,8 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
  * @param p2 The other point of the line.
  */
 function computeArrowHeadPoint(p1: ModelCordPoint, p2: ModelCordPoint): [ModelCordPoint, ModelCordPoint] {
-    const SIZE = 20;
-    const R = (40 * Math.PI) / 180;
+    const SIZE = 25;
+    const R = (25 * Math.PI) / 180;
 
     const vx = p2.x - p1.x;
     const vy = p2.y - p1.y;

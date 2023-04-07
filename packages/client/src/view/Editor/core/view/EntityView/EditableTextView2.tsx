@@ -72,7 +72,7 @@ export const EditableTextView2 = ({
                     ref={previewRef}
                     style={{
                         minWidth: 1,
-                        color: editing ? 'transparent' : textColor,
+                        color: textColor,
                         textShadow: `
                         rgb(249, 250, 251) 0 ${-1 / camera.scale}px 0,
                         rgb(249, 250, 251) 0 ${1 / camera.scale}px 0,

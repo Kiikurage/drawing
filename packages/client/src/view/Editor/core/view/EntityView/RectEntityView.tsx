@@ -2,8 +2,8 @@ import { useSlice } from '../../../../hooks/useStore';
 import { useEditorController, useExtension } from '../EditorControllerContext';
 import { EditableTextView } from './EditableTextView';
 import { Box, ColorPalette, RectEntity } from '@drawing/common';
-import { TextEditExtension } from '../../../features/textEdit/TextEditExtension';
-import { SelectExtension } from '../../../features/select/SelectExtension';
+import { TextEditExtension } from '../../extensions/textEdit/TextEditExtension';
+import { SelectExtension } from '../../extensions/select/SelectExtension';
 
 export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
     const controller = useEditorController();

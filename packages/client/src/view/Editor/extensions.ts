@@ -1,29 +1,23 @@
-import { TextEditExtension } from './features/textEdit/TextEditExtension';
-import { RangeSelectExtension } from './features/select/RangeSelectExtension';
-import { ContextMenuExtension } from './features/contextMenu/ContextMenuExtension';
-import { TextExtension } from './features/text/TextExtension';
-import { TransformExtension } from './features/transform/TransformExtension';
-import { CameraExtension } from './features/camera/CameraExtension';
-import { ClipboardExtension } from './features/clipboard/ClipboardExtension';
-import { ColorExtension } from './features/color/ColorExtension';
-import { LayoutExtension } from './features/layout/LayoutExtension';
-import { LineExtension } from './features/line/LineExtension';
-import { RectExtension } from './features/rect/RectExtension';
-import { SelectExtension } from './features/select/SelectExtension';
-import { SnapExtension } from './features/snap/SnapExtension';
+import { CameraExtension } from './extensions/camera/CameraExtension';
+import { ClipboardExtension } from './extensions/clipboard/ClipboardExtension';
+import { ColorExtension } from './extensions/color/ColorExtension';
+import { LayoutExtension } from './extensions/layout/LayoutExtension';
+import { LineExtension } from './extensions/line/LineExtension';
+import { ModeExtension } from './extensions/mode/ModeExtension';
+import { RectExtension } from './extensions/rect/RectExtension';
+import { SnapExtension } from './extensions/snap/SnapExtension';
+import { TextExtension } from './extensions/text/TextExtension';
+import { TransformExtension } from './extensions/transform/TransformExtension';
 
-export const extensions = [
+export const Extensions = [
     CameraExtension,
     ClipboardExtension,
     ColorExtension,
-    ContextMenuExtension,
     LayoutExtension,
-    LineExtension,
-    RangeSelectExtension,
-    RectExtension,
-    SelectExtension,
+    ModeExtension,
     SnapExtension,
-    TextEditExtension,
-    TextExtension,
     TransformExtension,
+    RectExtension,
+    LineExtension,
+    TextExtension,
 ];

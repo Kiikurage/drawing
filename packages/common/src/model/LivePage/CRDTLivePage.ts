@@ -203,8 +203,8 @@ export class CRDTLivePage implements Page, LivePage {
         // TODO
         this.collaborationController.dispatchActions(this.id, actions);
         this.collaborationController.savePage({
-            entities: this.entities,
             id: this.id,
+            entities: this.entities,
         });
     }
 
@@ -220,6 +220,7 @@ export class CRDTLivePage implements Page, LivePage {
 export interface CRDTLivePageWithTestVisibility extends Page, LivePage {
     readonly id: string;
     readonly entities: EntityMap;
+    readonly orders: string[];
 
     add(entity: Entity): EntityAddAction;
 
