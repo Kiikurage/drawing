@@ -1,4 +1,4 @@
-import { Record } from '../lib/Record';
+import { Record } from './Record';
 import { SharedClientAtom } from './SharedAtom';
 
 interface AddMessage {

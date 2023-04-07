@@ -1,17 +1,8 @@
 import * as firebase from '@firebase/app';
-import { CRDTLivePage, LivePage, Page, singleton } from '@drawing/common';
-import { CameraExtension } from '../view/Editor/controller/extensions/CameraExtension';
-import { ContextMenuExtension } from '../view/Editor/controller/extensions/ContextMenuExtension';
-import { LineModeExtension } from '../view/Editor/controller/extensions/LineModeExtension';
-import { RangeSelectExtension } from '../view/Editor/controller/extensions/RangeSelectExtension';
-import { RectModeExtension } from '../view/Editor/controller/extensions/RectModeExtension';
-import { SelectModeExtension } from '../view/Editor/controller/extensions/SelectModeExtension';
-import { TextEditModeExtension } from '../view/Editor/controller/extensions/TextEditModeExtension';
-import { TextModeExtension } from '../view/Editor/controller/extensions/TextModeExtension';
-import { TransformExtension } from '../view/Editor/controller/extensions/TransformExtension';
-import { CollaborationController } from '../view/Editor/controller/CollaborationController/CollaborationController';
-import { FirebaseCollaborationController } from '../view/Editor/controller/CollaborationController/FirebaseCollaborationController';
-import { DummyCollaborationController } from '../view/Editor/controller/CollaborationController/DummyCollaborationController';
+import { singleton } from '@drawing/common';
+import { CollaborationController } from '../view/Editor/core/controller/CollaborationController/CollaborationController';
+import { FirebaseCollaborationController } from '../view/Editor/core/controller/CollaborationController/FirebaseCollaborationController';
+import { DummyCollaborationController } from '../view/Editor/core/controller/CollaborationController/DummyCollaborationController';
 import { AppController } from '../view/App/AppController/AppController';
 import { FirebaseAppController } from '../view/App/AppController/FirebaseAppController';
 import { DummyAppController } from '../view/App/AppController/DummyAppController';
@@ -20,7 +11,6 @@ export module deps {
     import initializeApp = firebase.initializeApp;
     const USE_FIREBASE = true;
     const ENV = location.host.includes('localhost') ? 'qa' : 'prod';
-    const LIVE_PAGE_IMPL: 'crdt' | 'liveblock' = 'crdt';
 
     export function getFirebaseApp() {
         return initializeApp(getFirebaseConfig());
@@ -53,27 +43,6 @@ export module deps {
                 };
         }
     });
-    export const cameraExtension = singleton(() => new CameraExtension());
-    export const contextMenuExtension = singleton(() => new ContextMenuExtension());
-    export const lineModeExtension = singleton(() => new LineModeExtension());
-    export const rangeSelectExtension = singleton(() => new RangeSelectExtension());
-    export const rectModeExtension = singleton(() => new RectModeExtension(transformExtension()));
-    export const selectModeExtension = singleton(() => new SelectModeExtension(transformExtension()));
-    export const textEditModeExtension = singleton(() => new TextEditModeExtension());
-
-    export const textModeExtension = singleton(() => new TextModeExtension(transformExtension()));
-
-    export const transformExtension = singleton(() => new TransformExtension());
-
-    export function createLivePage(page?: Page): LivePage {
-        switch (LIVE_PAGE_IMPL) {
-            case 'crdt':
-                return new CRDTLivePage({ page, collaborationController: createCollaborationController() });
-
-            case 'liveblock':
-                throw new Error('Not implemented yet');
-        }
-    }
 
     export function createCollaborationController(): CollaborationController {
         if (ENV === 'prod' || USE_FIREBASE) {

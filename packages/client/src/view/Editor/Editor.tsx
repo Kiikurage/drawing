@@ -1,27 +1,23 @@
 import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import { Page, Point, Size } from '@drawing/common';
-import { EditorController } from './controller/EditorController';
-import { deps } from '../../config/dependency';
-import { EditorControllerContextProvider } from './EditorControllerContext';
+import { EditorController } from './core/controller/EditorController';
+import { EditorControllerContextProvider } from './core/view/EditorControllerContext';
 import { css } from '@linaria/core';
-import { ContentLayer } from './view/ContentLayer';
-import { IndicatorLayer } from './view/IndicatorLayer';
-import { ToolBar } from './view/ToolBar';
-import { ContextMenuPopup } from './view/ContextMenuPopup';
+import { ContentLayer } from './core/view/ContentLayer';
+import { ToolBar } from './core/view/ToolBar';
+import { ContextMenuPopup } from './features/contextMenu/ContextMenuPopup';
+import { extensions } from './extensions';
+import { SelectionView } from './core/view/SelectionView/SelectionView';
+import { SelectingRangeView } from './features/select/SelectingRangeView';
+import { SnapGuide } from './features/snap/SnapGuide';
 
 export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
-    const [controller] = useState(() =>
-        new EditorController({ page: defaultValue ?? Page.create() })
-            .addExtension(deps.cameraExtension())
-            .addExtension(deps.contextMenuExtension())
-            .addExtension(deps.lineModeExtension())
-            .addExtension(deps.rangeSelectExtension())
-            .addExtension(deps.rectModeExtension())
-            .addExtension(deps.selectModeExtension())
-            .addExtension(deps.textEditModeExtension())
-            .addExtension(deps.textModeExtension())
-            .addExtension(deps.transformExtension())
-    );
+    const [controller] = useState(() => {
+        const controller = new EditorController({ page: defaultValue ?? Page.create() });
+        extensions.forEach((extension) => controller.addExtension(extension));
+
+        return controller;
+    });
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
@@ -116,7 +112,9 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                 }
             >
                 <ContentLayer />
-                <IndicatorLayer />
+                <SelectionView />
+                <SelectingRangeView />
+                <SnapGuide />
                 <ToolBar />
                 <ContextMenuPopup />
             </div>

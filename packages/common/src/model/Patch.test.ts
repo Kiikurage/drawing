@@ -8,6 +8,9 @@ describe('Patch', () => {
 
         expect(nextState).toEqual({ x: 3, y: 4 });
         expect(prevState).toEqual({ x: 1, y: 2 });
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
     });
 
     it('多重構造を含むすべてのフィールドをパッチ', () => {
@@ -17,6 +20,9 @@ describe('Patch', () => {
 
         expect(nextState).toEqual({ x: 4, y: { z: 5, w: 6 } });
         expect(prevState).toEqual({ x: 1, y: { z: 2, w: 3 } });
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
     });
 
     it('一部のフィールドをパッチ', () => {
@@ -26,6 +32,9 @@ describe('Patch', () => {
 
         expect(nextState).toEqual({ x: 3, y: 2 });
         expect(prevState).toEqual({ x: 1, y: 2 });
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
     });
 
     it('ネストしたオブジェクトの一部をパッチ', () => {
@@ -35,6 +44,9 @@ describe('Patch', () => {
 
         expect(nextState).toEqual({ x: 1, y: { z: 2, w: 6 } });
         expect(prevState).toEqual({ x: 1, y: { z: 2, w: 3 } });
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
     });
 
     it('nullを含むパッチを適用', () => {
@@ -49,6 +61,9 @@ describe('Patch', () => {
 
         expect(nextState).toEqual({ x: 1, y: null });
         expect(prevState).toEqual({ x: 1, y: { z: 2, w: 3 } });
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
     });
 
     it('nullを含む状態にパッチを適用', () => {
@@ -66,6 +81,9 @@ describe('Patch', () => {
 
         expect(nextState).toEqual({ x: { y: { z: 1 } } });
         expect(prevState).toEqual({ x: undefined });
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
     });
 
     it('配列に対するパッチ', () => {
@@ -75,6 +93,9 @@ describe('Patch', () => {
 
         expect(nextState).toEqual({ x: [4, 5] });
         expect(prevState).toEqual({ x: [1, 2, 3] });
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
     });
 
     it('パッチ内容がundefinedなら代わりにそのフィールドを消す', () => {
@@ -84,5 +105,19 @@ describe('Patch', () => {
 
         expect(nextState).toEqual({ x: 3 });
         expect(prevState).toEqual({ x: 1, y: 2 });
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
+    });
+
+    it('パッチ内容が同じならもとのオブジェクトを返す', () => {
+        const prevState = { x: 1, y: { z: 2, w: 3 } };
+        const patch = { x: 1, y: { z: 2, w: 3 } };
+        const nextState = Patch.apply(prevState, patch);
+
+        expect(nextState).toBe(prevState);
+
+        const inversePatch = Patch.computeInversePatch(prevState, patch);
+        expect(inversePatch).toEqual({ x: 1, y: { z: 2, w: 3 } });
     });
 });
