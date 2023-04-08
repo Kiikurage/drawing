@@ -1,4 +1,4 @@
-import { Entity } from './entity/Entity';
+import { Entity } from './page/entity/Entity';
 import { Box, ModelCordBox } from './Box';
 import { Record } from './Record';
 

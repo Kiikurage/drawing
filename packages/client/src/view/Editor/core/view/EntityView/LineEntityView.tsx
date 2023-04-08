@@ -7,7 +7,7 @@ import { COLOR_SELECTION } from '../../../../styles';
 import { EditableTextView2 } from './EditableTextView2';
 import { TextEditExtension } from '../../extensions/textEdit/TextEditExtension';
 import { SelectExtension } from '../../extensions/select/SelectExtension';
-import { getLineIntersectPoint } from '@drawing/common/src/model/entity/lineUtil';
+import { getLineIntersectPoint } from '@drawing/common/build/model/page/entity/lineUtil';
 
 export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     const controller = useEditorController();

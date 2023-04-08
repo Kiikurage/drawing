@@ -1,7 +1,4 @@
-import { Camera } from '@drawing/common/src/model/Camera';
-import { HoverState } from '@drawing/common/src/model/HoverState';
-import { Page } from '@drawing/common/src/model/Page';
-import { Patch } from '@drawing/common/src/model/Patch';
+import { Camera, HoverState, Page, Patch } from '@drawing/common';
 
 export interface EditorState {
     page: Page;

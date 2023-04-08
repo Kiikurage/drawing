@@ -1,6 +1,6 @@
-import { randomId } from '../lib/randomId';
+import { randomId } from '../../lib/randomId';
 import { Entity } from './entity/Entity';
-import { Patch } from './Patch';
+import { Patch } from '../Patch';
 
 export interface Page {
     id: string;

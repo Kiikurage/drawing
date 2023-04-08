@@ -1,9 +1,9 @@
-import { EntityMap } from '../EntityMap';
-import { Transform } from '../Transform';
-import { ModelCordBox } from '../Box';
-import { Patch } from '../Patch';
-import { ModelCordPoint, Point } from '../Point';
-import { Size } from '../Size';
+import { EntityMap } from '../../EntityMap';
+import { Transform } from '../../Transform';
+import { ModelCordBox } from '../../Box';
+import { Patch } from '../../Patch';
+import { ModelCordPoint, Point } from '../../Point';
+import { Size } from '../../Size';
 import { LineEntity, LineEntityDelegate } from './LineEntity';
 import { RectEntity, RectEntityDelegate } from './RectEntity';
 import { TextEntity } from './TextEntity';

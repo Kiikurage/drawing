@@ -1,23 +1,21 @@
 import {
-    CRDTLivePage,
+    AddEntitiesEditAction,
+    DeleteEntitiesEditAction,
+    EditAction,
     Entity,
     EntityMap,
     HistoryManager,
-    LivePage,
     Patch,
     ReadonlyStore,
     Record,
     Store,
-} from '@drawing/common';
-import {
-    AddEntitiesEditAction,
-    DeleteEntitiesEditAction,
-    EditAction,
     UpdateEntitiesEditAction,
-} from '@drawing/common/src/model/EditAction';
+} from '@drawing/common';
 import { PageEditSession } from './PageEditSession';
 import { deps } from '../../../../config/dependency';
 import { EditorState } from '../model/EditorState';
+import { CRDTLivePage } from '../model/LivePage/CRDTLivePage';
+import { LivePage } from '../model/LivePage/LivePage';
 
 export class PageEditController {
     private readonly page: LivePage;

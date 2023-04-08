@@ -10,19 +10,23 @@ export * from './lib/singleton';
 export * from './lib/sleep';
 export * from './lib/Store';
 
-export * from './model/entity/Entity';
-export * from './model/entity/LineEntity';
-export * from './model/entity/RectEntity';
-export * from './model/entity/TextEntity';
+export * from './model/page/Page';
+export * from './model/messages/Message';
+export * from './model/page/entity/Entity';
+export * from './model/page/entity/LineEntity';
+export * from './model/page/entity/lineUtil';
+export * from './model/page/entity/RectEntity';
+export * from './model/page/entity/TextEntity';
 
 export * from './model/ArrowHeadType';
 export * from './model/Box';
 export * from './model/Camera';
 export * from './model/ColorPalette';
+export * from './model/EditAction';
 export * from './model/EntityMap';
 export * from './model/HoverState';
+export * from './model/Json';
 export * from './model/Key';
-export * from './model/Page';
 export * from './model/Patch';
 export * from './model/Point';
 export * from './model/Size';

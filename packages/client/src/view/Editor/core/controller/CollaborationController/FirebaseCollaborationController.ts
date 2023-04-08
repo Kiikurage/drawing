@@ -2,8 +2,9 @@ import * as firebaseAuth from 'firebase/auth';
 import * as firebaseDB from 'firebase/database';
 import { get, ref, set } from 'firebase/database';
 import { getAuth, getDatabase } from '../../../../../config/firebaseConfig';
-import { CRDTPageAction, Page, User } from '@drawing/common';
+import { Page, User } from '@drawing/common';
 import { CollaborationController } from './CollaborationController';
+import { CRDTPageAction } from '../../model/LivePage/CRDTLivePage';
 
 export class FirebaseCollaborationController implements CollaborationController {
     async dispatchActions(pageId: string, actions: CRDTPageAction[]) {

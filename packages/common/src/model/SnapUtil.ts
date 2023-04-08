@@ -3,7 +3,7 @@ import { Transform } from './Transform';
 import { SnapPointType, TransformType } from './TransformType';
 import { ModelCordPoint, Point } from './Point';
 import { ModelCordBox } from './Box';
-import { Entity } from './entity/Entity';
+import { Entity } from './page/entity/Entity';
 
 export function snapBox(
     box: ModelCordBox,

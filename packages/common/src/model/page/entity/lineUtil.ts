@@ -1,4 +1,4 @@
-import { ModelCordPoint, Point } from '../Point';
+import { ModelCordPoint, Point } from '../../Point';
 
 /**
  * Compute the point where L(p11, p12) and L(p21, p22). If lines don't cross, return null

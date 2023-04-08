@@ -1,4 +1,4 @@
-import { Point } from '../Point';
+import { Point } from '../../Point';
 import { getLineIntersectPoint, isLineIntersect } from './lineUtil';
 
 describe('lineUtil', () => {

@@ -1,12 +1,12 @@
-import { randomId } from '../../lib/randomId';
-import { ColorPaletteKey } from '../ColorPalette';
-import { Transform } from '../Transform';
-import { ModelCordBox } from '../Box';
-import { Patch } from '../Patch';
-import { ModelCordPoint, Point } from '../Point';
-import { Size } from '../Size';
+import { randomId } from '../../../lib/randomId';
+import { ColorPaletteKey } from '../../ColorPalette';
+import { Transform } from '../../Transform';
+import { ModelCordBox } from '../../Box';
+import { Patch } from '../../Patch';
+import { ModelCordPoint, Point } from '../../Point';
+import { Size } from '../../Size';
 import { Entity, EntityDelegates } from './Entity';
-import { ArrowHeadType } from '../ArrowHeadType';
+import { ArrowHeadType } from '../../ArrowHeadType';
 
 export interface LineEntity {
     id: string;

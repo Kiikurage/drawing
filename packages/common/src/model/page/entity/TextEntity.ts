@@ -1,11 +1,11 @@
-import { randomId } from '../../lib/randomId';
-import { ColorPaletteKey } from '../ColorPalette';
-import { Transform } from '../Transform';
-import { ModelCordBox } from '../Box';
-import { Patch } from '../Patch';
-import { ModelCordPoint, Point } from '../Point';
-import { ModelCordSize, Size } from '../Size';
-import { HorizontalAlign, VerticalAlign } from '../TextAlign';
+import { randomId } from '../../../lib/randomId';
+import { ColorPaletteKey } from '../../ColorPalette';
+import { Transform } from '../../Transform';
+import { ModelCordBox } from '../../Box';
+import { Patch } from '../../Patch';
+import { ModelCordPoint, Point } from '../../Point';
+import { ModelCordSize, Size } from '../../Size';
+import { HorizontalAlign, VerticalAlign } from '../../TextAlign';
 
 export interface TextEntity {
     id: string;

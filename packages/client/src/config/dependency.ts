@@ -1,11 +1,11 @@
 import * as firebase from '@firebase/app';
-import { singleton } from '@drawing/common';
 import { CollaborationController } from '../view/Editor/core/controller/CollaborationController/CollaborationController';
 import { FirebaseCollaborationController } from '../view/Editor/core/controller/CollaborationController/FirebaseCollaborationController';
 import { DummyCollaborationController } from '../view/Editor/core/controller/CollaborationController/DummyCollaborationController';
 import { AppController } from '../view/App/AppController/AppController';
 import { FirebaseAppController } from '../view/App/AppController/FirebaseAppController';
 import { DummyAppController } from '../view/App/AppController/DummyAppController';
+import { singleton } from '@drawing/common';
 
 export module deps {
     import initializeApp = firebase.initializeApp;

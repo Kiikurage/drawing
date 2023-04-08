@@ -1,4 +1,5 @@
-import { CRDTPageAction, Page } from '@drawing/common';
+import { Page } from '@drawing/common';
+import { CRDTPageAction } from '../../model/LivePage/CRDTLivePage';
 
 export interface CollaborationController {
     savePage(page: Page): Promise<void>;

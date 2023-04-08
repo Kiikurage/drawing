@@ -1,6 +1,6 @@
 import { Patch } from './Patch';
 import { EntityMap } from './EntityMap';
-import { Entity } from './entity/Entity';
+import { Entity } from './page/entity/Entity';
 
 export type EditAction = AddEntitiesEditAction | DeleteEntitiesEditAction | UpdateEntitiesEditAction;
 
