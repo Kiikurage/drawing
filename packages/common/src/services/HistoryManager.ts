@@ -1,5 +1,5 @@
-import { noop } from '../lib/noop';
 import { EditAction } from '../model/EditAction';
+import { dispatcher } from '../lib/Dispatcher';
 
 interface HistoryEntry {
     normal: EditAction[];
@@ -11,20 +11,23 @@ export class HistoryManager {
     private readonly redoStack: HistoryEntry[] = [];
 
     newSession(): HistoryManager.Session {
-        return new SessionImpl(
-            (action: EditAction) => {
-                this.redoStack.length = 0;
-                this.onAction(action);
-            },
-            (entry: HistoryEntry) => {
-                this.undoStack.push(entry);
-            }
-        );
+        const session = new SessionImpl();
+
+        session.onAction.addListener((action: EditAction) => {
+            this.redoStack.length = 0;
+            this.onAction.dispatch(action);
+        });
+
+        session.onCommit.addListener((entry: HistoryEntry) => {
+            this.undoStack.push(entry);
+        });
+
+        return session;
     }
 
     apply(normal: EditAction, reverse: EditAction) {
         this.redoStack.length = 0;
-        this.onAction(normal);
+        this.onAction.dispatch(normal);
         this.undoStack.push({ normal: [normal], reverse: [reverse] });
     }
 
@@ -32,7 +35,7 @@ export class HistoryManager {
         const entry = this.undoStack.pop();
         if (entry === undefined) return;
 
-        for (const action of entry.reverse) this.onAction(action);
+        for (const action of entry.reverse) this.onAction.dispatch(action);
 
         this.redoStack.push(entry);
     }
@@ -41,12 +44,12 @@ export class HistoryManager {
         const entry = this.redoStack.pop();
         if (entry === undefined) return;
 
-        for (const action of entry.normal) this.onAction(action);
+        for (const action of entry.normal) this.onAction.dispatch(action);
 
         this.undoStack.push(entry);
     }
 
-    onAction: (patch: EditAction) => void = noop;
+    readonly onAction = dispatcher<EditAction>();
 }
 
 export module HistoryManager {
@@ -62,23 +65,22 @@ class SessionImpl implements HistoryManager.Session {
     reverseActions: EditAction[] = [];
     private isCommit = false;
 
-    constructor(
-        private readonly onAction: (action: EditAction) => void,
-        private readonly onCommit: (entry: HistoryEntry) => void
-    ) {}
+    readonly onAction = dispatcher<EditAction>();
+
+    readonly onCommit = dispatcher<HistoryEntry>();
 
     apply(normal: EditAction, reverse: EditAction) {
         if (this.isCommit) {
             throw new Error('This session is already committed');
         }
 
-        this.onAction(normal);
+        this.onAction.dispatch(normal);
         this.normalActions.push(normal);
         this.reverseActions.push(reverse);
     }
 
     commit(): void {
-        this.onCommit({
+        this.onCommit.dispatch({
             normal: this.normalActions,
             reverse: this.reverseActions.reverse(),
         });

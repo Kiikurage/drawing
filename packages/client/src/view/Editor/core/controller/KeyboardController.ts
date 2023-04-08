@@ -1,13 +1,14 @@
-import { KeyboardEventInfo } from './IEditorController';
-import { Key } from '@drawing/common';
+import { KeyboardEventInfo } from './EditorController';
+import { dispatcher, Key } from '@drawing/common';
 
 export class KeyboardController {
-    private readonly keyDownListeners = new Set<(ev: KeyboardEventInfo) => void>();
     private readonly keyPatternListeners = new Map<string, Set<(ev: KeyboardEventInfo) => void>>();
-    private readonly keyUpListeners = new Set<(ev: KeyboardEventInfo) => void>();
 
-    onKeyDown(ev: KeyboardEventInfo) {
-        this.keyDownListeners.forEach((callback) => callback(ev));
+    readonly onKeyDown = dispatcher<KeyboardEventInfo>();
+    readonly onKeyUp = dispatcher<KeyboardEventInfo>();
+
+    handleKeyDown(ev: KeyboardEventInfo) {
+        this.onKeyDown.dispatch(ev);
 
         const keys = [ev.key];
         if (ev.shiftKey) keys.push('Shift');
@@ -17,18 +18,8 @@ export class KeyboardController {
         this.keyPatternListeners.get(pattern)?.forEach((callback) => callback(ev));
     }
 
-    onKeyUp(ev: KeyboardEventInfo) {
-        this.keyUpListeners.forEach((callback) => callback(ev));
-    }
-
-    addKeyDownListener(callback: (ev: KeyboardEventInfo) => void): this {
-        this.keyDownListeners.add(callback);
-        return this;
-    }
-
-    removeKeyDownListener(callback: (ev: KeyboardEventInfo) => void): this {
-        this.keyDownListeners.delete(callback);
-        return this;
+    handleKeyUp(ev: KeyboardEventInfo) {
+        this.onKeyUp.dispatch(ev);
     }
 
     addPatternListener(keys: string[], callback: (ev: KeyboardEventInfo) => void): this {
@@ -53,16 +44,6 @@ export class KeyboardController {
             this.keyPatternListeners.delete(pattern);
         }
 
-        return this;
-    }
-
-    addKeyUpListener(callback: (ev: KeyboardEventInfo) => void): this {
-        this.keyUpListeners.add(callback);
-        return this;
-    }
-
-    removeKeyUpListener(callback: (ev: KeyboardEventInfo) => void): this {
-        this.keyUpListeners.delete(callback);
         return this;
     }
 }

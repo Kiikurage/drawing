@@ -1,14 +1,14 @@
 import { Extension } from '../../core/controller/Extension';
-import { IEditorController } from '../../core/controller/IEditorController';
-import { EventDispatcher, Store } from '@drawing/common';
+import { EditorController } from '../../core/controller/EditorController';
+import { dispatcher, Store } from '@drawing/common';
 import { ModeChangeEvent } from './ModeChangeEvent';
 import { ModeState } from './ModeState';
 
 export class ModeExtension extends Extension {
     readonly store = new Store(ModeState.create());
 
-    onRegister(controller: IEditorController) {
-        super.onRegister(controller);
+    initialize(controller: EditorController) {
+        super.initialize(controller);
     }
 
     get mode(): string {
@@ -16,11 +16,9 @@ export class ModeExtension extends Extension {
     }
 
     setMode(mode: string) {
-        this.onModeChange(mode);
+        this.onModeChange.dispatch({ prevMode: this.mode, nextMode: mode });
         this.store.setState({ mode });
     }
 
-    readonly onModeChange = EventDispatcher((nextMode: string) => {
-        return { prevMode: this.mode, nextMode } satisfies ModeChangeEvent;
-    });
+    readonly onModeChange = dispatcher<ModeChangeEvent>();
 }

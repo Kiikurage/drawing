@@ -1,20 +1,19 @@
 import { Store } from '@drawing/common';
 import { Extension } from '../../core/controller/Extension';
 import { SnapState } from './SnapState';
-import { IEditorController } from '../../core/controller/IEditorController';
+import { EditorController } from '../../core/controller/EditorController';
 
 export class SnapExtension extends Extension {
     readonly store = new Store<SnapState>(SnapState.create());
 
-    onRegister(controller: IEditorController) {
-        super.onRegister(controller);
-        controller.keyboard
-            .addKeyDownListener((ev) => {
-                if (ev.key === 'Control') this.enable();
-            })
-            .addKeyUpListener((ev) => {
-                if (ev.key === 'Control') this.disable();
-            });
+    initialize(controller: EditorController) {
+        super.initialize(controller);
+        controller.keyboard.onKeyDown.addListener((ev) => {
+            if (ev.key === 'Control') this.enable();
+        });
+        controller.keyboard.onKeyUp.addListener((ev) => {
+            if (ev.key === 'Control') this.disable();
+        });
     }
 
     enable() {

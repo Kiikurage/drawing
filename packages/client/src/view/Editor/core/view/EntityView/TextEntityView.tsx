@@ -42,8 +42,8 @@ export const TextEntityView = ({ entity }: { entity: TextEntity }) => {
             verticalAlign={entity.verticalAlign}
             value={entity.text}
             editStartPoint={editStartPoint}
-            onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
-            onMouseLeave={controller.onUnhover}
+            onMouseOver={() => controller.handleHover({ type: 'entity', entityId: entity.id })}
+            onMouseLeave={controller.handleUnhover}
             onChange={(ev) => textEditExtension.updateEditingText(entity.id, ev.target.value)}
             onContentSizeChange={(width, height) => {
                 controller.updateEntities('transform', {

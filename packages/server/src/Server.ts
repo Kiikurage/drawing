@@ -1,6 +1,6 @@
 import * as http from 'http';
 import { connection as WebSocketConnection, Message as WebSocketMessage, server as WebSocketServer } from 'websocket';
-import { Message, MessageClient, MessageConnection } from '@drawing/common';
+import { MessageClient, MessageConnection } from '@drawing/common';
 
 export interface ServerOptions {
     port: number;
@@ -69,15 +69,15 @@ export class Server {
 class ServerMessageConnection implements MessageConnection {
     constructor(private readonly connection: WebSocketConnection) {}
 
-    addMessageCallback(callback: (message: Message) => void): void {
+    addMessageCallback(callback: (message: MessageClient) => void): void {
         this.connection.on('message', (data: WebSocketMessage) => {
             if (data.type !== 'utf8') return;
 
-            callback(JSON.parse(data.utf8Data) as Message);
+            callback(JSON.parse(data.utf8Data) as MessageClient);
         });
     }
 
-    send(message: Message): void {
+    send(message: MessageClient): void {
         this.connection.send(JSON.stringify(message));
     }
 }

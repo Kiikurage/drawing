@@ -1,6 +1,6 @@
 import { Extension } from '../../core/controller/Extension';
 import { ColorPaletteKey, Record } from '@drawing/common';
-import { IEditorController } from '../../core/controller/IEditorController';
+import { EditorController } from '../../core/controller/EditorController';
 import { ContextMenuExtension } from '../../core/extensions/contextMenu/ContextMenuExtension';
 import { ColorContextMenuSection } from './ColorContextMenuSection';
 import { SelectExtension } from '../../core/extensions/select/SelectExtension';
@@ -8,8 +8,8 @@ import { SelectExtension } from '../../core/extensions/select/SelectExtension';
 export class ColorExtension extends Extension {
     private selectExtension: SelectExtension = null as never;
 
-    onRegister(controller: IEditorController) {
-        super.onRegister(controller);
+    initialize(controller: EditorController) {
+        super.initialize(controller);
         controller.requireExtension(ContextMenuExtension).addSection({
             view: ColorContextMenuSection,
         });

@@ -1,4 +1,4 @@
-import { IEditorController, MouseEventInfo } from '../../controller/IEditorController';
+import { EditorController, MouseEventInfo } from '../../controller/EditorController';
 import { Extension } from '../../controller/Extension';
 import { DisplayCordPoint, Entity, Point, Store } from '@drawing/common';
 import { PageEditSession } from '../../controller/PageEditSession';
@@ -13,15 +13,15 @@ export class TextEditExtension extends Extension {
     private session: PageEditSession | null = null;
     private autoCommit = false;
 
-    onRegister(controller: IEditorController) {
-        super.onRegister(controller);
+    initialize(controller: EditorController) {
+        super.initialize(controller);
 
         this.selectExtension = controller.requireExtension(SelectExtension);
-        this.selectExtension.onSelectionChange.addListener(this.onSelectionChange);
+        this.selectExtension.onSelectionChange.addListener(this.handleSelectionChange);
 
         this.modeExtension = controller.requireExtension(ModeExtension);
 
-        controller.onDoubleClick.addListener(this.onDoubleClick);
+        controller.onDoubleClick.addListener(this.handleDoubleClick);
         controller.keyboard
             .addPatternListener(['Enter'], (ev) => {
                 ev.preventDefault();
@@ -77,11 +77,11 @@ export class TextEditExtension extends Extension {
         return true;
     }
 
-    private readonly onDoubleClick = (ev: MouseEventInfo) => {
+    private readonly handleDoubleClick = (ev: MouseEventInfo) => {
         this.tryStartTextEditForSelectedEntity(ev.pointInDisplay);
     };
 
-    private readonly onSelectionChange = (ev: SelectionChangeEventInfo) => {
+    private readonly handleSelectionChange = (ev: SelectionChangeEventInfo) => {
         if (this.store.state.entityId !== '') {
             if (!ev.nextEntityIds.includes(this.store.state.entityId)) {
                 this.completeTextEdit();

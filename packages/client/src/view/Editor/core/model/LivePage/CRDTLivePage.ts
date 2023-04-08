@@ -1,5 +1,5 @@
 import { LivePage, Transaction } from './LivePage';
-import { Entity, EntityMap, Page, Patch, randomId, Record, VectorClock } from '@drawing/common';
+import { dispatcher, Entity, EntityMap, Page, Patch, randomId, Record, VectorClock } from '@drawing/common';
 import { CollaborationController } from '../../controller/CollaborationController/CollaborationController';
 import { DummyCollaborationController } from '../../controller/CollaborationController/DummyCollaborationController';
 
@@ -39,7 +39,7 @@ export class CRDTLivePage implements Page, LivePage {
         this.metadata[entity.id] = {
             clock: { addDel: nextClock },
         };
-        this.onAddEntity(entity);
+        this.onAddEntity.dispatch(entity);
 
         return { type: 'add', clock: nextClock, entityId: entity.id, body: entity };
     }
@@ -55,7 +55,7 @@ export class CRDTLivePage implements Page, LivePage {
             },
             deleted: true,
         };
-        this.onDeleteEntity(entityId);
+        this.onDeleteEntity.dispatch({ entityId });
 
         return { type: 'delete', clock: nextClock, entityId };
     }
@@ -77,7 +77,7 @@ export class CRDTLivePage implements Page, LivePage {
                 [type]: nextClock,
             },
         };
-        this.onUpdateEntity(nextEntity);
+        this.onUpdateEntity.dispatch(nextEntity);
 
         return { type, clock: nextClock, entityId, body: patch };
     }
@@ -98,14 +98,14 @@ export class CRDTLivePage implements Page, LivePage {
                         if (VectorClock.hardCompare(prevClock, clock) === 'lt') {
                             this.entities[entity.id] = entity;
                             this.metadata[entity.id] = { clock: { addDel: clock } };
-                            this.onAddEntity(entity);
+                            this.onAddEntity.dispatch(entity);
                         }
                         return;
                     }
                     case 'lt': {
                         this.entities[entity.id] = entity;
                         this.metadata[entity.id] = { clock: { addDel: clock } };
-                        this.onAddEntity(entity);
+                        this.onAddEntity.dispatch(entity);
                         return;
                     }
                 }
@@ -126,7 +126,7 @@ export class CRDTLivePage implements Page, LivePage {
                             clock: { addDel: clock },
                             deleted: true,
                         };
-                        this.onDeleteEntity(entityId);
+                        this.onDeleteEntity.dispatch({ entityId });
                         return;
                     }
                 }
@@ -156,7 +156,7 @@ export class CRDTLivePage implements Page, LivePage {
                                 ...metadata,
                                 clock: { ...metadata.clock, [updateType]: clock },
                             };
-                            this.onUpdateEntity(nextEntity);
+                            this.onUpdateEntity.dispatch(nextEntity);
                         }
                         return;
                     }
@@ -170,7 +170,7 @@ export class CRDTLivePage implements Page, LivePage {
                             ...metadata,
                             clock: { ...metadata.clock, [updateType]: clock },
                         };
-                        this.onUpdateEntity(nextEntity);
+                        this.onUpdateEntity.dispatch(nextEntity);
                         return;
                     }
                 }
@@ -206,9 +206,9 @@ export class CRDTLivePage implements Page, LivePage {
         for (const action of actions) this.apply(action);
     }
 
-    onAddEntity = (entity: Entity) => {};
-    onDeleteEntity = (entityId: string) => {};
-    onUpdateEntity = (entity: Entity) => {};
+    readonly onAddEntity = dispatcher<Entity>();
+    readonly onDeleteEntity = dispatcher<{ entityId: string }>();
+    readonly onUpdateEntity = dispatcher<Entity>();
 }
 
 export interface CRDTLivePageWithTestVisibility extends Page, LivePage {

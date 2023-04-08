@@ -42,8 +42,8 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
             verticalAlign={entity.verticalAlign}
             value={entity.text}
             editStartPoint={editStartPoint}
-            onMouseOver={() => controller.onHover({ type: 'entity', entityId: entity.id })}
-            onMouseLeave={controller.onUnhover}
+            onMouseOver={() => controller.handleHover({ type: 'entity', entityId: entity.id })}
+            onMouseLeave={controller.handleUnhover}
             onChange={(ev) => textEditExtension.updateEditingText(entity.id, ev.target.value)}
             onContentSizeChange={(contentWidth, contentHeight) => {
                 controller.updateEntities('transform', {

@@ -141,8 +141,8 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                 <g
                     transform="translate(100,100)"
                     pointerEvents="all"
-                    onMouseOver={() => controller.onHover({ type: 'entity', entityId: id })}
-                    onMouseLeave={controller.onUnhover}
+                    onMouseOver={() => controller.handleHover({ type: 'entity', entityId: id })}
+                    onMouseLeave={controller.handleUnhover}
                 >
                     {content}
                     {highlighted && (

@@ -45,8 +45,8 @@ export const RectSelectionView = () => {
                     fill="none"
                     stroke={COLOR_SELECTION}
                     strokeWidth={1.5}
-                    onMouseOver={() => controller.onHover(HoverState.TRANSLATE_HANDLE)}
-                    onMouseLeave={() => controller.onUnhover()}
+                    onMouseOver={() => controller.handleHover(HoverState.TRANSLATE_HANDLE)}
+                    onMouseLeave={controller.handleUnhover}
                 />
                 <InvisibleResizeHandle cursor="ns-resize" width={width} hover={HoverState.RESIZE_HANDLE_TOP} />
                 <InvisibleResizeHandle cursor="ew-resize" height={height} hover={HoverState.RESIZE_HANDLE_LEFT} />

@@ -1,7 +1,7 @@
-import { IEditorController, MouseEventButton, MouseEventInfo } from '../../controller/IEditorController';
+import { EditorController, MouseEventButton, MouseEventInfo } from '../../controller/EditorController';
 import { Extension } from '../../controller/Extension';
 import { TransformExtension } from '../../../extensions/transform/TransformExtension';
-import { Entity, EntityMap, EventDispatcher, Patch, Store, TransformType } from '@drawing/common';
+import { dispatcher, Entity, EntityMap, Patch, Store, TransformType } from '@drawing/common';
 import { ModeExtension } from '../../../extensions/mode/ModeExtension';
 import { ModeChangeEvent } from '../../../extensions/mode/ModeChangeEvent';
 import { SelectState } from './SelectState';
@@ -25,15 +25,15 @@ export class SelectExtension extends Extension {
         return Object.values(this.selectedEntityMap);
     }
 
-    onRegister(controller: IEditorController) {
-        super.onRegister(controller);
+    initialize(controller: EditorController) {
+        super.initialize(controller);
 
         controller.requireExtension(ToolbarExtension).addItem({ view: SelectModeToolbarButton });
 
         this.transformExtension = this.controller.requireExtension(TransformExtension);
 
         const modeExtension = this.controller.requireExtension(ModeExtension);
-        modeExtension.onModeChange.addListener(this.onModeChange);
+        modeExtension.onModeChange.addListener(this.handleModeChange);
         this.updateModeSpecificListener(modeExtension.mode);
 
         controller.keyboard
@@ -70,7 +70,7 @@ export class SelectExtension extends Extension {
         const prevEntityIds = this.selectedEntityIds;
         const nextEntityIds = entityIds.filter((entityId) => entityId in this.controller.state.page.entities);
 
-        this.onSelectionChange({ prevEntityIds, nextEntityIds });
+        this.onSelectionChange.dispatch({ prevEntityIds, nextEntityIds });
 
         const patch: Patch<EntityMap> = {};
         for (const entityId of prevEntityIds) {
@@ -94,9 +94,9 @@ export class SelectExtension extends Extension {
         this.setSelection([]);
     }
 
-    readonly onSelectionChange = EventDispatcher<SelectionChangeEventInfo, [SelectionChangeEventInfo]>((ev) => ev);
+    readonly onSelectionChange = dispatcher<SelectionChangeEventInfo>();
 
-    private readonly onModeChange = (ev: ModeChangeEvent) => {
+    private readonly handleModeChange = (ev: ModeChangeEvent) => {
         this.updateModeSpecificListener(ev.nextMode);
         if (ev.nextMode !== SelectExtension.MODE_KEY) {
             this.clearSelection();
@@ -105,13 +105,13 @@ export class SelectExtension extends Extension {
 
     private updateModeSpecificListener(mode: string) {
         if (mode === SelectExtension.MODE_KEY) {
-            this.controller.onMouseDown.addListener(this.onMouseDown);
+            this.controller.onMouseDown.addListener(this.handleMouseDown);
         } else {
-            this.controller.onMouseDown.removeListener(this.onMouseDown);
+            this.controller.onMouseDown.removeListener(this.handleMouseDown);
         }
     }
 
-    private readonly onMouseDown = (ev: MouseEventInfo) => {
+    private readonly handleMouseDown = (ev: MouseEventInfo) => {
         const { hover } = this.controller.state;
 
         switch (ev.button) {

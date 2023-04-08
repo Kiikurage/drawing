@@ -1,7 +1,7 @@
 import {
+    dispatcher,
     Entity,
     EntityMap,
-    EventDispatcher,
     LineEntity,
     ModelCordBox,
     ModelCordPoint,
@@ -12,7 +12,7 @@ import {
     TransformType,
 } from '@drawing/common';
 import { Extension } from '../../core/controller/Extension';
-import { IEditorController, MouseEventInfo } from '../../core/controller/IEditorController';
+import { EditorController, MouseEventInfo } from '../../core/controller/EditorController';
 import { PageEditSession } from '../../core/controller/PageEditSession';
 import { SnapExtension } from '../snap/SnapExtension';
 
@@ -27,18 +27,17 @@ export class TransformExtension extends Extension {
     private snapExtension: SnapExtension = null as never;
     private constrainEnabled = false;
 
-    onRegister(controller: IEditorController) {
-        super.onRegister(controller);
+    initialize(controller: EditorController) {
+        super.initialize(controller);
         controller.onMouseMove.addListener(this.onMouseMove);
         controller.onMouseUp.addListener(this.onMouseUp);
         this.snapExtension = controller.requireExtension(SnapExtension);
-        controller.keyboard
-            .addKeyDownListener((ev) => {
-                if (ev.key === 'Shift') this.constrainEnabled = true;
-            })
-            .addKeyUpListener((ev) => {
-                if (ev.key === 'Shift') this.constrainEnabled = false;
-            });
+        controller.keyboard.onKeyDown.addListener((ev) => {
+            if (ev.key === 'Shift') this.constrainEnabled = true;
+        });
+        controller.keyboard.onKeyUp.addListener((ev) => {
+            if (ev.key === 'Shift') this.constrainEnabled = false;
+        });
     }
 
     startTransform(
@@ -76,12 +75,7 @@ export class TransformExtension extends Extension {
         this.snapExtension.showGuide();
     }
 
-    readonly onTransformEnd = EventDispatcher(() => {
-        if (this.autoCommit) this.session?.commit();
-        this.session = null;
-
-        this.snapExtension.hideGuide();
-    });
+    readonly onTransformEnd = dispatcher<void>();
 
     private readonly onMouseMove = (ev: MouseEventInfo) => {
         const { point: nextPoint } = ev;
@@ -141,6 +135,12 @@ export class TransformExtension extends Extension {
         this.entities = null;
         this.startBox = null;
         this.transformType = null;
-        this.onTransformEnd();
+
+        if (this.autoCommit) this.session?.commit();
+        this.session = null;
+
+        this.snapExtension.hideGuide();
+
+        this.onTransformEnd.dispatch();
     };
 }

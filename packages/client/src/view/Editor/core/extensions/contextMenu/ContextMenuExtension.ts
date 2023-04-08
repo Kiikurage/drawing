@@ -1,4 +1,4 @@
-import { IEditorController, MouseEventButton, MouseEventInfo } from '../../controller/IEditorController';
+import { EditorController, MouseEventButton, MouseEventInfo } from '../../controller/EditorController';
 import { Extension } from '../../controller/Extension';
 import { ContextMenuState } from './ContextMenuState';
 import { ContextMenuSectionEntry } from './ContextMenuSectionEntry';
@@ -12,13 +12,13 @@ export class ContextMenuExtension extends Extension {
     readonly store = new Store<ContextMenuState>(ContextMenuState.create());
     private selectExtension: SelectExtension = null as never;
 
-    onRegister(controller: IEditorController) {
-        super.onRegister(controller);
+    initialize(controller: EditorController) {
+        super.initialize(controller);
 
         this.selectExtension = controller.requireExtension(SelectExtension);
 
         const modeExtension = controller.requireExtension(ModeExtension);
-        modeExtension.onModeChange.addListener(this.onModeChange);
+        modeExtension.onModeChange.addListener(this.handleModeChange);
         this.updateModeSpecificListener(modeExtension.mode);
     }
 
@@ -38,7 +38,7 @@ export class ContextMenuExtension extends Extension {
         this.store.setState({ open: false });
     }
 
-    private readonly onModeChange = (ev: ModeChangeEvent) => {
+    private readonly handleModeChange = (ev: ModeChangeEvent) => {
         this.updateModeSpecificListener(ev.nextMode);
         if (ev.nextMode !== SelectExtension.MODE_KEY) {
             this.close();
@@ -47,13 +47,13 @@ export class ContextMenuExtension extends Extension {
 
     private updateModeSpecificListener(mode: string) {
         if (mode === SelectExtension.MODE_KEY) {
-            this.controller.onMouseDown.addListener(this.onMouseDown);
+            this.controller.onMouseDown.addListener(this.handleMouseDown);
         } else {
-            this.controller.onMouseDown.removeListener(this.onMouseDown);
+            this.controller.onMouseDown.removeListener(this.handleMouseDown);
         }
     }
 
-    private readonly onMouseDown = (ev: MouseEventInfo) => {
+    private readonly handleMouseDown = (ev: MouseEventInfo) => {
         if (ev.button !== MouseEventButton.WHEEL) {
             this.close();
         }

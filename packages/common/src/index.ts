@@ -1,6 +1,6 @@
 export * from './lib/deepEqual';
 export * from './lib/distinct';
-export * from './lib/EventDispatcher';
+export * from './lib/Dispatcher';
 export * from './lib/getClosestValue';
 export * from './lib/nonNull';
 export * from './lib/noop';
@@ -11,7 +11,7 @@ export * from './lib/sleep';
 export * from './lib/Store';
 
 export * from './model/page/Page';
-export * from './model/messages/Message';
+export * from './messages/MessageClient';
 export * from './model/page/entity/Entity';
 export * from './model/page/entity/LineEntity';
 export * from './model/page/entity/lineUtil';

@@ -25,14 +25,11 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
             ev.preventDefault();
 
             if (ev.ctrlKey) {
-                controller.onZoom({
-                    diff: -0.001 * ev.deltaY,
-                    pointInDisplay: Point.display(ev.clientX, ev.clientY),
-                });
+                controller.handleZoom(Point.display(ev.clientX, ev.clientY), -0.001 * ev.deltaY);
             } else if (ev.shiftKey) {
-                controller.onScroll(Size.display(ev.deltaY, ev.deltaX));
+                controller.handleScroll(Size.display(ev.deltaY, ev.deltaX));
             } else {
-                controller.onScroll(Size.display(ev.deltaX, ev.deltaY));
+                controller.handleScroll(Size.display(ev.deltaX, ev.deltaY));
             }
         };
 
@@ -48,7 +45,7 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
     useEffect(() => {
         const onMouseMove = (ev: MouseEvent) => {
             const pointInDisplay = Point.display(ev.clientX, ev.clientY);
-            controller.onMouseMove({
+            controller.handleMouseMove({
                 button: ev.button,
                 shiftKey: ev.shiftKey,
                 pointInDisplay,
@@ -57,7 +54,7 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
 
         const onMouseUp = (ev: MouseEvent) => {
             const pointInDisplay = Point.display(ev.clientX, ev.clientY);
-            controller.onMouseUp({
+            controller.handleMouseUp({
                 button: ev.button,
                 shiftKey: ev.shiftKey,
                 pointInDisplay,
@@ -66,19 +63,19 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
 
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', onMouseUp);
-        window.addEventListener('keydown', controller.onKeyDown);
-        window.addEventListener('keyup', controller.onKeyUp);
+        window.addEventListener('keydown', controller.handleKeyDown);
+        window.addEventListener('keyup', controller.handleKeyUp);
         return () => {
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', onMouseUp);
-            window.removeEventListener('keydown', controller.onKeyDown);
-            window.removeEventListener('keyup', controller.onKeyUp);
+            window.removeEventListener('keydown', controller.handleKeyDown);
+            window.removeEventListener('keyup', controller.handleKeyUp);
         };
     }, [controller]);
 
     const onMouseDown: MouseEventHandler = useCallback(
         (ev) => {
-            controller.onMouseDown({
+            controller.handleMouseDown({
                 button: ev.button,
                 shiftKey: ev.shiftKey,
                 pointInDisplay: Point.display(ev.clientX, ev.clientY),
@@ -104,7 +101,7 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                 onMouseDown={onMouseDown}
                 onContextMenu={(ev) => ev.preventDefault()}
                 onDoubleClick={(ev) =>
-                    controller.onDoubleClick({
+                    controller.handleDoubleClick({
                         button: ev.button,
                         shiftKey: ev.shiftKey,
                         pointInDisplay: Point.display(ev.clientX, ev.clientY),

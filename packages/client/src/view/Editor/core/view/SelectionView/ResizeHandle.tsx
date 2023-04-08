@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { memo } from 'react';
 import { HoverState } from '@drawing/common';
 import { useEditorController } from '../EditorControllerContext';
 import { COLOR_SELECTION } from '../../../../styles';
@@ -15,8 +15,8 @@ export const ResizeHandle = memo(
                     y={-12}
                     width={24}
                     height={24}
-                    onMouseOver={() => controller.onHover(hover)}
-                    onMouseLeave={() => controller.onUnhover()}
+                    onMouseOver={() => controller.handleHover(hover)}
+                    onMouseLeave={controller.handleUnhover}
                     pointerEvents="all"
                     fill="none"
                     stroke="none"
@@ -45,14 +45,6 @@ export const InvisibleResizeHandle = memo(
     }) => {
         const controller = useEditorController();
 
-        const onHover = useCallback(() => {
-            controller.onHover(hover);
-        }, [controller, hover]);
-
-        const onUnhover = useCallback(() => {
-            controller.onUnhover();
-        }, [controller]);
-
         return (
             <rect
                 cursor={cursor}
@@ -60,8 +52,8 @@ export const InvisibleResizeHandle = memo(
                 y={y - 12}
                 width={width + 24}
                 height={height + 24}
-                onMouseOver={onHover}
-                onMouseLeave={onUnhover}
+                onMouseOver={() => controller.handleHover(hover)}
+                onMouseLeave={controller.handleUnhover}
                 pointerEvents="all"
                 fill="none"
                 stroke="none"

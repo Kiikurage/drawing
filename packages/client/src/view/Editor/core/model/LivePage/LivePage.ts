@@ -1,13 +1,13 @@
-import { Entity, Page, Patch } from '@drawing/common';
+import { Dispatcher, Entity, Page, Patch } from '@drawing/common';
 
 export interface LivePage extends Readonly<Page> {
     transaction(fn: (transaction: Transaction) => void): void;
 
-    onAddEntity: (entity: Entity) => void;
+    onAddEntity: Dispatcher<Entity>;
 
-    onDeleteEntity: (entityId: string) => void;
+    onDeleteEntity: Dispatcher<{ entityId: string }>;
 
-    onUpdateEntity: (entity: Entity) => void;
+    onUpdateEntity: Dispatcher<Entity>;
 }
 
 export interface Transaction {

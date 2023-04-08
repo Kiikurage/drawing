@@ -1,12 +1,15 @@
 import { PageEditController } from './PageEditController';
 import {
     Camera,
+    dispatcher,
+    DisplayCordPoint,
     DisplayCordSize,
     Entity,
     EntityMap,
-    EventDispatcher,
     HistoryManager,
     HoverState,
+    ModelCordPoint,
+    ModelCordSize,
     Patch,
     Point,
     Record,
@@ -14,25 +17,16 @@ import {
     Store,
 } from '@drawing/common';
 import { PageEditSession } from './PageEditSession';
-import {
-    IEditorController,
-    KeyboardEventInfo,
-    MouseEventInfo,
-    ScrollEvent,
-    UIMouseEvent,
-    UIZoomEvent,
-    ZoomEvent,
-} from './IEditorController';
 import { Extension } from './Extension';
 import { KeyboardController } from './KeyboardController';
-import { ExtensionConstructor } from './ExtensionHost';
+import { ExtensionConstructor, ExtensionHost } from './ExtensionHost';
 import { EditorState } from '../model/EditorState';
 import { CoreExtensions } from '../extensions/coreExtensions';
 
 /**
  * Root controller for Editor view
  */
-export class EditorController implements IEditorController {
+export class EditorController implements ExtensionHost {
     readonly keyboard = new KeyboardController();
     readonly store: Store<EditorState>;
     readonly core: PageEditController;
@@ -52,7 +46,7 @@ export class EditorController implements IEditorController {
     addExtension(ExtensionConstructor: ExtensionConstructor): this {
         if (!this.extensions.has(ExtensionConstructor)) {
             const extension = new ExtensionConstructor();
-            extension.onRegister(this);
+            extension.initialize(this);
             this.extensions.set(ExtensionConstructor, extension);
         }
         return this;
@@ -62,7 +56,7 @@ export class EditorController implements IEditorController {
         let extension = this.extensions.get(ExtensionConstructor);
         if (extension === undefined) {
             extension = new ExtensionConstructor();
-            extension.onRegister(this);
+            extension.initialize(this);
             this.extensions.set(ExtensionConstructor, extension);
         }
 
@@ -115,63 +109,78 @@ export class EditorController implements IEditorController {
 
     // Event handlers
 
-    readonly onZoom = EventDispatcher((ev: UIZoomEvent) => {
-        return {
-            ...ev,
-            point: Point.toModel(this.state.camera, ev.pointInDisplay),
-        } satisfies ZoomEvent;
-    });
+    readonly handleZoom = (pointInDisplay: DisplayCordPoint, diff: number) => {
+        this.onZoom.dispatch({
+            diff,
+            point: Point.toModel(this.state.camera, pointInDisplay),
+            pointInDisplay,
+        });
+    };
 
-    readonly onScroll = EventDispatcher((diffInDisplay: DisplayCordSize) => {
-        return {
+    readonly handleScroll = (diffInDisplay: DisplayCordSize) => {
+        this.onScroll.dispatch({
             diff: Size.toModel(this.state.camera, diffInDisplay),
             diffInDisplay,
-        } satisfies ScrollEvent;
-    });
+        });
+    };
 
-    readonly onMouseDown = EventDispatcher((ev: UIMouseEvent) => {
-        return {
+    readonly handleMouseDown = (ev: UIMouseEvent) => {
+        this.onMouseDown.dispatch({
             ...ev,
             point: Point.toModel(this.state.camera, ev.pointInDisplay),
-        } satisfies MouseEventInfo;
-    });
+        });
+    };
 
-    readonly onMouseMove = EventDispatcher((ev: UIMouseEvent) => {
-        return {
+    readonly handleMouseMove = (ev: UIMouseEvent) => {
+        this.onMouseMove.dispatch({
             ...ev,
             point: Point.toModel(this.state.camera, ev.pointInDisplay),
-        };
-    });
+        });
+    };
 
-    readonly onMouseUp = EventDispatcher((ev: UIMouseEvent) => {
-        return {
+    readonly handleMouseUp = (ev: UIMouseEvent) => {
+        this.onMouseUp.dispatch({
             ...ev,
-            point: Point.toModel(this.camera, ev.pointInDisplay),
-        };
-    });
+            point: Point.toModel(this.state.camera, ev.pointInDisplay),
+        });
+    };
 
-    readonly onDoubleClick = EventDispatcher((ev: UIMouseEvent) => {
-        return {
+    readonly handleDoubleClick = (ev: UIMouseEvent) => {
+        this.onDoubleClick.dispatch({
             ...ev,
-            point: Point.toModel(this.camera, ev.pointInDisplay),
-        };
-    });
+            point: Point.toModel(this.state.camera, ev.pointInDisplay),
+        });
+    };
 
-    readonly onHover = (hover: HoverState) => {
+    readonly handleHover = (hover: HoverState) => {
         this.store.setState({ hover });
     };
 
-    readonly onUnhover = () => {
+    readonly handleUnhover = () => {
         this.store.setState({ hover: HoverState.IDLE });
     };
 
-    readonly onKeyDown = (ev: KeyboardEventInfo) => {
-        this.keyboard.onKeyDown(ev);
+    readonly handleKeyDown = (ev: KeyboardEventInfo) => {
+        this.keyboard.handleKeyDown(ev);
     };
 
-    readonly onKeyUp = (ev: KeyboardEventInfo) => {
-        this.keyboard.onKeyUp(ev);
+    readonly handleKeyUp = (ev: KeyboardEventInfo) => {
+        this.keyboard.handleKeyUp(ev);
     };
+
+    // Events
+
+    readonly onZoom = dispatcher<ZoomEvent>();
+
+    readonly onScroll = dispatcher<ScrollEvent>();
+
+    readonly onMouseDown = dispatcher<MouseEventInfo>();
+
+    readonly onMouseMove = dispatcher<MouseEventInfo>();
+
+    readonly onMouseUp = dispatcher<MouseEventInfo>();
+
+    readonly onDoubleClick = dispatcher<MouseEventInfo>();
 
     private initializeShortcuts() {
         this.keyboard
@@ -188,4 +197,50 @@ export class EditorController implements IEditorController {
                 this.redo();
             });
     }
+}
+
+export interface UIMouseEvent {
+    pointInDisplay: DisplayCordPoint;
+    shiftKey: boolean;
+    button: number;
+}
+
+export interface MouseEventInfo {
+    point: ModelCordPoint;
+    pointInDisplay: DisplayCordPoint;
+    shiftKey: boolean;
+    button: number;
+}
+
+export module MouseEventButton {
+    export const PRIMARY = 0;
+    export const WHEEL = 1;
+    export const SECONDARY = 2;
+}
+export type MouseEventButton =
+    | typeof MouseEventButton.PRIMARY
+    | typeof MouseEventButton.WHEEL
+    | typeof MouseEventButton.SECONDARY;
+
+export interface KeyboardEventInfo {
+    preventDefault: () => void;
+    shiftKey: boolean;
+    ctrlKey: boolean;
+    key: string;
+}
+
+export interface UIZoomEvent {
+    pointInDisplay: DisplayCordPoint;
+    diff: number;
+}
+
+export interface ZoomEvent {
+    point: ModelCordPoint;
+    pointInDisplay: DisplayCordPoint;
+    diff: number;
+}
+
+export interface ScrollEvent {
+    diff: ModelCordSize;
+    diffInDisplay: DisplayCordSize;
 }

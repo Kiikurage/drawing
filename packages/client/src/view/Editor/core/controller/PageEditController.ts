@@ -21,14 +21,14 @@ export class PageEditController {
     private readonly page: LivePage;
 
     constructor(private readonly store: Store<EditorState>, private readonly historyManager: HistoryManager) {
-        this.historyManager.onAction = this.onAction;
+        this.historyManager.onAction.addListener(this.handleAction);
         this.page = new CRDTLivePage({
             page: this.store.state.page,
             collaborationController: deps.createCollaborationController(),
         });
-        this.page.onAddEntity = this.onAddEntity;
-        this.page.onDeleteEntity = this.onDeleteEntity;
-        this.page.onUpdateEntity = this.onUpdateEntity;
+        this.page.onAddEntity.addListener(this.handleAddEntity);
+        this.page.onDeleteEntity.addListener(this.handleDeleteEntity);
+        this.page.onUpdateEntity.addListener(this.handleUpdateEntity);
     }
 
     addEntities(entities: EntityMap) {
@@ -59,21 +59,21 @@ export class PageEditController {
         return new Session(this.store, this.historyManager.newSession());
     }
 
-    private readonly onAction = (action: EditAction) => {
+    private readonly handleAction = (action: EditAction) => {
         switch (action.type) {
             case 'addEntities':
-                this.onAddEntitiesAction(action);
+                this.handleAddEntitiesAction(action);
                 break;
             case 'deleteEntities':
-                this.onDeleteEntitiesAction(action);
+                this.handleDeleteEntitiesAction(action);
                 break;
             case 'updateEntities':
-                this.onUpdateEntitiesAction(action);
+                this.handleUpdateEntitiesAction(action);
                 break;
         }
     };
 
-    private readonly onAddEntitiesAction = (action: AddEntitiesEditAction) => {
+    private readonly handleAddEntitiesAction = (action: AddEntitiesEditAction) => {
         this.page.transaction((transaction) => {
             for (const entity of Object.values(action.entities)) {
                 transaction.add(entity);
@@ -81,7 +81,7 @@ export class PageEditController {
         });
     };
 
-    private onDeleteEntitiesAction(action: DeleteEntitiesEditAction) {
+    private handleDeleteEntitiesAction(action: DeleteEntitiesEditAction) {
         this.page.transaction((transaction) => {
             for (const entityId of Object.values(action.entityIds)) {
                 transaction.delete(entityId);
@@ -89,7 +89,7 @@ export class PageEditController {
         });
     }
 
-    private onUpdateEntitiesAction(action: UpdateEntitiesEditAction) {
+    private handleUpdateEntitiesAction(action: UpdateEntitiesEditAction) {
         this.page.transaction((transaction) => {
             for (const [entityId, patch] of Object.entries(action.patch)) {
                 transaction.update(entityId, action.type, patch);
@@ -97,7 +97,7 @@ export class PageEditController {
         });
     }
 
-    private readonly onUpdateEntity = (entity: Entity) => {
+    private readonly handleUpdateEntity = (entity: Entity) => {
         this.store.setState({
             page: {
                 entities: { [entity.id]: entity },
@@ -105,18 +105,15 @@ export class PageEditController {
         });
     };
 
-    private readonly onDeleteEntity = (entityId: string) => {
+    private readonly handleDeleteEntity = ({ entityId }: { entityId: string }) => {
         this.store.setState({
             page: {
                 entities: { [entityId]: undefined },
             },
-            // selectMode: {
-            //     entityIds: this.store.state.selectMode.entityIds.filter((id) => id !== entityId),
-            // },
         });
     };
 
-    private readonly onAddEntity = (entity: Entity) => {
+    private readonly handleAddEntity = (entity: Entity) => {
         this.store.setState({
             page: {
                 entities: { [entity.id]: entity },
