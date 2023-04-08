@@ -96,7 +96,13 @@ export class LineExtension extends Extension {
     }
 
     private readonly onMouseDownLineMode = (ev: MouseEventInfo) => {
-        const newEntity = LineEntity.create({ p1: ev.point, p2: Point.model(ev.point.x + 1, ev.point.y + 1) });
+        const linkedEntity1 = findLinkTarget(ev.point, this.controller.state.page.entities);
+
+        const newEntity = LineEntity.create({
+            p1: ev.point,
+            p2: Point.model(ev.point.x + 1, ev.point.y + 1),
+            linkedEntityId1: linkedEntity1?.id ?? null,
+        });
         const newEntityMap = { [newEntity.id]: newEntity };
 
         this.controller.addEntities(newEntityMap);
@@ -140,7 +146,7 @@ export class LineExtension extends Extension {
             nextLinePoint = transform.apply(nextLinePoint);
         }
 
-        const linkedEntity = this.findLinkTarget(nextLinePoint, this.controller.state.page.entities);
+        const linkedEntity = findLinkTarget(nextLinePoint, this.controller.state.page.entities);
 
         this.controller.updateEntities('transform', {
             [entity.id]: {
@@ -164,16 +170,16 @@ export class LineExtension extends Extension {
         this.startPoint = startPoint;
         this.pointKey = pointKey;
     }
+}
 
-    private findLinkTarget(point: ModelCordPoint, entities: EntityMap): Entity | undefined {
-        for (const entity of Object.values(entities)) {
-            if (entity.type === 'line') continue;
+function findLinkTarget(point: ModelCordPoint, entities: EntityMap): Entity | undefined {
+    for (const entity of Object.values(entities)) {
+        if (entity.type === 'line') continue;
 
-            if (Entity.includes(entity, point)) {
-                return entity;
-            }
+        if (Entity.includes(entity, point)) {
+            return entity;
         }
-
-        return undefined;
     }
+
+    return undefined;
 }

@@ -74,7 +74,7 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                 d={`M${p1.x - origin.x},${p1.y - origin.y} L${p2.x - origin.x},${p2.y - origin.y}`}
                 stroke={ColorPalette[palette].strokeColor}
                 strokeLinecap="round"
-                strokeWidth={8}
+                strokeWidth={6}
             />,
         ];
 
@@ -88,8 +88,9 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                     },${p4.y - origin.y}`}
                     fill="none"
                     strokeLinecap="round"
+                    strokeLinejoin="round"
                     stroke={ColorPalette[palette].strokeColor}
-                    strokeWidth={8}
+                    strokeWidth={6}
                 />
             );
         }
@@ -104,8 +105,9 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                     },${p4.y - origin.y}`}
                     fill="none"
                     strokeLinecap="round"
+                    strokeLinejoin="round"
                     stroke={ColorPalette[palette].strokeColor}
-                    strokeWidth={8}
+                    strokeWidth={6}
                 />
             );
         }
@@ -182,7 +184,7 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
  * @param p2 The other point of the line.
  */
 function computeArrowHeadPoint(p1: ModelCordPoint, p2: ModelCordPoint): [ModelCordPoint, ModelCordPoint] {
-    const SIZE = 25;
+    const SIZE = 20;
     const R = (25 * Math.PI) / 180;
 
     const vx = p2.x - p1.x;
