@@ -8,7 +8,7 @@ export class SnapExtension extends Extension {
 
     onRegister(controller: IEditorController) {
         super.onRegister(controller);
-        controller.shortcuts
+        controller.keyboard
             .addKeyDownListener((ev) => {
                 if (ev.key === 'Control') this.enable();
             })

@@ -35,7 +35,7 @@ export const SnapGuide = memo(() => {
 
     const snapResults = useMemo(() => {
         return Object.values(getSnapPoints(range)).flatMap((point) => {
-            const result = snapPoint(point, snapTargets, 0);
+            const result = snapPoint(point, snapTargets, 0.5);
             return [...result.pairsX, ...result.pairsY];
         });
     }, [range, snapTargets]);

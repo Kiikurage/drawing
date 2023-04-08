@@ -52,7 +52,7 @@ export class LineExtension extends Extension {
 
         controller.onMouseMove.addListener(this.onMouseMove);
         controller.onMouseUp.addListener(this.onMouseUp);
-        controller.shortcuts
+        controller.keyboard
             .addPatternListener(['L'], () => {
                 this.modeExtension.setMode(LineExtension.MODE_KEY);
             })

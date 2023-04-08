@@ -32,7 +32,7 @@ export class TextExtension extends Extension {
         modeExtension.onModeChange.addListener(this.onModeChange);
         this.updateModeSpecificListener(modeExtension.mode);
 
-        controller.shortcuts.addPatternListener(['T'], () => {
+        controller.keyboard.addPatternListener(['T'], () => {
             modeExtension.setMode(TextExtension.MODE_KEY);
         });
 

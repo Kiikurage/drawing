@@ -11,7 +11,7 @@ export class ClipboardExtension extends Extension {
 
         this.selectExtension = controller.requireExtension(SelectExtension);
 
-        controller.shortcuts
+        controller.keyboard
             .addPatternListener(['Control', 'X'], (ev) => {
                 ev.preventDefault();
                 this.cut();

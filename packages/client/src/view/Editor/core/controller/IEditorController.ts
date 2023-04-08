@@ -13,7 +13,7 @@ import {
     Store,
 } from '@drawing/common';
 import { PageEditSession } from './PageEditSession';
-import { ShortcutController } from './ShortcutController';
+import { KeyboardController } from './KeyboardController';
 import { ExtensionHost } from './ExtensionHost';
 import { EditorState } from '../model/EditorState';
 
@@ -23,7 +23,7 @@ import { EditorState } from '../model/EditorState';
 export interface IEditorController extends ExtensionHost {
     // Utility getters
 
-    readonly shortcuts: ShortcutController;
+    readonly keyboard: KeyboardController;
 
     readonly store: Store<EditorState>;
 

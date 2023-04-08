@@ -36,7 +36,7 @@ export class SelectExtension extends Extension {
         modeExtension.onModeChange.addListener(this.onModeChange);
         this.updateModeSpecificListener(modeExtension.mode);
 
-        controller.shortcuts
+        controller.keyboard
             .addPatternListener(['V'], () => {
                 modeExtension.setMode(SelectExtension.MODE_KEY);
             })

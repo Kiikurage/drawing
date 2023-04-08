@@ -26,7 +26,7 @@ export class RectExtension extends Extension {
         this.modeExtension.onModeChange.addListener(this.onModeChange);
         this.updateModeSpecificListener(this.modeExtension.mode);
 
-        controller.shortcuts.addPatternListener(['R'], () => {
+        controller.keyboard.addPatternListener(['R'], () => {
             this.modeExtension.setMode(RectExtension.MODE_KEY);
         });
     }

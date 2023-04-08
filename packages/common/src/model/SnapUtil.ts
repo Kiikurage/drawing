@@ -16,7 +16,7 @@ export function snapBox(
     let bestDiffX = threshold;
     let bestDiffY = threshold;
 
-    for (const point of getSnapPointsForTransformType(box, transformType)) {
+    for (const point of transformType.getSnapPointsForTransformType(box)) {
         const snapPointResult = snapPoint(point, snapTargets, threshold);
 
         if (Math.abs(snapPointResult.transform.translateX) < Math.abs(bestDiffX)) {
@@ -38,8 +38,16 @@ export function snapBox(
     const prevPoint = Point.model(pairsX[0]?.[0]?.x ?? 0, pairsY[0]?.[0]?.y ?? 0);
     const nextPoint = Point.model(pairsX[0]?.[1]?.x ?? 0, pairsY[0]?.[1]?.y ?? 0);
 
+    const scaleOrigin = transformType.scaleOrigin(box);
+    const transform = Transform.scale(
+        transformType.scaleFactor.x(box, prevPoint, nextPoint),
+        transformType.scaleFactor.y(box, prevPoint, nextPoint),
+        scaleOrigin.x,
+        scaleOrigin.y
+    ).then(transformType.translate(box, prevPoint, nextPoint));
+
     return {
-        transform: transformType(box, prevPoint, nextPoint),
+        transform,
         pairsX,
         pairsY,
     };

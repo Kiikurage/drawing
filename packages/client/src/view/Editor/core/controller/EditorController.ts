@@ -24,7 +24,7 @@ import {
     ZoomEvent,
 } from './IEditorController';
 import { Extension } from './Extension';
-import { ShortcutController } from './ShortcutController';
+import { KeyboardController } from './KeyboardController';
 import { ExtensionConstructor } from './ExtensionHost';
 import { EditorState } from '../model/EditorState';
 import { CoreExtensions } from '../extensions/coreExtensions';
@@ -33,7 +33,7 @@ import { CoreExtensions } from '../extensions/coreExtensions';
  * Root controller for Editor view
  */
 export class EditorController implements IEditorController {
-    readonly shortcuts = new ShortcutController();
+    readonly keyboard = new KeyboardController();
     readonly store: Store<EditorState>;
     readonly core: PageEditController;
     readonly historyManager = new HistoryManager();
@@ -166,15 +166,15 @@ export class EditorController implements IEditorController {
     };
 
     readonly onKeyDown = (ev: KeyboardEventInfo) => {
-        this.shortcuts.onKeyDown(ev);
+        this.keyboard.onKeyDown(ev);
     };
 
     readonly onKeyUp = (ev: KeyboardEventInfo) => {
-        this.shortcuts.onKeyUp(ev);
+        this.keyboard.onKeyUp(ev);
     };
 
     private initializeShortcuts() {
-        this.shortcuts
+        this.keyboard
             .addPatternListener(['Control', 'Z'], (ev) => {
                 ev.preventDefault();
                 this.undo();

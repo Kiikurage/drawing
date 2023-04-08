@@ -22,7 +22,7 @@ export class TextEditExtension extends Extension {
         this.modeExtension = controller.requireExtension(ModeExtension);
 
         controller.onDoubleClick.addListener(this.onDoubleClick);
-        controller.shortcuts
+        controller.keyboard
             .addPatternListener(['Enter'], (ev) => {
                 ev.preventDefault();
                 this.tryStartTextEditForSelectedEntity();

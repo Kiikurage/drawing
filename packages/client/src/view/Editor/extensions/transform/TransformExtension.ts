@@ -8,6 +8,7 @@ import {
     Patch,
     Record,
     snapBox,
+    Transform,
     TransformType,
 } from '@drawing/common';
 import { Extension } from '../../core/controller/Extension';
@@ -24,12 +25,20 @@ export class TransformExtension extends Extension {
     private session: PageEditSession | null = null;
     private autoCommit = false;
     private snapExtension: SnapExtension = null as never;
+    private constrainEnabled = false;
 
     onRegister(controller: IEditorController) {
         super.onRegister(controller);
         controller.onMouseMove.addListener(this.onMouseMove);
         controller.onMouseUp.addListener(this.onMouseUp);
         this.snapExtension = controller.requireExtension(SnapExtension);
+        controller.keyboard
+            .addKeyDownListener((ev) => {
+                if (ev.key === 'Shift') this.constrainEnabled = true;
+            })
+            .addKeyUpListener((ev) => {
+                if (ev.key === 'Shift') this.constrainEnabled = false;
+            });
     }
 
     startTransform(
@@ -79,7 +88,13 @@ export class TransformExtension extends Extension {
         const { startPoint, entities, startBox, transformType } = this;
         if (startPoint === null || entities === null || startBox === null || transformType === null) return;
 
-        const transform = transformType(startBox, startPoint, nextPoint);
+        const scaleOrigin = transformType.scaleOrigin(startBox);
+        const transform = Transform.scale(
+            transformType.scaleFactor.x(startBox, startPoint, nextPoint),
+            transformType.scaleFactor.y(startBox, startPoint, nextPoint),
+            scaleOrigin.x,
+            scaleOrigin.y
+        ).then(transformType.translate(startBox, startPoint, nextPoint));
 
         if (this.snapExtension.store.state.enabled) {
             const { transform: snapTransform } = snapBox(
@@ -89,6 +104,14 @@ export class TransformExtension extends Extension {
                 16 / this.controller.state.camera.scale
             );
             transform.then(snapTransform);
+        }
+
+        if (this.constrainEnabled) {
+            const scale = Math.max(transform.scaleX, transform.scaleY);
+            const originPoint = transformType.scaleOrigin(startBox);
+            transform.then(
+                Transform.scale(scale / transform.scaleX, scale / transform.scaleY, originPoint.x, originPoint.y)
+            );
         }
 
         const patches: Record<string, Patch<Entity>> = {};

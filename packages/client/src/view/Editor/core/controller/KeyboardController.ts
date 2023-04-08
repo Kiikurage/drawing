@@ -1,7 +1,7 @@
 import { KeyboardEventInfo } from './IEditorController';
 import { Key } from '@drawing/common';
 
-export class ShortcutController {
+export class KeyboardController {
     private readonly keyDownListeners = new Set<(ev: KeyboardEventInfo) => void>();
     private readonly keyPatternListeners = new Map<string, Set<(ev: KeyboardEventInfo) => void>>();
     private readonly keyUpListeners = new Set<(ev: KeyboardEventInfo) => void>();
