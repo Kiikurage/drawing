@@ -6,7 +6,7 @@ export class ClientMessageClient extends MessageClient {
     constructor() {
         super();
         this.ws = new WebSocket(
-            location.hostname === 'localhost' ? 'ws://localhost:10000' : 'ws://drawing-server.onrender.com/'
+            location.hostname === 'localhost' ? 'ws://localhost:10000' : 'wss://drawing-server.onrender.com/'
         );
         this.ws.addEventListener('message', (ev) => {
             if (typeof ev.data !== 'string') return;
