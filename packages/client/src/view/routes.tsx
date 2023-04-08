@@ -1,7 +1,6 @@
 import { Navigate, RouteObject } from 'react-router-dom';
 import { AppShell } from './AppShell';
 import { EditorPage } from './EditorPage';
-import { PageListPage } from './PageListPage';
 
 export const routes: RouteObject[] = [
     {
@@ -11,10 +10,6 @@ export const routes: RouteObject[] = [
             {
                 path: 'edit',
                 element: <EditorPage />,
-            },
-            {
-                path: 'list',
-                element: <PageListPage />,
             },
             {
                 index: true,

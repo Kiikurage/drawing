@@ -51,7 +51,6 @@ export class TextExtension extends Extension {
 
     setVerticalTextAlign(entityIds: string[], align: VerticalAlign) {
         this.controller.updateEntities(
-            'verticalTextAlign',
             Record.mapToRecord(entityIds, (entityId) => [
                 entityId,
                 {
@@ -67,7 +66,6 @@ export class TextExtension extends Extension {
 
     setHorizontalTextAlign(entityIds: string[], align: HorizontalAlign) {
         this.controller.updateEntities(
-            'horizontalTextAlign',
             Record.mapToRecord(entityIds, (entityId) => [
                 entityId,
                 {

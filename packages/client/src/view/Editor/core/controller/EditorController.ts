@@ -27,15 +27,15 @@ import { CoreExtensions } from '../extensions/coreExtensions';
  * Root controller for Editor view
  */
 export class EditorController implements ExtensionHost {
-    readonly keyboard = new KeyboardController();
     readonly store: Store<EditorState>;
-    readonly core: PageEditController;
+    readonly keyboard = new KeyboardController();
+    readonly pageEdit: PageEditController;
     readonly historyManager = new HistoryManager();
     private readonly extensions = new Map<ExtensionConstructor, Extension>();
 
     constructor(initialData: Patch<EditorState>) {
         this.store = new Store(EditorState.create(initialData));
-        this.core = new PageEditController(this.store, this.historyManager);
+        this.pageEdit = new PageEditController(this.store, this.historyManager);
         this.initializeShortcuts();
 
         CoreExtensions.forEach((extension) => this.addExtension(extension));
@@ -82,15 +82,15 @@ export class EditorController implements ExtensionHost {
     // Core editing
 
     addEntities(entities: EntityMap) {
-        this.core.addEntities(entities);
+        this.pageEdit.addEntities(entities);
     }
 
     deleteEntities(entityIds: string[]) {
-        this.core.deleteEntities(entityIds);
+        this.pageEdit.deleteEntities(entityIds);
     }
 
-    updateEntities(type: string, patches: Record<string, Patch<Entity>>) {
-        this.core.updateEntities(type, patches);
+    updateEntities(patches: Record<string, Patch<Entity>>) {
+        this.pageEdit.updateEntities(patches);
     }
 
     // history
@@ -104,7 +104,7 @@ export class EditorController implements ExtensionHost {
     }
 
     newSession(): PageEditSession {
-        return this.core.newSession();
+        return this.pageEdit.newSession();
     }
 
     // Event handlers

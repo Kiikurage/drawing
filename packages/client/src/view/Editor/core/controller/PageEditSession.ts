@@ -5,7 +5,7 @@ export interface PageEditSession {
 
     deleteEntities(entityIds: string[]): void;
 
-    updateEntities(type: string, patches: Record<string, Patch<Entity>>): void;
+    updateEntities(patches: Record<string, Patch<Entity>>): void;
 
     commit(): void;
 }

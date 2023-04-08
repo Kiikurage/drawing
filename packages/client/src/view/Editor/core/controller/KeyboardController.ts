@@ -15,6 +15,7 @@ export class KeyboardController {
         if (ev.ctrlKey) keys.push('Control');
 
         const pattern = Key.serialize(keys);
+
         this.keyPatternListeners.get(pattern)?.forEach((callback) => callback(ev));
     }
 

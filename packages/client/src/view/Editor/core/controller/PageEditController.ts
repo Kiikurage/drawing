@@ -1,10 +1,12 @@
 import {
     AddEntitiesEditAction,
     DeleteEntitiesEditAction,
+    dispatcher,
     EditAction,
     Entity,
     EntityMap,
     HistoryManager,
+    Message,
     Patch,
     ReadonlyStore,
     Record,
@@ -12,133 +14,105 @@ import {
     UpdateEntitiesEditAction,
 } from '@drawing/common';
 import { PageEditSession } from './PageEditSession';
-import { deps } from '../../../../config/dependency';
 import { EditorState } from '../model/EditorState';
-import { CRDTLivePage } from '../model/LivePage/CRDTLivePage';
-import { LivePage } from '../model/LivePage/LivePage';
+import { ClientMessageClient } from '../../../../lib/ClientMessageClient';
 
 export class PageEditController {
-    private readonly page: LivePage;
+    private readonly client: ClientMessageClient;
 
     constructor(private readonly store: Store<EditorState>, private readonly historyManager: HistoryManager) {
-        this.historyManager.onAction.addListener(this.handleAction);
-        this.page = new CRDTLivePage({
-            page: this.store.state.page,
-            collaborationController: deps.createCollaborationController(),
-        });
-        this.page.onAddEntity.addListener(this.handleAddEntity);
-        this.page.onDeleteEntity.addListener(this.handleDeleteEntity);
-        this.page.onUpdateEntity.addListener(this.handleUpdateEntity);
+        this.historyManager.onAction.addListener(this.handleHistoryManagerAction);
+        this.client = new ClientMessageClient();
+        this.client.onMessage.addListener(this.handleMessageClientMessage);
     }
 
     addEntities(entities: EntityMap) {
-        this.historyManager.apply(AddEntitiesEditAction(entities), DeleteEntitiesEditAction(Object.keys(entities)));
+        const normal = AddEntitiesEditAction(entities);
+        const reverse = DeleteEntitiesEditAction(Object.keys(entities));
+        this.historyManager.apply(normal, reverse);
+        this.applyAction(normal);
+        this.client.send({ type: 'edit', edit: normal });
     }
 
     deleteEntities(entityIds: string[]) {
-        this.historyManager.apply(
-            DeleteEntitiesEditAction(entityIds),
-            AddEntitiesEditAction(
-                Record.mapToRecord(entityIds, (entityId) => [entityId, this.store.state.page.entities[entityId]])
-            )
+        const normal = DeleteEntitiesEditAction(entityIds);
+        const reverse = AddEntitiesEditAction(
+            Record.mapToRecord(entityIds, (entityId) => [entityId, this.store.state.page.entities[entityId]])
         );
+
+        this.historyManager.apply(normal, reverse);
+        this.applyAction(normal);
+        this.client.send({ type: 'edit', edit: normal });
     }
 
-    updateEntities(type: string, patches: Record<string, Patch<Entity>>) {
+    updateEntities(patches: Record<string, Patch<Entity>>) {
         const reversePatches = Patch.computeInversePatch(this.store.state.page.entities, patches) as Record<
             string,
             Patch<Entity>
         >;
-        this.historyManager.apply(
-            UpdateEntitiesEditAction(type, patches),
-            UpdateEntitiesEditAction(type, reversePatches)
-        );
+        const normal = UpdateEntitiesEditAction(patches);
+        const reverse = UpdateEntitiesEditAction(reversePatches);
+
+        this.historyManager.apply(normal, reverse);
+        this.applyAction(normal);
+        this.client.send({ type: 'edit', edit: normal });
     }
 
     newSession(): PageEditSession {
-        return new Session(this.store, this.historyManager.newSession());
+        const session = new Session(this.store, this.historyManager.newSession());
+        session.onAction.addListener(this.handleSessionAction);
+
+        return session;
     }
 
-    private readonly handleAction = (action: EditAction) => {
-        switch (action.type) {
-            case 'addEntities':
-                this.handleAddEntitiesAction(action);
-                break;
-            case 'deleteEntities':
-                this.handleDeleteEntitiesAction(action);
-                break;
-            case 'updateEntities':
-                this.handleUpdateEntitiesAction(action);
-                break;
+    private applyAction(action: EditAction) {
+        this.store.setState({ page: EditAction.toPatch(this.store.state.page, action) });
+    }
+
+    private readonly handleHistoryManagerAction = (action: EditAction) => {
+        this.applyAction(action);
+    };
+
+    private readonly handleMessageClientMessage = (message: Message) => {
+        switch (message.type) {
+            case 'edit': {
+                this.applyAction(message.edit);
+                return;
+            }
+            case 'sync': {
+                this.store.setState({
+                    page: message.page,
+                });
+                return;
+            }
+            case 'request':
+            case 'ack':
+            default:
+                return;
         }
     };
 
-    private readonly handleAddEntitiesAction = (action: AddEntitiesEditAction) => {
-        this.page.transaction((transaction) => {
-            for (const entity of Object.values(action.entities)) {
-                transaction.add(entity);
-            }
-        });
-    };
-
-    private handleDeleteEntitiesAction(action: DeleteEntitiesEditAction) {
-        this.page.transaction((transaction) => {
-            for (const entityId of Object.values(action.entityIds)) {
-                transaction.delete(entityId);
-            }
-        });
-    }
-
-    private handleUpdateEntitiesAction(action: UpdateEntitiesEditAction) {
-        this.page.transaction((transaction) => {
-            for (const [entityId, patch] of Object.entries(action.patch)) {
-                transaction.update(entityId, action.type, patch);
-            }
-        });
-    }
-
-    private readonly handleUpdateEntity = (entity: Entity) => {
-        this.store.setState({
-            page: {
-                entities: { [entity.id]: entity },
-            },
-        });
-    };
-
-    private readonly handleDeleteEntity = ({ entityId }: { entityId: string }) => {
-        this.store.setState({
-            page: {
-                entities: { [entityId]: undefined },
-            },
-        });
-    };
-
-    private readonly handleAddEntity = (entity: Entity) => {
-        this.store.setState({
-            page: {
-                entities: { [entity.id]: entity },
-            },
-        });
+    private readonly handleSessionAction = (action: EditAction) => {
+        this.applyAction(action);
+        this.client.send({ type: 'edit', edit: action });
     };
 }
 
 class Session implements PageEditSession {
     constructor(private readonly store: ReadonlyStore<EditorState>, private readonly session: HistoryManager.Session) {}
 
-    apply(normal: EditAction, reverse: EditAction) {
-        this.session.apply(normal, reverse);
-    }
+    readonly onAction = dispatcher<EditAction>();
 
     commit() {
         this.session.commit();
     }
 
     addEntities(entities: EntityMap) {
-        this.session.apply(AddEntitiesEditAction(entities), DeleteEntitiesEditAction(Object.keys(entities)));
+        this.apply(AddEntitiesEditAction(entities), DeleteEntitiesEditAction(Object.keys(entities)));
     }
 
     deleteEntities(entityIds: string[]) {
-        this.session.apply(
+        this.apply(
             DeleteEntitiesEditAction(entityIds),
             AddEntitiesEditAction(
                 Record.mapToRecord(entityIds, (entityId) => [entityId, this.store.state.page.entities[entityId]])
@@ -146,11 +120,16 @@ class Session implements PageEditSession {
         );
     }
 
-    updateEntities(type: string, patches: Record<string, Patch<Entity>>) {
+    updateEntities(patches: Record<string, Patch<Entity>>) {
         const reversePatches = Patch.computeInversePatch(this.store.state.page.entities, patches) as Record<
             string,
             Patch<Entity>
         >;
-        this.session.apply(UpdateEntitiesEditAction(type, patches), UpdateEntitiesEditAction(type, reversePatches));
+        this.apply(UpdateEntitiesEditAction(patches), UpdateEntitiesEditAction(reversePatches));
+    }
+
+    private apply(normal: EditAction, reverse: EditAction) {
+        this.session.apply(normal, reverse);
+        this.onAction.dispatch(normal);
     }
 }

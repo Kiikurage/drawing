@@ -124,7 +124,7 @@ export class TransformExtension extends Extension {
             }
         }
 
-        this.session?.updateEntities('transform', patches);
+        this.session?.updateEntities(patches);
     };
 
     private readonly onMouseUp = () => {

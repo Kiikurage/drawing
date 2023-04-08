@@ -1,6 +1,6 @@
 import * as http from 'http';
 import { connection as WebSocketConnection, Message as WebSocketMessage, server as WebSocketServer } from 'websocket';
-import { MessageClient, MessageConnection } from '@drawing/common';
+import { EditAction, Message, MessageClient, Page, Patch } from '@drawing/common';
 
 export interface ServerOptions {
     port: number;
@@ -9,6 +9,8 @@ export interface ServerOptions {
 export class Server {
     private httpServer: http.Server | null = null;
     private websocketServer: WebSocketServer | null = null;
+    private page: Page = Page.create();
+    private readonly messageClients = new Set<ServerMessageClient>();
 
     constructor(private readonly options: ServerOptions) {}
 
@@ -52,32 +54,47 @@ export class Server {
     }
 
     private readonly onWebSocketConnect = (connection: WebSocketConnection) => {
-        const client = new MessageClient(new ServerMessageConnection(connection));
+        const client = new ServerMessageClient(connection);
 
-        client.onMessage = (message) => {
-            console.log(message);
+        client.onMessage.addListener((message: Message) => {
+            switch (message.type) {
+                case 'edit': {
+                    this.page = Patch.apply(this.page, EditAction.toPatch(this.page, message.edit));
+                    this.messageClients.forEach((c) => {
+                        if (c === client) return;
+                        c.send({ type: 'edit', edit: message.edit });
+                    });
+                    return;
+                }
 
-            setTimeout(() => {
-                client.send({
-                    type: 'patch',
-                });
-            }, 1000);
-        };
+                case 'request': {
+                    client.send({ type: 'sync', page: this.page });
+                    return;
+                }
+
+                case 'sync':
+                case 'ack':
+                default:
+                    return;
+            }
+        });
+
+        connection.on('close', () => this.messageClients.delete(client));
+        this.messageClients.add(client);
     };
 }
 
-class ServerMessageConnection implements MessageConnection {
-    constructor(private readonly connection: WebSocketConnection) {}
-
-    addMessageCallback(callback: (message: MessageClient) => void): void {
-        this.connection.on('message', (data: WebSocketMessage) => {
+class ServerMessageClient extends MessageClient {
+    constructor(private readonly connection: WebSocketConnection) {
+        super();
+        connection.on('message', (data: WebSocketMessage) => {
             if (data.type !== 'utf8') return;
 
-            callback(JSON.parse(data.utf8Data) as MessageClient);
+            this.handleMessage(JSON.parse(data.utf8Data));
         });
     }
 
-    send(message: MessageClient): void {
-        this.connection.send(JSON.stringify(message));
+    protected sendMessage(data: Record<string, unknown>): void {
+        this.connection.send(JSON.stringify(data));
     }
 }

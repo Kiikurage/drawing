@@ -58,7 +58,7 @@ export class TextEditExtension extends Extension {
 
     updateEditingText(entityId: string, text: string) {
         if (this.session === null) return;
-        this.session.updateEntities('text', { [entityId]: { text } });
+        this.session.updateEntities({ [entityId]: { text } });
     }
 
     completeTextEdit() {

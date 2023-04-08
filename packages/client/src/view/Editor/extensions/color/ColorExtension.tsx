@@ -18,10 +18,7 @@ export class ColorExtension extends Extension {
     }
 
     setColor(entityIds: string[], palette: ColorPaletteKey) {
-        this.controller.updateEntities(
-            'style',
-            Record.mapToRecord(entityIds, (entityId) => [entityId, { palette }])
-        );
+        this.controller.updateEntities(Record.mapToRecord(entityIds, (entityId) => [entityId, { palette }]));
     }
 
     setColorForSelectedEntities(palette: ColorPaletteKey) {

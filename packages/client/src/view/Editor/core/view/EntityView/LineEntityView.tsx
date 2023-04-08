@@ -34,7 +34,6 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     const { id, palette } = entity;
     let { p1, p2 } = entity;
     if (linkedEntity1 !== null) {
-        console.log(linkedEntity1);
         const box = Entity.getBoundingBox(linkedEntity1);
         const linkedEntity1p11 = box.point;
         const linkedEntity1p12 = Point.model(box.point.x, box.point.y + box.size.height);
@@ -48,7 +47,6 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
             p1;
     }
     if (linkedEntity2 !== null) {
-        console.log(linkedEntity2);
         const box = Entity.getBoundingBox(linkedEntity2);
         const linkedEntity2p11 = box.point;
         const linkedEntity2p12 = Point.model(box.point.x, box.point.y + box.size.height);

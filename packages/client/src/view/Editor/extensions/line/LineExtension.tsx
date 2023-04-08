@@ -63,7 +63,6 @@ export class LineExtension extends Extension {
 
     setArrowHeadType(entityIds: string[], point: 'p1' | 'p2', type: ArrowHeadType) {
         this.controller.updateEntities(
-            'arrowHeadType',
             Record.mapToRecord(entityIds, (entityId) => {
                 const patch: Patch<LineEntity> = {};
                 if (point === 'p1') patch.arrowHeadType1 = type;
@@ -148,7 +147,7 @@ export class LineExtension extends Extension {
 
         const linkedEntity = findLinkTarget(nextLinePoint, this.controller.state.page.entities);
 
-        this.controller.updateEntities('transform', {
+        this.controller.updateEntities({
             [entity.id]: {
                 [this.pointKey]: nextLinePoint,
                 linkedEntityId1: this.pointKey === 'p1' ? linkedEntity?.id ?? null : entity.linkedEntityId1,

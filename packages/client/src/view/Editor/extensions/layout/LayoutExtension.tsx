@@ -47,7 +47,7 @@ export class LayoutExtension extends Extension {
             x += box.size.width + gap;
         }
 
-        this.controller.updateEntities('transform', patches);
+        this.controller.updateEntities(patches);
     }
 
     distributeSelectedEntitiesVertical() {
@@ -76,7 +76,7 @@ export class LayoutExtension extends Extension {
             y += box.size.height + gap;
         }
 
-        this.controller.updateEntities('transform', patches);
+        this.controller.updateEntities(patches);
     }
 
     alignSelectedEntitiesHorizontal(anchor: 'left' | 'center' | 'right') {
@@ -108,7 +108,7 @@ export class LayoutExtension extends Extension {
             reversePatches[entity.id] = { p1: { x: entity.p1.x } };
         }
 
-        this.controller.updateEntities('transform', patches);
+        this.controller.updateEntities(patches);
     }
 
     alignSelectedEntitiesVertical(anchor: 'top' | 'center' | 'bottom') {
@@ -143,6 +143,6 @@ export class LayoutExtension extends Extension {
             reversePatches[entity.id] = { p1: { y: entity.p1.y } };
         }
 
-        this.controller.updateEntities('transform', patches);
+        this.controller.updateEntities(patches);
     }
 }

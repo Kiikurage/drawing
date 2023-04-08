@@ -46,7 +46,7 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
             onMouseLeave={controller.handleUnhover}
             onChange={(ev) => textEditExtension.updateEditingText(entity.id, ev.target.value)}
             onContentSizeChange={(contentWidth, contentHeight) => {
-                controller.updateEntities('transform', {
+                controller.updateEntities({
                     [entity.id]: {
                         size: {
                             width: Math.max(contentWidth, entity.size.width),
