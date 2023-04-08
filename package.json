@@ -2,5 +2,9 @@
   "name": "drawing",
   "workspaces": [
     "./packages/*"
-  ]
+  ],
+  "engines": {
+    "node": ">=18 <19",
+    "npm": ">=9 <10"
+  }
 }

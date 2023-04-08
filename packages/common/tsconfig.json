@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
     "lib": [
-      "DOM",
       "ES2020"
     ],
-    "target": "ES2020",
+    "target": "ES2015",
     "outDir": "./build",
-    "jsx": "react-jsx",
     "strict": true,
     "sourceMap": true,
+    "declaration": true,
+    "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true
   },
   "exclude": [
+    "**/*.test.ts",
     "../../node_modules"
   ]
 }

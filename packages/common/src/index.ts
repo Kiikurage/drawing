@@ -1,4 +1,3 @@
-export * from './lib/caretRangeFromPoint';
 export * from './lib/deepEqual';
 export * from './lib/distinct';
 export * from './lib/EventDispatcher';
@@ -16,9 +15,6 @@ export * from './model/entity/LineEntity';
 export * from './model/entity/RectEntity';
 export * from './model/entity/TextEntity';
 
-export * from './model/LivePage/CRDTLivePage';
-export * from './model/LivePage/LivePage';
-
 export * from './model/ArrowHeadType';
 export * from './model/Box';
 export * from './model/Camera';
@@ -29,9 +25,6 @@ export * from './model/Key';
 export * from './model/Page';
 export * from './model/Patch';
 export * from './model/Point';
-export * from './model/SharedArray';
-export * from './model/SharedAtom';
-export * from './model/SharedRecord';
 export * from './model/Size';
 export * from './model/SnapUtil';
 export * from './model/TextAlign';

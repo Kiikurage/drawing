@@ -1,13 +1,7 @@
 import { LivePage, Transaction } from './LivePage';
-import { Page } from '../Page';
-import { VectorClock } from '../VectorClock';
-import { randomId } from '../../lib/randomId';
-import { Record } from '../Record';
-import { Entity } from '../entity/Entity';
-import { Patch } from '../Patch';
-import { EntityMap } from '../EntityMap';
-import { CollaborationController } from '../../../../client/src/view/Editor/core/controller/CollaborationController/CollaborationController';
-import { DummyCollaborationController } from '../../../../client/src/view/Editor/core/controller/CollaborationController/DummyCollaborationController';
+import { Entity, EntityMap, Page, Patch, randomId, Record, VectorClock } from '@drawing/common';
+import { CollaborationController } from '../../controller/CollaborationController/CollaborationController';
+import { DummyCollaborationController } from '../../controller/CollaborationController/DummyCollaborationController';
 
 export class CRDTLivePage implements Page, LivePage {
     readonly id: string;

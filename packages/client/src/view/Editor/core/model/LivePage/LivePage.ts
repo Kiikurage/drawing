@@ -1,6 +1,4 @@
-import { Page } from '../Page';
-import { Entity } from '../entity/Entity';
-import { Patch } from '../Patch';
+import { Entity, Page, Patch } from '@drawing/common';
 
 export interface LivePage extends Readonly<Page> {
     transaction(fn: (transaction: Transaction) => void): void;

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Page } from '@drawing/common';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppController } from './App/AppControllerContext';
 import { css } from '@linaria/core';
 import { Editor } from './Editor/Editor';
@@ -42,23 +42,35 @@ export const EditorWrapper = () => {
                 inset: 0;
             `}
         >
-            {initialPage === null && <span>Loading...</span>}
+            {initialPage === null && (
+                <div
+                    className={css`
+                        position: fixed;
+                        inset: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    `}
+                >
+                    Loading...
+                </div>
+            )}
 
             {initialPage !== null && (
                 <>
                     <Editor defaultValue={initialPage} />
-                    <div
-                        className={css`
-                            user-select: none;
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            background: rgba(255, 255, 255, 0.7);
-                            padding: 8px 16px;
-                        `}
-                    >
-                        <Link to="/list">ページ一覧へ</Link>
-                    </div>
+                    {/*<div*/}
+                    {/*    className={css`*/}
+                    {/*        user-select: none;*/}
+                    {/*        position: fixed;*/}
+                    {/*        top: 0;*/}
+                    {/*        left: 0;*/}
+                    {/*        background: rgba(255, 255, 255, 0.7);*/}
+                    {/*        padding: 8px 16px;*/}
+                    {/*    `}*/}
+                    {/*>*/}
+                    {/*    <Link to="/list">ページ一覧へ</Link>*/}
+                    {/*</div>*/}
                 </>
             )}
         </div>

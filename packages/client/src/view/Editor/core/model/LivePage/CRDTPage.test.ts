@@ -1,8 +1,5 @@
 import { CRDTLivePage, CRDTLivePageWithTestVisibility } from './CRDTLivePage';
-import { RectEntity } from '../entity/RectEntity';
-import { LineEntity } from '../entity/LineEntity';
-import { Patch } from '../Patch';
-import { Point } from '../Point';
+import { LineEntity, Patch, Point, RectEntity } from '@drawing/common';
 
 describe('CRDTPage', () => {
     it('Add and delete entities with no concurrent updates', () => {
