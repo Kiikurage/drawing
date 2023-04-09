@@ -1,11 +1,11 @@
 import { createContext, useContext } from 'react';
-import { EditorController } from '../controller/EditorController';
+import { Editor } from '../controller/Editor';
 import { Extension } from '../controller/Extension';
 import { ExtensionConstructor } from '../controller/ExtensionHost';
 
-const context = createContext<EditorController>(null as never);
+const context = createContext<Editor>(null as never);
 
-export function useEditorController() {
+export function useEditor() {
     return useContext(context);
 }
 
@@ -13,4 +13,4 @@ export function useExtension<T extends Extension>(ExtensionConstructor: Extensio
     return useContext(context).getExtension(ExtensionConstructor);
 }
 
-export const EditorControllerContextProvider = context.Provider;
+export const EditorContextProvider = context.Provider;

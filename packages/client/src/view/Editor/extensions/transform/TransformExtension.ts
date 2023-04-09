@@ -12,7 +12,7 @@ import {
     TransformType,
 } from '@drawing/common';
 import { Extension } from '../../core/controller/Extension';
-import { EditorController, MouseEventInfo } from '../../core/controller/EditorController';
+import { Editor, MouseEventInfo } from '../../core/controller/Editor';
 import { PageEditSession } from '../../core/controller/PageEditSession';
 import { SnapExtension } from '../snap/SnapExtension';
 
@@ -27,7 +27,7 @@ export class TransformExtension extends Extension {
     private snapExtension: SnapExtension = null as never;
     private constrainEnabled = false;
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
         controller.onMouseMove.addListener(this.onMouseMove);
         controller.onMouseUp.addListener(this.onMouseUp);

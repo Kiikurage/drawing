@@ -1,13 +1,13 @@
 import { useSlice } from '../../../../hooks/useStore';
-import { useEditorController, useExtension } from '../EditorControllerContext';
+import { useEditor, useExtension } from '../EditorControllerContext';
 import { EditableTextView } from './EditableTextView';
 import { Box, ColorPalette, RectEntity } from '@drawing/common';
 import { TextEditExtension } from '../../extensions/textEdit/TextEditExtension';
 import { SelectExtension } from '../../extensions/select/SelectExtension';
 
 export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
-    const controller = useEditorController();
-    const { camera, hovered } = useSlice(controller.store, (state) => {
+    const editor = useEditor();
+    const { camera, hovered } = useSlice(editor.store, (state) => {
         return {
             camera: state.camera,
             hovered: state.hover.type === 'entity' && state.hover.entityId === entity.id,
@@ -42,11 +42,11 @@ export const RectEntityView = ({ entity }: { entity: RectEntity }) => {
             verticalAlign={entity.verticalAlign}
             value={entity.text}
             editStartPoint={editStartPoint}
-            onMouseOver={() => controller.handleHover({ type: 'entity', entityId: entity.id })}
-            onMouseLeave={controller.handleUnhover}
+            onMouseOver={() => editor.handleHover({ type: 'entity', entityId: entity.id })}
+            onMouseLeave={editor.handleUnhover}
             onChange={(ev) => textEditExtension.updateEditingText(entity.id, ev.target.value)}
             onContentSizeChange={(contentWidth, contentHeight) => {
-                controller.updateEntities({
+                editor.updateEntities({
                     [entity.id]: {
                         size: {
                             width: Math.max(contentWidth, entity.size.width),

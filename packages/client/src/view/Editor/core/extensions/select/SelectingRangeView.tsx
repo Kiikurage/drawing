@@ -1,13 +1,13 @@
-import { useEditorController, useExtension } from '../../view/EditorControllerContext';
+import { useEditor, useExtension } from '../../view/EditorControllerContext';
 import { useSlice } from '../../../../hooks/useStore';
 import { Box } from '@drawing/common';
 import { css } from '@linaria/core';
 import { RangeSelectExtension } from './RangeSelectExtension';
 
 export const SelectingRangeView = () => {
-    const controller = useEditorController();
+    const editor = useEditor();
     const extension = useExtension(RangeSelectExtension);
-    const { camera } = useSlice(controller.store, (state) => ({
+    const { camera } = useSlice(editor.store, (state) => ({
         camera: state.camera,
     }));
     const { selecting, selectRange } = useSlice(extension.store, (state) => ({

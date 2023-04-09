@@ -1,12 +1,12 @@
 import { Store } from '@drawing/common';
 import { Extension } from '../../core/controller/Extension';
 import { SnapState } from './SnapState';
-import { EditorController } from '../../core/controller/EditorController';
+import { Editor } from '../../core/controller/Editor';
 
 export class SnapExtension extends Extension {
     readonly store = new Store<SnapState>(SnapState.create());
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
         controller.keyboard.onKeyDown.addListener((ev) => {
             if (ev.key === 'Control') this.enable();

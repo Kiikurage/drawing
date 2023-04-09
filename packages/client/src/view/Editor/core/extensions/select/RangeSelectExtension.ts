@@ -1,4 +1,4 @@
-import { EditorController, MouseEventButton, MouseEventInfo } from '../../controller/EditorController';
+import { Editor, MouseEventButton, MouseEventInfo } from '../../controller/Editor';
 import { Extension } from '../../controller/Extension';
 import { Box, Entity, ModelCordBox, ModelCordPoint, Store } from '@drawing/common';
 import { RangeSelectState } from './RangeSelectState';
@@ -12,7 +12,7 @@ export class RangeSelectExtension extends Extension {
     private selectExtension: SelectExtension = null as never;
     readonly store = new Store(RangeSelectState.create());
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
 
         this.selectExtension = controller.requireExtension(SelectExtension);

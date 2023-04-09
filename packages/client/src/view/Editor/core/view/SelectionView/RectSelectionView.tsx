@@ -1,4 +1,4 @@
-import { useEditorController, useExtension } from '../EditorControllerContext';
+import { useEditor, useExtension } from '../EditorControllerContext';
 import { useSlice } from '../../../../hooks/useStore';
 import { Box, Entity, HoverState } from '@drawing/common';
 import { css } from '@linaria/core';
@@ -13,8 +13,8 @@ export const RectSelectionView = () => {
         selectionBoundingBox: Entity.computeBoundingBox(state.entities),
     }));
 
-    const controller = useEditorController();
-    const { camera } = useSlice(controller.store, (state) => ({ camera: state.camera }));
+    const editor = useEditor();
+    const { camera } = useSlice(editor.store, (state) => ({ camera: state.camera }));
 
     const { x, y, width, height } = useMemo(() => {
         const selectionBoundingBoxInDisplay = Box.toDisplay(camera, selectionBoundingBox);
@@ -45,8 +45,8 @@ export const RectSelectionView = () => {
                     fill="none"
                     stroke={COLOR_SELECTION}
                     strokeWidth={1.5}
-                    onMouseOver={() => controller.handleHover(HoverState.TRANSLATE_HANDLE)}
-                    onMouseLeave={controller.handleUnhover}
+                    onMouseOver={() => editor.handleHover(HoverState.TRANSLATE_HANDLE)}
+                    onMouseLeave={editor.handleUnhover}
                 />
                 <InvisibleResizeHandle cursor="ns-resize" width={width} hover={HoverState.RESIZE_HANDLE_TOP} />
                 <InvisibleResizeHandle cursor="ew-resize" height={height} hover={HoverState.RESIZE_HANDLE_LEFT} />

@@ -1,17 +1,11 @@
-import {
-    EditorController,
-    MouseEventButton,
-    MouseEventInfo,
-    ScrollEvent,
-    ZoomEvent,
-} from '../../core/controller/EditorController';
+import { Editor, MouseEventButton, MouseEventInfo, ScrollEvent, ZoomEvent } from '../../core/controller/Editor';
 import { Extension } from '../../core/controller/Extension';
 import { Camera, ModelCordPoint, Point } from '@drawing/common';
 
 export class CameraExtension extends Extension {
     private dragStartPosition: ModelCordPoint | null = null;
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
         controller.onZoom.addListener(this.handleZoom);
         controller.onScroll.addListener(this.handleScroll);

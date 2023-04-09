@@ -1,13 +1,13 @@
 import { css } from '@linaria/core';
 import { memo, useMemo } from 'react';
 import { useSlice } from '../../../hooks/useStore';
-import { useEditorController } from './EditorControllerContext';
+import { useEditor } from './EditorControllerContext';
 import { EntityView } from './EntityView/EntityView';
 import { Box, Camera, EntityMap } from '@drawing/common';
 
 export const ContentLayer = memo(() => {
-    const controller = useEditorController();
-    const { page, camera } = useSlice(controller.store, (state) => ({
+    const editor = useEditor();
+    const { page, camera } = useSlice(editor.store, (state) => ({
         page: state.page,
         camera: state.camera,
     }));

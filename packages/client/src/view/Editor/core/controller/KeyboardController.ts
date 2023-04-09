@@ -1,4 +1,4 @@
-import { KeyboardEventInfo } from './EditorController';
+import { KeyboardEventInfo } from './Editor';
 import { dispatcher, Key } from '@drawing/common';
 
 export class KeyboardController {

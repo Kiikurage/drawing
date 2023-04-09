@@ -1,4 +1,4 @@
-import { EditorController, MouseEventInfo } from '../../controller/EditorController';
+import { Editor, MouseEventInfo } from '../../controller/Editor';
 import { Extension } from '../../controller/Extension';
 import { DisplayCordPoint, Entity, Point, Store } from '@drawing/common';
 import { PageEditSession } from '../../controller/PageEditSession';
@@ -13,7 +13,7 @@ export class TextEditExtension extends Extension {
     private session: PageEditSession | null = null;
     private autoCommit = false;
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
 
         this.selectExtension = controller.requireExtension(SelectExtension);

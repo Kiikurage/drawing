@@ -1,5 +1,5 @@
 import { css } from '@linaria/core';
-import { Editor } from './Editor/Editor';
+import { EditorView } from './Editor/EditorView';
 
 export const EditorPage = () => {
     return (
@@ -9,7 +9,7 @@ export const EditorPage = () => {
                 inset: 0;
             `}
         >
-            <Editor />
+            <EditorView />
         </div>
     );
 };

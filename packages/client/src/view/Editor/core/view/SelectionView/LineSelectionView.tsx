@@ -1,11 +1,11 @@
-import { useEditorController } from '../EditorControllerContext';
+import { useEditor } from '../EditorControllerContext';
 import { Box, Camera, Entity, HoverState, LineEntity, Point } from '@drawing/common';
 import { css } from '@linaria/core';
 import { COLOR_SELECTION } from '../../../../styles';
 import { ResizeHandle } from './ResizeHandle';
 
 export const LineSelectionView = ({ camera, entity }: { camera: Camera; entity: LineEntity }) => {
-    const controller = useEditorController();
+    const controller = useEditor();
 
     const modelBoundingBox = Entity.getBoundingBox(entity);
     const modelBoundingBoxCamera = { ...camera, point: modelBoundingBox.point };

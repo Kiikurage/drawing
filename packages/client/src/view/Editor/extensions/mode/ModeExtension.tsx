@@ -1,5 +1,5 @@
 import { Extension } from '../../core/controller/Extension';
-import { EditorController } from '../../core/controller/EditorController';
+import { Editor } from '../../core/controller/Editor';
 import { dispatcher, Store } from '@drawing/common';
 import { ModeChangeEvent } from './ModeChangeEvent';
 import { ModeState } from './ModeState';
@@ -7,7 +7,7 @@ import { ModeState } from './ModeState';
 export class ModeExtension extends Extension {
     readonly store = new Store(ModeState.create());
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
     }
 

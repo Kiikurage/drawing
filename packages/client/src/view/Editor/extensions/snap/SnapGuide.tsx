@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { useEditorController, useExtension } from '../../core/view/EditorControllerContext';
+import { useEditor, useExtension } from '../../core/view/EditorControllerContext';
 import { useSlice } from '../../../hooks/useStore';
 import { Entity, getSnapPoints, Point, Record, snapPoint } from '@drawing/common';
 import { css } from '@linaria/core';
@@ -7,8 +7,8 @@ import { SnapExtension } from './SnapExtension';
 import { SelectExtension } from '../../core/extensions/select/SelectExtension';
 
 export const SnapGuide = memo(() => {
-    const controller = useEditorController();
-    const { camera, page } = useSlice(controller.store, (state) => ({
+    const editor = useEditor();
+    const { camera, page } = useSlice(editor.store, (state) => ({
         camera: state.camera,
         page: state.page,
     }));

@@ -1,7 +1,7 @@
 import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import { Page, Point, Size } from '@drawing/common';
-import { EditorController } from './core/controller/EditorController';
-import { EditorControllerContextProvider } from './core/view/EditorControllerContext';
+import { Editor } from './core/controller/Editor';
+import { EditorContextProvider } from './core/view/EditorControllerContext';
 import { css } from '@linaria/core';
 import { ContentLayer } from './core/view/ContentLayer';
 import { Toolbar } from './core/extensions/toolbar/Toolbar';
@@ -11,12 +11,12 @@ import { SelectionView } from './core/view/SelectionView/SelectionView';
 import { SelectingRangeView } from './core/extensions/select/SelectingRangeView';
 import { SnapGuide } from './extensions/snap/SnapGuide';
 
-export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
-    const [controller] = useState(() => {
-        const controller = new EditorController({ page: defaultValue ?? Page.create() });
-        Extensions.forEach((extension) => controller.addExtension(extension));
+export const EditorView = ({ defaultValue }: { defaultValue?: Page }) => {
+    const [editor] = useState(() => {
+        const editor = new Editor({ page: defaultValue ?? Page.create() });
+        Extensions.forEach((extension) => editor.addExtension(extension));
 
-        return controller;
+        return editor;
     });
 
     const ref = useRef<HTMLDivElement>(null);
@@ -25,11 +25,11 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
             ev.preventDefault();
 
             if (ev.ctrlKey) {
-                controller.handleZoom(Point.display(ev.clientX, ev.clientY), -0.001 * ev.deltaY);
+                editor.handleZoom(Point.display(ev.clientX, ev.clientY), -0.001 * ev.deltaY);
             } else if (ev.shiftKey) {
-                controller.handleScroll(Size.display(ev.deltaY, ev.deltaX));
+                editor.handleScroll(Size.display(ev.deltaY, ev.deltaX));
             } else {
-                controller.handleScroll(Size.display(ev.deltaX, ev.deltaY));
+                editor.handleScroll(Size.display(ev.deltaX, ev.deltaY));
             }
         };
 
@@ -40,12 +40,12 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
         return () => {
             container.removeEventListener('wheel', onWheel);
         };
-    }, [controller]);
+    }, [editor]);
 
     useEffect(() => {
         const onMouseMove = (ev: MouseEvent) => {
             const pointInDisplay = Point.display(ev.clientX, ev.clientY);
-            controller.handleMouseMove({
+            editor.handleMouseMove({
                 button: ev.button,
                 shiftKey: ev.shiftKey,
                 pointInDisplay,
@@ -54,7 +54,7 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
 
         const onMouseUp = (ev: MouseEvent) => {
             const pointInDisplay = Point.display(ev.clientX, ev.clientY);
-            controller.handleMouseUp({
+            editor.handleMouseUp({
                 button: ev.button,
                 shiftKey: ev.shiftKey,
                 pointInDisplay,
@@ -63,29 +63,29 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
 
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', onMouseUp);
-        window.addEventListener('keydown', controller.handleKeyDown);
-        window.addEventListener('keyup', controller.handleKeyUp);
+        window.addEventListener('keydown', editor.handleKeyDown);
+        window.addEventListener('keyup', editor.handleKeyUp);
         return () => {
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', onMouseUp);
-            window.removeEventListener('keydown', controller.handleKeyDown);
-            window.removeEventListener('keyup', controller.handleKeyUp);
+            window.removeEventListener('keydown', editor.handleKeyDown);
+            window.removeEventListener('keyup', editor.handleKeyUp);
         };
-    }, [controller]);
+    }, [editor]);
 
     const onMouseDown: MouseEventHandler = useCallback(
         (ev) => {
-            controller.handleMouseDown({
+            editor.handleMouseDown({
                 button: ev.button,
                 shiftKey: ev.shiftKey,
                 pointInDisplay: Point.display(ev.clientX, ev.clientY),
             });
         },
-        [controller]
+        [editor]
     );
 
     return (
-        <EditorControllerContextProvider value={controller}>
+        <EditorContextProvider value={editor}>
             <div
                 ref={ref}
                 className={css`
@@ -100,13 +100,13 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                 `}
                 onMouseDown={onMouseDown}
                 onContextMenu={(ev) => ev.preventDefault()}
-                onDoubleClick={(ev) =>
-                    controller.handleDoubleClick({
-                        button: ev.button,
-                        shiftKey: ev.shiftKey,
-                        pointInDisplay: Point.display(ev.clientX, ev.clientY),
-                    })
-                }
+                // onDoubleClick={(ev) =>
+                //     editor.handleEntityDoubleClick({
+                //         button: ev.button,
+                //         shiftKey: ev.shiftKey,
+                //         pointInDisplay: Point.display(ev.clientX, ev.clientY),
+                //     })
+                // }
             >
                 <ContentLayer />
                 <SelectionView />
@@ -115,6 +115,6 @@ export const Editor = ({ defaultValue }: { defaultValue?: Page }) => {
                 <Toolbar />
                 <ContextMenuPopup />
             </div>
-        </EditorControllerContextProvider>
+        </EditorContextProvider>
     );
 };

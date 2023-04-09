@@ -1,9 +1,9 @@
-import { EditorController } from './EditorController';
+import { Editor } from './Editor';
 
 export abstract class Extension {
-    protected controller: EditorController = null as never;
+    protected controller: Editor = null as never;
 
-    initialize(controller: EditorController): void {
+    initialize(controller: Editor): void {
         this.controller = controller;
     }
 }

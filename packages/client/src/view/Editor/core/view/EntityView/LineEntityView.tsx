@@ -1,5 +1,5 @@
 import { ColorPalette, Entity, LineEntity, ModelCordPoint, Point } from '@drawing/common';
-import { useEditorController, useExtension } from '../EditorControllerContext';
+import { useEditor, useExtension } from '../EditorControllerContext';
 import { useSlice } from '../../../../hooks/useStore';
 import { ReactNode, useMemo } from 'react';
 import { css } from '@linaria/core';
@@ -10,8 +10,8 @@ import { SelectExtension } from '../../extensions/select/SelectExtension';
 import { getLineIntersectPoint } from '@drawing/common/build/model/page/entity/lineUtil';
 
 export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
-    const controller = useEditorController();
-    const { linkedEntity1, linkedEntity2, camera, hovered } = useSlice(controller.store, (state) => {
+    const editor = useEditor();
+    const { linkedEntity1, linkedEntity2, camera, hovered } = useSlice(editor.store, (state) => {
         return {
             linkedEntity1: entity.linkedEntityId1 === null ? null : state.page.entities[entity.linkedEntityId1],
             linkedEntity2: entity.linkedEntityId2 === null ? null : state.page.entities[entity.linkedEntityId2],
@@ -139,8 +139,8 @@ export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
                 <g
                     transform="translate(100,100)"
                     pointerEvents="all"
-                    onMouseOver={() => controller.handleHover({ type: 'entity', entityId: id })}
-                    onMouseLeave={controller.handleUnhover}
+                    onMouseOver={() => editor.handleHover({ type: 'entity', entityId: id })}
+                    onMouseLeave={editor.handleUnhover}
                 >
                     {content}
                     {highlighted && (

@@ -1,4 +1,4 @@
-import { EditorController, MouseEventButton, MouseEventInfo } from '../../controller/EditorController';
+import { Editor, MouseEventButton, MouseEventInfo } from '../../controller/Editor';
 import { Extension } from '../../controller/Extension';
 import { ContextMenuState } from './ContextMenuState';
 import { ContextMenuSectionEntry } from './ContextMenuSectionEntry';
@@ -12,7 +12,7 @@ export class ContextMenuExtension extends Extension {
     readonly store = new Store<ContextMenuState>(ContextMenuState.create());
     private selectExtension: SelectExtension = null as never;
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
 
         this.selectExtension = controller.requireExtension(SelectExtension);

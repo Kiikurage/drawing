@@ -1,4 +1,4 @@
-import { EditorController, MouseEventButton, MouseEventInfo } from '../../controller/EditorController';
+import { Editor, MouseEventButton, MouseEventInfo } from '../../controller/Editor';
 import { Extension } from '../../controller/Extension';
 import { TransformExtension } from '../../../extensions/transform/TransformExtension';
 import { dispatcher, Entity, EntityMap, Patch, Store, TransformType } from '@drawing/common';
@@ -25,7 +25,7 @@ export class SelectExtension extends Extension {
         return Object.values(this.selectedEntityMap);
     }
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
 
         controller.requireExtension(ToolbarExtension).addItem({ view: SelectModeToolbarButton });

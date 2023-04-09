@@ -10,7 +10,7 @@ import {
     snapPoint,
 } from '@drawing/common';
 import { Extension } from '../../core/controller/Extension';
-import { EditorController, MouseEventButton, MouseEventInfo } from '../../core/controller/EditorController';
+import { Editor, MouseEventButton, MouseEventInfo } from '../../core/controller/Editor';
 import { SnapExtension } from '../snap/SnapExtension';
 import { ContextMenuExtension } from '../../core/extensions/contextMenu/ContextMenuExtension';
 import { ArrowHeadContextMenuSection } from './ArrowHeadContextMenuSection';
@@ -29,7 +29,7 @@ export class LineExtension extends Extension {
     private modeExtension: ModeExtension = null as never;
     private selectExtension: SelectExtension = null as never;
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
 
         controller.requireExtension(ToolbarExtension).addItem({ view: LineModeToolbarButton });

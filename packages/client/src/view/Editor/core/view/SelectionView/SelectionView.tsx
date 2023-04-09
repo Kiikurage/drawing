@@ -1,4 +1,4 @@
-import { useEditorController, useExtension } from '../EditorControllerContext';
+import { useEditor, useExtension } from '../EditorControllerContext';
 import { useSlice } from '../../../../hooks/useStore';
 import { LineSelectionView } from './LineSelectionView';
 import { LineEntity } from '@drawing/common';
@@ -7,8 +7,8 @@ import { TextEditExtension } from '../../extensions/textEdit/TextEditExtension';
 import { SelectExtension } from '../../extensions/select/SelectExtension';
 
 export const SelectionView = () => {
-    const controller = useEditorController();
-    const { camera } = useSlice(controller.store, (state) => {
+    const editor = useEditor();
+    const { camera } = useSlice(editor.store, (state) => {
         return { camera: state.camera };
     });
 

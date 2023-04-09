@@ -1,11 +1,11 @@
 import { memo } from 'react';
 import { HoverState } from '@drawing/common';
-import { useEditorController } from '../EditorControllerContext';
+import { useEditor } from '../EditorControllerContext';
 import { COLOR_SELECTION } from '../../../../styles';
 
 export const ResizeHandle = memo(
     ({ x = 0, y = 0, hover, cursor }: { x?: number; y?: number; hover: HoverState; cursor: string }) => {
-        const controller = useEditorController();
+        const editor = useEditor();
 
         return (
             <g transform={`translate(${x},${y})`}>
@@ -15,8 +15,8 @@ export const ResizeHandle = memo(
                     y={-12}
                     width={24}
                     height={24}
-                    onMouseOver={() => controller.handleHover(hover)}
-                    onMouseLeave={controller.handleUnhover}
+                    onMouseOver={() => editor.handleHover(hover)}
+                    onMouseLeave={editor.handleUnhover}
                     pointerEvents="all"
                     fill="none"
                     stroke="none"
@@ -43,7 +43,7 @@ export const InvisibleResizeHandle = memo(
         hover: HoverState;
         cursor: string;
     }) => {
-        const controller = useEditorController();
+        const editor = useEditor();
 
         return (
             <rect
@@ -52,8 +52,8 @@ export const InvisibleResizeHandle = memo(
                 y={y - 12}
                 width={width + 24}
                 height={height + 24}
-                onMouseOver={() => controller.handleHover(hover)}
-                onMouseLeave={controller.handleUnhover}
+                onMouseOver={() => editor.handleHover(hover)}
+                onMouseLeave={editor.handleUnhover}
                 pointerEvents="all"
                 fill="none"
                 stroke="none"

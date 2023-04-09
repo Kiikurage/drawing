@@ -1,12 +1,12 @@
 import { Extension } from '../../core/controller/Extension';
 import { EntityMap, Patch, randomId, Record } from '@drawing/common';
-import { EditorController } from '../../core/controller/EditorController';
+import { Editor } from '../../core/controller/Editor';
 import { SelectExtension } from '../../core/extensions/select/SelectExtension';
 
 export class ClipboardExtension extends Extension {
     private selectExtension: SelectExtension = null as never;
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
 
         this.selectExtension = controller.requireExtension(SelectExtension);

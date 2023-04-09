@@ -1,4 +1,4 @@
-import { EditorController, MouseEventInfo } from '../../core/controller/EditorController';
+import { Editor, MouseEventInfo } from '../../core/controller/Editor';
 import { Extension } from '../../core/controller/Extension';
 import { HorizontalAlign, Record, TextEntity, TransformType, VerticalAlign } from '@drawing/common';
 import { TextEditExtension } from '../../core/extensions/textEdit/TextEditExtension';
@@ -18,7 +18,7 @@ export class TextExtension extends Extension {
     private selectExtension: SelectExtension = null as never;
     private modeExtension: ModeExtension = null as never;
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
 
         controller.requireExtension(ToolbarExtension).addItem({ view: TextModeToolbarButton });

@@ -26,7 +26,7 @@ import { CoreExtensions } from '../extensions/coreExtensions';
 /**
  * Root controller for Editor view
  */
-export class EditorController implements ExtensionHost {
+export class Editor implements ExtensionHost {
     readonly store: Store<EditorState>;
     readonly keyboard = new KeyboardController();
     readonly pageEdit: PageEditController;

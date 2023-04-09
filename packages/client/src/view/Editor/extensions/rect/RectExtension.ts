@@ -1,4 +1,4 @@
-import { EditorController, MouseEventInfo } from '../../core/controller/EditorController';
+import { Editor, MouseEventInfo } from '../../core/controller/Editor';
 import { Extension } from '../../core/controller/Extension';
 import { TransformExtension } from '../transform/TransformExtension';
 import { RectEntity, Size, TransformType } from '@drawing/common';
@@ -14,7 +14,7 @@ export class RectExtension extends Extension {
     private selectExtension: SelectExtension = null as never;
     private modeExtension: ModeExtension = null as never;
 
-    initialize(controller: EditorController) {
+    initialize(controller: Editor) {
         super.initialize(controller);
 
         controller.requireExtension(ToolbarExtension).addItem({ view: RectModeToolbarButton });
