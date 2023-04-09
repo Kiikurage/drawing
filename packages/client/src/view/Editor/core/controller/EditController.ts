@@ -17,11 +17,11 @@ import { PageEditSession } from './PageEditSession';
 import { EditorState } from '../model/EditorState';
 import { ClientMessageClient } from '../../../../lib/ClientMessageClient';
 
-export class PageEditController {
+export class EditController {
     private readonly client: ClientMessageClient;
+    private readonly history = new HistoryManager();
 
-    constructor(private readonly store: Store<EditorState>, private readonly historyManager: HistoryManager) {
-        this.historyManager.onAction.addListener(this.handleHistoryManagerAction);
+    constructor(private readonly store: Store<EditorState>) {
         this.client = new ClientMessageClient();
         this.client.onMessage.addListener(this.handleMessageClientMessage);
     }
@@ -29,7 +29,7 @@ export class PageEditController {
     addEntities(entities: EntityMap) {
         const normal = AddEntitiesEditAction(entities);
         const reverse = DeleteEntitiesEditAction(Object.keys(entities));
-        this.historyManager.apply(normal, reverse);
+        this.history.addEntry(normal, reverse);
         this.applyAction(normal);
         this.client.send({ type: 'edit', edit: normal });
     }
@@ -40,7 +40,7 @@ export class PageEditController {
             Record.mapToRecord(entityIds, (entityId) => [entityId, this.store.state.page.entities[entityId]])
         );
 
-        this.historyManager.apply(normal, reverse);
+        this.history.addEntry(normal, reverse);
         this.applyAction(normal);
         this.client.send({ type: 'edit', edit: normal });
     }
@@ -53,13 +53,23 @@ export class PageEditController {
         const normal = UpdateEntitiesEditAction(patches);
         const reverse = UpdateEntitiesEditAction(reversePatches);
 
-        this.historyManager.apply(normal, reverse);
+        this.history.addEntry(normal, reverse);
         this.applyAction(normal);
         this.client.send({ type: 'edit', edit: normal });
     }
 
+    undo() {
+        const actions = this.history.undo();
+        actions.forEach((action) => this.applyAction(action));
+    }
+
+    redo() {
+        const actions = this.history.redo();
+        actions.forEach((action) => this.applyAction(action));
+    }
+
     newSession(): PageEditSession {
-        const session = new Session(this.store, this.historyManager.newSession());
+        const session = new Session(this.store, this.history.newSession());
         session.onAction.addListener(this.handleSessionAction);
 
         return session;
@@ -68,10 +78,6 @@ export class PageEditController {
     private applyAction(action: EditAction) {
         this.store.setState({ page: EditAction.toPatch(this.store.state.page, action) });
     }
-
-    private readonly handleHistoryManagerAction = (action: EditAction) => {
-        this.applyAction(action);
-    };
 
     private readonly handleMessageClientMessage = (message: Message) => {
         switch (message.type) {

@@ -18,30 +18,28 @@ export class HistoryManager {
         return session;
     }
 
-    apply(normal: EditAction, reverse: EditAction) {
+    addEntry(normal: EditAction, reverse: EditAction) {
         this.redoStack.length = 0;
         this.undoStack.push({ normal: [normal], reverse: [reverse] });
     }
 
-    undo() {
+    undo(): EditAction[] {
         const entry = this.undoStack.pop();
-        if (entry === undefined) return;
-
-        for (const action of entry.reverse) this.onAction.dispatch(action);
+        if (entry === undefined) return [];
 
         this.redoStack.push(entry);
+
+        return entry.reverse;
     }
 
-    redo() {
+    redo(): EditAction[] {
         const entry = this.redoStack.pop();
-        if (entry === undefined) return;
-
-        for (const action of entry.normal) this.onAction.dispatch(action);
+        if (entry === undefined) return [];
 
         this.undoStack.push(entry);
-    }
 
-    readonly onAction = dispatcher<EditAction>();
+        return entry.normal;
+    }
 }
 
 export module HistoryManager {

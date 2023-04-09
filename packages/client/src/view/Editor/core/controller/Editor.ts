@@ -1,4 +1,4 @@
-import { PageEditController } from './PageEditController';
+import { EditController } from './EditController';
 import {
     Camera,
     dispatcher,
@@ -6,7 +6,6 @@ import {
     DisplayCordSize,
     Entity,
     EntityMap,
-    HistoryManager,
     HoverState,
     ModelCordPoint,
     ModelCordSize,
@@ -29,13 +28,12 @@ import { CoreExtensions } from '../extensions/coreExtensions';
 export class Editor implements ExtensionHost {
     readonly store: Store<EditorState>;
     readonly keyboard = new KeyboardController();
-    readonly pageEdit: PageEditController;
-    readonly historyManager = new HistoryManager();
+    readonly edit: EditController;
     private readonly extensions = new Map<ExtensionConstructor, Extension>();
 
     constructor(initialData: Patch<EditorState>) {
         this.store = new Store(EditorState.create(initialData));
-        this.pageEdit = new PageEditController(this.store, this.historyManager);
+        this.edit = new EditController(this.store);
         this.initializeShortcuts();
 
         CoreExtensions.forEach((extension) => this.addExtension(extension));
@@ -82,29 +80,29 @@ export class Editor implements ExtensionHost {
     // Core editing
 
     addEntities(entities: EntityMap) {
-        this.pageEdit.addEntities(entities);
+        this.edit.addEntities(entities);
     }
 
     deleteEntities(entityIds: string[]) {
-        this.pageEdit.deleteEntities(entityIds);
+        this.edit.deleteEntities(entityIds);
     }
 
     updateEntities(patches: Record<string, Patch<Entity>>) {
-        this.pageEdit.updateEntities(patches);
+        this.edit.updateEntities(patches);
     }
 
     // history
 
     undo() {
-        this.historyManager.undo();
+        this.edit.undo();
     }
 
     redo() {
-        this.historyManager.redo();
+        this.edit.redo();
     }
 
     newSession(): PageEditSession {
-        return this.pageEdit.newSession();
+        return this.edit.newSession();
     }
 
     // Event handlers
