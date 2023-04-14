@@ -1,11 +1,13 @@
 import { memo, useMemo } from 'react';
 import { useEditorViewController } from './EditorControllerContext';
 import { useSlice } from '../../hooks/useSlice';
-import { Entity, getSnapPoints, Point, snapPoint } from '@drawing/common';
 import { css } from '@linaria/core';
 import { useCamera } from '../../hooks/useCamera';
 import { useSelectedEntities, useSelectedEntityIds } from '../../hooks/useSelection';
 import { useEntities } from '../../hooks/useEntityMap';
+import { getSnapPoints, snapPoint } from '@drawing/common/src/model/SnapUtil';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { Point } from '@drawing/common/src/model/Point';
 
 export const SnapGuide = memo(() => {
     const controller = useEditorViewController();

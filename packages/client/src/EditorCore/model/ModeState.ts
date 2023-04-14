@@ -1,4 +1,4 @@
-import { Patch } from '@drawing/common/build/model/Patch';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export interface ModeState {
     mode: string;

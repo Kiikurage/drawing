@@ -1,5 +1,6 @@
 import { useEntityMap } from './useEntityMap';
-import { Entity, nonNull } from '@drawing/common';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { nonNull } from '@drawing/common/src/lib/nonNull';
 
 export function useLayout(): Entity[] {
     const entities = Object.values(useEntityMap()).filter(nonNull);

@@ -1,8 +1,8 @@
 import { useEditorViewController } from '../EditorControllerContext';
 import { useSlice } from '../../../hooks/useSlice';
-import { Box } from '@drawing/common';
 import { css } from '@linaria/core';
 import { useCamera } from '../../../hooks/useCamera';
+import { Box } from '@drawing/common/src/model/Box';
 
 export const SelectingRangeView = () => {
     const controller = useEditorViewController();

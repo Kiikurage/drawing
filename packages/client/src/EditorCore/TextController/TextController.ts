@@ -1,4 +1,3 @@
-import { HorizontalAlign, Record, TextEntity, TransformType, VerticalAlign } from '@drawing/common';
 import { MYDragEvent } from '../model/MYDragEvent';
 import { GestureRecognizer } from '../gesture/GestureRecognizer';
 import { ModeController } from '../mode/ModeController';
@@ -9,6 +8,10 @@ import { Command } from '../CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortcutCommandManager';
 import { MYPointerEvent } from '../model/MYPointerEvent';
 import { TransformController } from '../TransformController/TransformController';
+import { HorizontalAlign, VerticalAlign } from '@drawing/common/src/model/TextAlign';
+import { Record } from '@drawing/common/src/model/Record';
+import { TextEntity } from '@drawing/common/src/model/page/entity/TextEntity';
+import { TransformType } from '@drawing/common/src/model/TransformType';
 
 export class TextController {
     static readonly ModeName = 'text';

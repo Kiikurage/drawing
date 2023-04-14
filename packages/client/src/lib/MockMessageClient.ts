@@ -1,4 +1,4 @@
-import { MessageClient } from '@drawing/common';
+import { MessageClient } from '@drawing/common/src/lib/MessageClient';
 
 export class MockMessageClient extends MessageClient {
     constructor() {

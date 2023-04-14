@@ -1,27 +1,23 @@
-import {
-    Action,
-    AddEntitiesAction,
-    Box,
-    DeleteEntitiesAction,
-    dispatcher,
-    Entity,
-    HistoryManager,
-    Message,
-    MessageClient,
-    nonNull,
-    Page,
-    Patch,
-    ReadonlyStore,
-    Record,
-    Store,
-    UpdateEntitiesAction,
-} from '@drawing/common';
 import { PageEditSession } from './PageEditSession';
 import { PageState } from './PageState';
 import { Command } from '../CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortcutCommandManager';
 import { MockMessageClient } from '../../lib/MockMessageClient';
 import { ClientMessageClient } from '../../lib/ClientMessageClient';
+import { ReadonlyStore, Store } from '@drawing/common/src/lib/Store';
+import { MessageClient } from '@drawing/common/src/lib/MessageClient';
+import { HistoryManager } from '@drawing/common/src/lib/HistoryManager';
+import { Page } from '@drawing/common/src/model/page/Page';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { nonNull } from '@drawing/common/src/lib/nonNull';
+import { AddEntitiesAction } from '@drawing/common/src/model/page/action/AddEntitiesAction';
+import { DeleteEntitiesAction } from '@drawing/common/src/model/page/action/DeleteEntitiesAction';
+import { Patch } from '@drawing/common/src/model/Patch';
+import { UpdateEntitiesAction } from '@drawing/common/src/model/page/action/UpdateEntitiesAction';
+import { Box } from '@drawing/common/src/model/Box';
+import { Action } from '@drawing/common/src/model/page/action/Action';
+import { Message } from '@drawing/common/src/model/Message';
+import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
 
 export class PageController {
     readonly store = new Store(PageState.create());
@@ -42,8 +38,6 @@ export class PageController {
         this.keyboardShortcutCommandManager
             .set(['Control', 'Shift', 'Z'], redoCommand)
             .set(['Control', 'Y'], redoCommand);
-
-        this.onChange.addListener((state) => console.log(state));
     }
 
     get page(): Page {

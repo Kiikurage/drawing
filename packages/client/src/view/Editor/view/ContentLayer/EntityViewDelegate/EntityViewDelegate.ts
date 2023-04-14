@@ -1,8 +1,8 @@
-import { Entity } from '@drawing/common';
 import { ComponentType } from 'react';
 import { PolygonEntityViewDelegate } from './PolygonEntityViewDelegate/PolygonEntityViewDelegate';
 import { LineEntityViewDelegate } from './LineEntityViewDelegate/LineEntityViewDelegate';
 import { TextEntityViewDelegate } from './TextEntityViewDelegate/TextEntityViewDelegate';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export interface EntityViewDelegate<T extends Entity> {
     contentComponentType: ComponentType<{ entity: T }>;

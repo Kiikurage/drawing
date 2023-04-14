@@ -1,4 +1,5 @@
-import { Box, ModelCordBox, Patch } from '@drawing/common';
+import { Box, ModelCordBox } from '@drawing/common/src/model/Box';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export interface SelectionState {
     selected: Record<string, boolean | undefined>;

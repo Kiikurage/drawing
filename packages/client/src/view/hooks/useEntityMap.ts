@@ -1,6 +1,6 @@
 import { useSlice } from './useSlice';
 import { useEditorViewController } from '../Editor/view/EditorControllerContext';
-import { nonNull } from '@drawing/common';
+import { nonNull } from '@drawing/common/src/lib/nonNull';
 
 export function useEntityMap() {
     return useSlice(useEditorViewController().pageController.store, (state) => state.page.entities);

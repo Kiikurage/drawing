@@ -1,4 +1,3 @@
-import { Entity, LineEntity, Store, TransformType } from '@drawing/common';
 import { DragSession } from '../gesture/DragSession';
 import { PageEditSession } from '../PageController/PageEditSession';
 import { PageController } from '../PageController/PageController';
@@ -7,6 +6,10 @@ import { TransformState } from './TransformState';
 import { CameraController } from '../camera/CameraController';
 import { EditorViewEvents } from '../EditorViewEvents/EditorViewEvents';
 import { SingleLineTransformSession } from './SingleLineTransformSession';
+import { Store } from '@drawing/common/src/lib/Store';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { TransformType } from '@drawing/common/src/model/TransformType';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
 
 export class TransformController {
     readonly store = new Store(TransformState.create());

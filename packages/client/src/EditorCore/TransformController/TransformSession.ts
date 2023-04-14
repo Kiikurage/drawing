@@ -1,21 +1,19 @@
-import {
-    dispatcher,
-    Entity,
-    LineEntity,
-    ModelCordBox,
-    nonNull,
-    Patch,
-    Record,
-    snapBox,
-    Store,
-    Transform,
-    TransformType,
-} from '@drawing/common';
 import { DragSession } from '../gesture/DragSession';
 import { PageEditSession } from '../PageController/PageEditSession';
 import { PageController } from '../PageController/PageController';
 import { TransformState } from './TransformState';
 import { CameraController } from '../camera/CameraController';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { ModelCordBox } from '@drawing/common/src/model/Box';
+import { Transform } from '@drawing/common/src/model/Transform';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
+import { TransformType } from '@drawing/common/src/model/TransformType';
+import { Store } from '@drawing/common/src/lib/Store';
+import { Record } from '@drawing/common/src/model/Record';
+import { nonNull } from '@drawing/common/src/lib/nonNull';
+import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
+import { snapBox } from '@drawing/common/src/model/SnapUtil';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export class TransformSession {
     private readonly entityMap: Record<string, Entity | undefined>;

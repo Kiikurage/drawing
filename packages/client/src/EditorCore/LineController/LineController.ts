@@ -1,4 +1,3 @@
-import { ArrowHeadType, Entity, LineEntity, ModelCordPoint, nonNull, Patch, Record } from '@drawing/common';
 import { MouseEventButton } from '../model/MouseEventButton';
 import { MYDragEvent } from '../model/MYDragEvent';
 import { GestureRecognizer } from '../gesture/GestureRecognizer';
@@ -8,6 +7,13 @@ import { SelectionController } from '../selection/SelectionController';
 import { Command } from '../CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortcutCommandManager';
 import { TransformController } from '../TransformController/TransformController';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
+import { ArrowHeadType } from '@drawing/common/src/model/ArrowHeadType';
+import { Record } from '@drawing/common/src/model/Record';
+import { Patch } from '@drawing/common/src/model/Patch';
+import { nonNull } from '@drawing/common/src/lib/nonNull';
+import { ModelCordPoint } from '@drawing/common/src/model/Point';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export class LineController {
     static readonly ModeName = 'line';

@@ -1,7 +1,8 @@
-import { Box, Entity } from '@drawing/common';
 import { SelectionController } from './SelectionController';
 import { DragSession } from '../gesture/DragSession';
 import { PageController } from '../PageController/PageController';
+import { Box } from '@drawing/common/src/model/Box';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export class RangeSelectionSession {
     private readonly preSelectedEntityIds: string[];

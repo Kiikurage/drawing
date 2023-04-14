@@ -1,4 +1,5 @@
-import { Entity, Patch } from '@drawing/common';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export interface PageEditSession {
     addEntities(entities: Entity[]): void;

@@ -1,4 +1,4 @@
-import { ModelCordPoint } from '@drawing/common';
+import { ModelCordPoint } from '@drawing/common/src/model/Point';
 
 export interface MYZoomEvent {
     point: ModelCordPoint;

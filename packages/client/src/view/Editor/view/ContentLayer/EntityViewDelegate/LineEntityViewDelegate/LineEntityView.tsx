@@ -1,10 +1,12 @@
-import { Box, ColorPalette, LineEntity } from '@drawing/common';
 import { SVGContainer } from '../../../CameraLayer/SVGContainer';
 import { adjustLineEdgePoints, computePath } from './util';
 import { EditableEntityText } from '../../EditableEntityText';
 import { useEntityMap } from '../../../../../hooks/useEntityMap';
 import { useMemo } from 'react';
 import { useSelectedEntities } from '../../../../../hooks/useSelection';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
+import { Box } from '@drawing/common/src/model/Box';
+import { ColorPalette } from '@drawing/common/src/model/ColorPalette';
 
 export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
     const entities = useEntityMap();

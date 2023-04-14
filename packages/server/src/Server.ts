@@ -1,6 +1,10 @@
 import * as http from 'http';
 import { connection as WebSocketConnection, Message as WebSocketMessage, server as WebSocketServer } from 'websocket';
-import { Action, Message, MessageClient, Page, Patch } from '@drawing/common';
+import { Page } from '@drawing/common/src/model/page/Page';
+import { Patch } from '@drawing/common/src/model/Patch';
+import { Action } from '@drawing/common/src/model/page/action/Action';
+import { Message } from '@drawing/common/src/model/Message';
+import { MessageClient } from '@drawing/common/src/lib/MessageClient';
 
 export interface ServerOptions {
     port: number;

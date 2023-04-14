@@ -1,7 +1,7 @@
 import { memo, PointerEventHandler } from 'react';
 import { COLOR_SELECTION } from '../../../styles';
-import { ModelCordPoint } from '@drawing/common';
 import { useCamera } from '../../../hooks/useCamera';
+import { ModelCordPoint } from '@drawing/common/src/model/Point';
 
 export const SquareHandle = memo(
     ({

@@ -1,14 +1,3 @@
-import {
-    Box,
-    dispatcher,
-    distinct,
-    Entity,
-    ModelCordBox,
-    ModelCordPoint,
-    Record,
-    Store,
-    TransformType,
-} from '@drawing/common';
 import { SelectionChangeEvent } from '../model/SelectionChangeEvent';
 import { PageState } from '../PageController/PageState';
 import { MYDragEvent } from '../model/MYDragEvent';
@@ -23,6 +12,13 @@ import { Command } from '../CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortcutCommandManager';
 import { RangeSelectionSession } from './RangeSelectionSession';
 import { TransformController } from '../TransformController/TransformController';
+import { Store } from '@drawing/common/src/lib/Store';
+import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { distinct } from '@drawing/common/src/lib/distinct';
+import { ModelCordPoint } from '@drawing/common/src/model/Point';
+import { Box, ModelCordBox } from '@drawing/common/src/model/Box';
+import { TransformType } from '@drawing/common/src/model/TransformType';
 
 export class SelectionController {
     static readonly ModeName = 'select';

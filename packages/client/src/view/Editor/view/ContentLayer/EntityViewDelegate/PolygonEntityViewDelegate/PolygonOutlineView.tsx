@@ -1,4 +1,3 @@
-import { Entity, PolygonEntity } from '@drawing/common';
 import { useEditorViewController } from '../../../EditorControllerContext';
 import { SVGContainer } from '../../../CameraLayer/SVGContainer';
 import { css } from '@linaria/core';
@@ -6,6 +5,8 @@ import { COLOR_SELECTION } from '../../../../../styles';
 import { createPath } from './util';
 import { useCamera } from '../../../../../hooks/useCamera';
 import { useIsSelected } from '../../../../../hooks/useIsSelected';
+import { PolygonEntity } from '@drawing/common/src/model/page/entity/PolygonEntity';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export const PolygonOutlineView = ({ entity }: { entity: PolygonEntity }) => {
     const controller = useEditorViewController();

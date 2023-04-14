@@ -1,4 +1,3 @@
-import { Box, LineEntity, Point } from '@drawing/common';
 import { useEditorViewController } from '../../../EditorControllerContext';
 import { SVGContainer } from '../../../CameraLayer/SVGContainer';
 import { css } from '@linaria/core';
@@ -9,6 +8,9 @@ import { useCamera } from '../../../../../hooks/useCamera';
 import { useIsSelected } from '../../../../../hooks/useIsSelected';
 import { useEntityMap } from '../../../../../hooks/useEntityMap';
 import { useMemo } from 'react';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
+import { Box } from '@drawing/common/src/model/Box';
+import { Point } from '@drawing/common/src/model/Point';
 
 export const LineOutlineView = ({ entity }: { entity: LineEntity }) => {
     const controller = useEditorViewController();

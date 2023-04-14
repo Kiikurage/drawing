@@ -1,4 +1,5 @@
-import { DisplayCordPoint, Patch, Point } from '@drawing/common';
+import { DisplayCordPoint, Point } from '@drawing/common/src/model/Point';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export interface ContextMenuState {
     open: boolean;

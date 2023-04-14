@@ -1,7 +1,8 @@
 import { useEditorViewController } from '../../../EditorControllerContext';
-import { Box, LineEntity } from '@drawing/common';
 import { CircleHandle } from '../../../SelectionView/Handle';
 import { SVGContainer } from '../../../CameraLayer/SVGContainer';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
+import { Box } from '@drawing/common/src/model/Box';
 
 export const LineSelectionView = ({ entity }: { entity: LineEntity }) => {
     const controller = useEditorViewController();

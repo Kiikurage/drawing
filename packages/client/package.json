@@ -1,30 +1,33 @@
 {
   "name": "@drawing/client",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
+  "description": "Simple drawing app",
+  "private": true,
+  "engines": {
+    "node": ">=18 <19",
+    "npm": ">=9 <10"
+  },
   "scripts": {
-    "start": "../../node_modules/.bin/webpack-cli serve",
-    "build": "../../node_modules/.bin/webpack-cli bundle ",
+    "start": "webpack-cli serve",
+    "build": "webpack-cli bundle ",
     "prebuild": "npm run clean",
     "clean": "npx rimraf ./build",
     "test": "npm run test:jest",
-    "test:jest": "../../node_modules/.bin/jest"
+    "test:jest": "jest"
   },
-  "dependencies": {
+  "devDependencies": {
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.4",
-    "@drawing/common": "^0.0.1",
     "@linaria/babel-preset": "^4.4.3",
     "@linaria/core": "^4.2.8",
     "@linaria/react": "^4.3.6",
-    "@linaria/webpack-loader": "^4.1.15",
+    "@linaria/webpack5-loader": "^4.1.15",
     "@types/jest": "^29.5.0",
-    "@types/react": "^18.0.33",
+    "@types/react": "^18.0.35",
     "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.57.1",
-    "@typescript-eslint/parser": "^5.57.1",
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
     "babel-loader": "^9.1.2",
     "css-loader": "^6.7.3",
     "eslint": "^8.38.0",
@@ -40,9 +43,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.10.0",
-    "rimraf": "^4.4.1",
+    "rimraf": "^5.0.0",
     "typescript": "^5.0.4",
-    "webpack": "^5.78.0",
+    "webpack": "^5.79.0",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.13.2"
   }

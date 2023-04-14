@@ -1,6 +1,7 @@
 import { ModeState } from './ModeState';
-import { dispatcher, Store } from '@drawing/common';
 import { ModeChangeEvent } from '../model/ModeChangeEvent';
+import { Store } from '@drawing/common/src/lib/Store';
+import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
 
 export class ModeController {
     readonly store = new Store<ModeState>(ModeState.create());

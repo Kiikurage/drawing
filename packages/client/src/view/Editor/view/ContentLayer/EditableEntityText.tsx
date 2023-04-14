@@ -1,9 +1,9 @@
-import { Entity } from '@drawing/common';
 import { css } from '@linaria/core';
 import { useEditorViewController } from '../EditorControllerContext';
 import { useSlice } from '../../../hooks/useSlice';
 import { EditableText } from './EditableText';
 import { useCamera } from '../../../hooks/useCamera';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export const EditableEntityText = ({ entity }: { entity: Entity }) => {
     const controller = useEditorViewController();

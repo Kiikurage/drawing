@@ -1,5 +1,6 @@
-import { dispatcher, DisplayCordPoint, ModelCordPoint } from '@drawing/common';
 import { MYPointerEvent } from '../model/MYPointerEvent';
+import { DisplayCordPoint, ModelCordPoint } from '@drawing/common/src/model/Point';
+import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
 
 export class DragSession {
     startPoint: ModelCordPoint;

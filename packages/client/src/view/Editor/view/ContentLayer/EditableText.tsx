@@ -1,7 +1,9 @@
-import { Camera, DisplayCordPoint, Size } from '@drawing/common';
 import { ChangeEventHandler, useCallback, useLayoutEffect, useRef } from 'react';
 import { css, CSSProperties } from '@linaria/core';
 import { caretRangeFromPoint } from '../../../../lib/caretRangeFromPoint';
+import { DisplayCordPoint } from '@drawing/common/src/model/Point';
+import { Camera } from '@drawing/common/src/model/Camera';
+import { Size } from '@drawing/common/src/model/Size';
 
 export const EditableText = ({
     value,

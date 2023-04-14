@@ -1,4 +1,5 @@
-import { Page, Patch } from '@drawing/common';
+import { Page } from '@drawing/common/src/model/page/Page';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export interface PageState {
     page: Page;

@@ -1,7 +1,8 @@
 import { css } from '@linaria/core';
 import { Popup } from '../Popup';
-import { ColorPalette, ColorPaletteKey, Record } from '@drawing/common';
 import { useEditorViewController } from '../EditorControllerContext';
+import { ColorPalette, ColorPaletteKey } from '@drawing/common/src/model/ColorPalette';
+import { Record } from '@drawing/common/src/model/Record';
 
 export const ColorContextMenuSection = () => {
     return (

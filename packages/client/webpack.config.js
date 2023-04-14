@@ -25,7 +25,7 @@ module.exports = {
                 use: [
                     { loader: 'babel-loader' },
                     {
-                        loader: '@linaria/webpack-loader',
+                        loader: '@linaria/webpack5-loader',
                         options: {
                             variableNameSlug: '[componentName]-[valueSlug]-[index]',
                         },

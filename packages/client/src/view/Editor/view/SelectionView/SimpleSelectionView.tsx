@@ -1,11 +1,13 @@
 import { useEditorViewController } from '../EditorControllerContext';
-import { Entity, Point, TransformType } from '@drawing/common';
 import React, { useMemo } from 'react';
 import { SVGContainer } from '../CameraLayer/SVGContainer';
 import { EdgeHandle, SquareHandle } from './Handle';
 import { COLOR_SELECTION } from '../../../styles';
 import { useCamera } from '../../../hooks/useCamera';
 import { useSelectedEntities } from '../../../hooks/useSelection';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { Point } from '@drawing/common/src/model/Point';
+import { TransformType } from '@drawing/common/src/model/TransformType';
 
 export const SimpleSelectionView = () => {
     const controller = useEditorViewController();

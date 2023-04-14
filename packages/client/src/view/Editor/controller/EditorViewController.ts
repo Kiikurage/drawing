@@ -1,4 +1,3 @@
-import { Point, singleton, Size } from '@drawing/common';
 import { Editor } from '../../../EditorCore/Editor';
 import { ClipboardController } from './ClipboardController';
 import { EditorViewEvents } from '../../../EditorCore/EditorViewEvents/EditorViewEvents';
@@ -15,6 +14,9 @@ import { MouseEventTarget } from '../../../EditorCore/model/MYMouseEvent';
 import { ContextMenuController } from '../../../EditorCore/contextmenu/ContextMenuController';
 import { KeyboardShortcutCommandManager } from '../../../EditorCore/CommandManager/KeyboardShortcutCommandManager';
 import { TransformController } from '../../../EditorCore/TransformController/TransformController';
+import { singleton } from '@drawing/common/src/lib/singleton';
+import { Point } from '@drawing/common/src/model/Point';
+import { Size } from '@drawing/common/src/model/Size';
 
 export class EditorViewController {
     constructor(

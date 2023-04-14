@@ -1,6 +1,6 @@
-import { Key } from '@drawing/common';
 import { MYKeyboardEvent } from '../model/MYKeyboardEvent';
 import { EditorViewEvents } from '../EditorViewEvents/EditorViewEvents';
+import { Key } from '@drawing/common/src/model/Key';
 
 export class KeyPatternRecognizer {
     private readonly callbacksByPattern = new Map<string, Set<(ev: MYKeyboardEvent) => void>>();

@@ -1,9 +1,10 @@
 import { css } from '@linaria/core';
 import { useEditorViewController } from '../EditorControllerContext';
 import { Popup } from '../Popup';
-import { distinct, LineEntity } from '@drawing/common';
 import { useSelectedEntities } from '../../../hooks/useSelection';
 import { useMemo } from 'react';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
+import { distinct } from '@drawing/common/src/lib/distinct';
 
 export const ArrowHeadContextMenuSection = () => {
     const controller = useEditorViewController();

@@ -1,6 +1,8 @@
-import { Entity, nonNull, Patch, Record } from '@drawing/common';
 import { SelectionController } from '../selection/SelectionController';
 import { PageController } from '../PageController/PageController';
+import { nonNull } from '@drawing/common/src/lib/nonNull';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export class LayoutController {
     constructor(

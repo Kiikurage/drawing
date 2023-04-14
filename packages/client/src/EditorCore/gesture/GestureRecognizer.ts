@@ -1,8 +1,8 @@
 import { DragSession } from './DragSession';
 import { MYPointerEvent } from '../model/MYPointerEvent';
 import { MYDragEvent } from '../model/MYDragEvent';
-import { dispatcher } from '@drawing/common';
 import { EditorViewEvents } from '../EditorViewEvents/EditorViewEvents';
+import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
 
 const HOLD_THRESHOLD_IN_MS = 600;
 

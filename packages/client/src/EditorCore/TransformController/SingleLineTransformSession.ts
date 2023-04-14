@@ -1,19 +1,16 @@
-import {
-    dispatcher,
-    Entity,
-    getClosestValue,
-    LineEntity,
-    ModelCordPoint,
-    nonNull,
-    Patch,
-    Point,
-    Store,
-    Transform,
-} from '@drawing/common';
 import { DragSession } from '../gesture/DragSession';
 import { PageEditSession } from '../PageController/PageEditSession';
 import { PageController } from '../PageController/PageController';
 import { TransformState } from './TransformState';
+import { Transform } from '@drawing/common/src/model/Transform';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
+import { Store } from '@drawing/common/src/lib/Store';
+import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
+import { nonNull } from '@drawing/common/src/lib/nonNull';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { ModelCordPoint, Point } from '@drawing/common/src/model/Point';
+import { Patch } from '@drawing/common/src/model/Patch';
+import { getClosestValue } from '@drawing/common/src/lib/getClosestValue';
 
 export class SingleLineTransformSession {
     private transform: Transform = Transform.scale(1, 1);

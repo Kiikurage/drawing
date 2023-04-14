@@ -1,4 +1,3 @@
-import { PolygonEntity, TransformType } from '@drawing/common';
 import { MYDragEvent } from '../model/MYDragEvent';
 import { GestureRecognizer } from '../gesture/GestureRecognizer';
 import { ModeController } from '../mode/ModeController';
@@ -7,6 +6,8 @@ import { SelectionController } from '../selection/SelectionController';
 import { Command } from '../CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortcutCommandManager';
 import { TransformController } from '../TransformController/TransformController';
+import { TransformType } from '@drawing/common/src/model/TransformType';
+import { PolygonEntity } from '@drawing/common/src/model/page/entity/PolygonEntity';
 
 export class PolygonController {
     static readonly ModeName = 'polygon';

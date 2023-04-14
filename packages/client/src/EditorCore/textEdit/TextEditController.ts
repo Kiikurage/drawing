@@ -1,4 +1,3 @@
-import { DisplayCordPoint, Entity, Point, Store } from '@drawing/common';
 import { PageEditSession } from '../PageController/PageEditSession';
 import { TextEditState } from './TextEditState';
 import { SelectionChangeEvent } from '../model/SelectionChangeEvent';
@@ -8,6 +7,9 @@ import { EditorViewEvents } from '../EditorViewEvents/EditorViewEvents';
 import { PageController } from '../PageController/PageController';
 import { Command } from '../CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortcutCommandManager';
+import { Store } from '@drawing/common/src/lib/Store';
+import { DisplayCordPoint, Point } from '@drawing/common/src/model/Point';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export class TextEditController {
     readonly store = new Store(TextEditState.create());

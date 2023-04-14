@@ -1,4 +1,4 @@
-import { Patch } from '@drawing/common';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export interface TransformState {
     snapEnabled: boolean;

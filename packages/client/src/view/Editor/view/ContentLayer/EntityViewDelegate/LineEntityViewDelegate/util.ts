@@ -1,4 +1,9 @@
-import { ArrowHeadType, Box, Entity, getLineIntersectPoint, LineEntity, ModelCordPoint, Point } from '@drawing/common';
+import { ArrowHeadType } from '@drawing/common/src/model/ArrowHeadType';
+import { ModelCordPoint, Point } from '@drawing/common/src/model/Point';
+import { Box } from '@drawing/common/src/model/Box';
+import { LineEntity } from '@drawing/common/src/model/page/entity/LineEntity';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { getLineIntersectPoint } from '@drawing/common/src/model/page/entity/lineUtil';
 
 export function computePath(p1: ModelCordPoint, p2: ModelCordPoint, head1: ArrowHeadType, head2: ArrowHeadType) {
     const { x: x0, y: y0 } = Box.fromPoints(p1, p2).point;

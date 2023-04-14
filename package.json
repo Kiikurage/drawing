@@ -1,5 +1,8 @@
 {
   "name": "drawing",
+  "version": "0.0.1",
+  "description": "Simple drawing app",
+  "private": true,
   "workspaces": [
     "./packages/*"
   ],

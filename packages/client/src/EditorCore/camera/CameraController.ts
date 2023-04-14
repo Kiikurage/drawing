@@ -1,10 +1,12 @@
-import { Camera, Point, Store } from '@drawing/common';
 import { MYZoomEvent } from '../model/MYZoomEvent';
 import { MYScrollEvent } from '../model/MYScrollEvent';
 import { MouseEventButton } from '../model/MouseEventButton';
 import { MYDragEvent } from '../model/MYDragEvent';
 import { GestureRecognizer } from '../gesture/GestureRecognizer';
 import { EditorViewEvents } from '../EditorViewEvents/EditorViewEvents';
+import { Store } from '@drawing/common/src/lib/Store';
+import { Camera } from '@drawing/common/src/model/Camera';
+import { Point } from '@drawing/common/src/model/Point';
 
 export class CameraController {
     readonly store = new Store<Camera>(Camera.create());

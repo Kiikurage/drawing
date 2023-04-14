@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { deepEqual, ReadonlyStore } from '@drawing/common';
+import { ReadonlyStore } from '@drawing/common/src/lib/Store';
+import { deepEqual } from '@drawing/common/src/lib/deepEqual';
 
 export function useSlice<T extends object, U extends object>(store: ReadonlyStore<T>, fn: (state: T) => U): U {
     const [cachedState, setCachedState] = useState<U>(() => fn(store.state));

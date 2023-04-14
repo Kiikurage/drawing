@@ -1,9 +1,9 @@
-import { dispatcher } from '@drawing/common';
 import { MYZoomEvent } from '../model/MYZoomEvent';
 import { MYScrollEvent } from '../model/MYScrollEvent';
 import { MYPointerEvent } from '../model/MYPointerEvent';
 import { MYMouseEvent } from '../model/MYMouseEvent';
 import { MYKeyboardEvent } from '../model/MYKeyboardEvent';
+import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
 
 export class EditorViewEvents {
     readonly handleZoom = (ev: MYZoomEvent) => this.onZoom.dispatch(ev);

@@ -1,8 +1,9 @@
-import { Entity, randomId } from '@drawing/common';
 import { PageController } from '../../../EditorCore/PageController/PageController';
 import { SelectionController } from '../../../EditorCore/selection/SelectionController';
 import { Command } from '../../../EditorCore/CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../../../EditorCore/CommandManager/KeyboardShortcutCommandManager';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { randomId } from '@drawing/common/src/lib/randomId';
 
 export class ClipboardController {
     constructor(

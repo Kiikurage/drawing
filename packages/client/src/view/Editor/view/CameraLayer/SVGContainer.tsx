@@ -1,6 +1,6 @@
-import { ModelCordBox } from '@drawing/common';
 import { ReactNode } from 'react';
 import { css } from '@linaria/core';
+import { ModelCordBox } from '@drawing/common/src/model/Box';
 
 const PADDING = 100;
 

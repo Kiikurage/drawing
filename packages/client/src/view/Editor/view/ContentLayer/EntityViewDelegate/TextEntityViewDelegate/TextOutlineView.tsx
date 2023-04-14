@@ -1,10 +1,11 @@
-import { Entity, TextEntity } from '@drawing/common';
 import { useEditorViewController } from '../../../EditorControllerContext';
 import { SVGContainer } from '../../../CameraLayer/SVGContainer';
 import { css } from '@linaria/core';
 import { COLOR_SELECTION } from '../../../../../styles';
 import { useCamera } from '../../../../../hooks/useCamera';
 import { useIsSelected } from '../../../../../hooks/useIsSelected';
+import { TextEntity } from '@drawing/common/src/model/page/entity/TextEntity';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export const TextOutlineView = ({ entity }: { entity: TextEntity }) => {
     const controller = useEditorViewController();

@@ -1,4 +1,4 @@
-import { PolygonEntity } from '@drawing/common';
+import { PolygonEntity } from '@drawing/common/src/model/page/entity/PolygonEntity';
 
 export function createPath(entity: PolygonEntity) {
     const {

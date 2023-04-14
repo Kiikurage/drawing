@@ -1,4 +1,5 @@
-import { DisplayCordPoint, ModelCordPoint, TransformType } from '@drawing/common';
+import { DisplayCordPoint, ModelCordPoint } from '@drawing/common/src/model/Point';
+import { TransformType } from '@drawing/common/src/model/TransformType';
 
 export interface MYMouseEvent {
     target: MouseEventTarget;

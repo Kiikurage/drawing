@@ -1,13 +1,14 @@
 import { ContextMenuState } from './ContextMenuState';
 import { ContextMenuSectionEntry } from './ContextMenuSectionEntry';
 import { ModeChangeEvent } from '../model/ModeChangeEvent';
-import { DisplayCordPoint, Store } from '@drawing/common';
 import { MouseEventButton } from '../model/MouseEventButton';
 import { MYPointerEvent } from '../model/MYPointerEvent';
 import { ModeController } from '../mode/ModeController';
 import { EditorViewEvents } from '../EditorViewEvents/EditorViewEvents';
 import { SelectionController } from '../selection/SelectionController';
 import { GestureRecognizer } from '../gesture/GestureRecognizer';
+import { Store } from '@drawing/common/src/lib/Store';
+import { DisplayCordPoint } from '@drawing/common/src/model/Point';
 
 export class ContextMenuController {
     readonly sections: ContextMenuSectionEntry[] = [];

@@ -1,8 +1,9 @@
 import { memo } from 'react';
-import { Box, Entity } from '@drawing/common';
 import { OutlineView } from './OutlineView';
 import { useCamera } from '../../../hooks/useCamera';
 import { useLayout } from '../../../hooks/useLayout';
+import { Box } from '@drawing/common/src/model/Box';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export const OutlineLayer = memo(() => {
     const entities = useLayout();

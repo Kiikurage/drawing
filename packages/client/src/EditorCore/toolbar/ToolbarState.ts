@@ -1,5 +1,5 @@
-import { Patch } from '@drawing/common';
 import { ToolbarItem } from './ToolbarItem';
+import { Patch } from '@drawing/common/src/model/Patch';
 
 export interface ToolbarState {
     items: ToolbarItem[];

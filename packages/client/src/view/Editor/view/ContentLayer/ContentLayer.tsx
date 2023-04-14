@@ -1,8 +1,9 @@
 import { memo } from 'react';
 import { EntityView } from './EntityView';
-import { Box, Entity } from '@drawing/common';
 import { useCamera } from '../../../hooks/useCamera';
 import { useLayout } from '../../../hooks/useLayout';
+import { Box } from '@drawing/common/src/model/Box';
+import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
 export const ContentLayer = memo(() => {
     const entities = useLayout();
