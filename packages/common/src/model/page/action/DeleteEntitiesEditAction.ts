@@ -17,6 +17,7 @@ export module DeleteEntitiesEditAction {
         toPatch(page: Page, action: DeleteEntitiesEditAction): Patch<Page> {
             return {
                 entities: Record.mapToRecord(action.entityIds, (entityId) => [entityId, undefined]),
+                layouts: page.layouts.filter((id) => !action.entityIds.includes(id)),
             };
         },
     };

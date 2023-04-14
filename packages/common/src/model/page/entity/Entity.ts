@@ -1,14 +1,13 @@
-import { EntityMap } from '../../EntityMap';
 import { Transform } from '../../Transform';
 import { ModelCordBox } from '../../Box';
 import { Patch } from '../../Patch';
 import { ModelCordPoint, Point } from '../../Point';
 import { Size } from '../../Size';
 import { LineEntity, LineEntityDelegate } from './LineEntity';
-import { RectEntity, RectEntityDelegate } from './RectEntity';
-import { TextEntity } from './TextEntity';
+import { PolygonEntity, PolygonEntityDelegate } from './PolygonEntity';
+import { TextEntity, TextEntityDelegate } from './TextEntity';
 
-export type Entity = RectEntity | TextEntity | LineEntity;
+export type Entity = PolygonEntity | TextEntity | LineEntity;
 
 export interface EntityDelegates<T extends Entity> {
     getBoundingBox(entity: T): ModelCordBox;
@@ -22,8 +21,8 @@ export interface EntityDelegates<T extends Entity> {
 
 export module Entity {
     const delegates: Record<Entity['type'], EntityDelegates<Entity>> = {
-        rect: RectEntityDelegate,
-        text: TextEntity,
+        polygon: PolygonEntityDelegate,
+        text: TextEntityDelegate,
         line: LineEntityDelegate,
     };
 
@@ -35,13 +34,13 @@ export module Entity {
         return getDelegate(entity).getBoundingBox(entity);
     }
 
-    export function computeBoundingBox(entities: EntityMap): ModelCordBox {
+    export function computeBoundingBox(entities: Entity[]): ModelCordBox {
         let x0 = +Infinity,
             y0 = +Infinity,
             x1 = -Infinity,
             y1 = -Infinity;
 
-        for (const entity of Object.values(entities)) {
+        for (const entity of entities) {
             const box = Entity.getBoundingBox(entity);
             x0 = Math.min(box.point.x, x0);
             y0 = Math.min(box.point.y, y0);

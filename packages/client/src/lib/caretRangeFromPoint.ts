@@ -30,11 +30,11 @@ export function caretRangeFromPoint(element: HTMLElement, x: number, y: number):
             const range = document.createRange();
             range.setStart(textNode, i);
             selection.addRange(range);
-            const rangeRect = selection.getRangeAt(0).getBoundingClientRect();
+            const rangeBox = selection.getRangeAt(0).getBoundingClientRect();
 
             // 座標とテキスト位置の距離を計算
-            const dx = x - (rangeRect.left + rangeRect.right) / 2;
-            const dy = y - (rangeRect.top + rangeRect.bottom) / 2;
+            const dx = x - (rangeBox.left + rangeBox.right) / 2;
+            const dy = y - (rangeBox.top + rangeBox.bottom) / 2;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
             // 最も近いテキスト位置を更新

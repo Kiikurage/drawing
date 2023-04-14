@@ -11,7 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@drawing/common": "file:../common",
+    "@drawing/common": "^0.0.1",
     "websocket": "^1.0.34"
   },
   "devDependencies": {

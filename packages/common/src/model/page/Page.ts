@@ -4,7 +4,8 @@ import { Patch } from '../Patch';
 
 export interface Page {
     id: string;
-    entities: Record<string, Entity>;
+    entities: { [entityId: string]: Entity };
+    layouts: string[];
 }
 
 export module Page {
@@ -13,6 +14,7 @@ export module Page {
             {
                 id: randomId(),
                 entities: {},
+                layouts: [],
             },
             data
         );

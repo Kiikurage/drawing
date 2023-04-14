@@ -1,4 +1,3 @@
-import { EntityMap } from './EntityMap';
 import { Transform } from './Transform';
 import { SnapPointType, TransformType } from './TransformType';
 import { ModelCordPoint, Point } from './Point';
@@ -7,7 +6,7 @@ import { Entity } from './page/entity/Entity';
 
 export function snapBox(
     box: ModelCordBox,
-    snapTargets: EntityMap,
+    snapTargets: Entity[],
     transformType: TransformType,
     threshold: number
 ): SnapResult {
@@ -53,13 +52,13 @@ export function snapBox(
     };
 }
 
-export function snapPoint(point: ModelCordPoint, snapTargets: EntityMap, threshold: number): SnapResult {
+export function snapPoint(point: ModelCordPoint, snapTargets: Entity[], threshold: number): SnapResult {
     const pairsX: [source: ModelCordPoint, target: ModelCordPoint][] = [];
     const pairsY: [source: ModelCordPoint, target: ModelCordPoint][] = [];
     let bestDiffX = threshold;
     let bestDiffY = threshold;
 
-    for (const entity of Object.values(snapTargets)) {
+    for (const entity of snapTargets) {
         const box = Entity.getBoundingBox(entity);
 
         for (const targetPoint of Object.values(getSnapPoints(box))) {

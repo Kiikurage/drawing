@@ -1,11 +1,10 @@
 import { randomId } from '../../../lib/randomId';
 import { ColorPaletteKey } from '../../ColorPalette';
 import { Transform } from '../../Transform';
-import { ModelCordBox } from '../../Box';
+import { Box, ModelCordBox } from '../../Box';
 import { Patch } from '../../Patch';
 import { ModelCordPoint, Point } from '../../Point';
-import { Size } from '../../Size';
-import { Entity, EntityDelegates } from './Entity';
+import { EntityDelegates } from './Entity';
 import { ArrowHeadType } from '../../ArrowHeadType';
 
 export interface LineEntity {
@@ -28,7 +27,7 @@ export module LineEntity {
                 id: randomId(),
                 type: 'line',
                 p1: Point.model(0, 0),
-                p2: Point.model(100, 100),
+                p2: Point.model(1, 1),
                 text: '',
                 palette: 'BLACK',
                 linkedEntityId1: null,
@@ -39,18 +38,11 @@ export module LineEntity {
             data
         );
     }
-
-    export function isLine(entity: Entity): entity is LineEntity {
-        return entity.type === 'line';
-    }
 }
 
 export const LineEntityDelegate: EntityDelegates<LineEntity> = {
     getBoundingBox(entity: LineEntity): ModelCordBox {
-        return {
-            point: Point.model(Math.min(entity.p1.x, entity.p2.x), Math.min(entity.p1.y, entity.p2.y)),
-            size: Size.model(Math.abs(entity.p1.x - entity.p2.x), Math.abs(entity.p1.y - entity.p2.y)),
-        };
+        return Box.fromPoints(entity.p1, entity.p2);
     },
     transform(entity: LineEntity, transform: Transform): Patch<LineEntity> {
         return {
@@ -61,7 +53,7 @@ export const LineEntityDelegate: EntityDelegates<LineEntity> = {
     isTextEditable(): boolean {
         return true;
     },
-    includes(): boolean {
+    includes(entity: LineEntity, point: ModelCordPoint): boolean {
         return false;
     },
 };

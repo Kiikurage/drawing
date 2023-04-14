@@ -20,7 +20,7 @@ export * from './model/page/action/UpdateEntitiesEditAction';
 export * from './model/page/entity/Entity';
 export * from './model/page/entity/LineEntity';
 export * from './model/page/entity/lineUtil';
-export * from './model/page/entity/RectEntity';
+export * from './model/page/entity/PolygonEntity';
 export * from './model/page/entity/TextEntity';
 
 export * from './model/ArrowHeadType';
@@ -28,8 +28,6 @@ export * from './model/Box';
 export * from './model/Camera';
 export * from './model/ColorPalette';
 export * from './model/page/action/EditAction';
-export * from './model/EntityMap';
-export * from './model/HoverState';
 export * from './model/Json';
 export * from './model/Key';
 export * from './model/Message';

@@ -1,117 +1,96 @@
-import { MouseEventHandler, useCallback, useEffect, useRef, useState } from 'react';
-import { Page, Point, Size } from '@drawing/common';
-import { Editor } from './core/controller/Editor';
-import { EditorContextProvider } from './core/view/EditorControllerContext';
+import { useEffect, useRef, useState } from 'react';
+import { Editor } from '../../EditorCore/Editor';
+import { EditorContextProvider } from './view/EditorControllerContext';
 import { css } from '@linaria/core';
-import { ContentLayer } from './core/view/ContentLayer';
-import { Toolbar } from './core/extensions/toolbar/Toolbar';
-import { ContextMenuPopup } from './core/extensions/contextMenu/ContextMenuPopup';
-import { Extensions } from './extensions';
-import { SelectionView } from './core/view/SelectionView/SelectionView';
-import { SelectingRangeView } from './core/extensions/select/SelectingRangeView';
-import { SnapGuide } from './extensions/snap/SnapGuide';
+import { ContentLayer } from './view/ContentLayer/ContentLayer';
+import { Toolbar } from './view/ToolBar/Toolbar';
+import { ContextMenuPopup } from './view/ContextMenu/ContextMenuPopup';
+import { SelectionView } from './view/SelectionView/SelectionView';
+import { SelectingRangeView } from './view/SelectionView/SelectingRangeView';
+import { SnapGuide } from './view/SnapGuide';
+import { EditorViewController } from './controller/EditorViewController';
+import { OutlineLayer } from './view/OutlineLayer/OutlineLayer';
+import { CameraLayer } from './view/CameraLayer/CameraLayer';
 
-export const EditorView = ({ defaultValue }: { defaultValue?: Page }) => {
-    const [editor] = useState(() => {
-        const editor = new Editor({ page: defaultValue ?? Page.create() });
-        Extensions.forEach((extension) => editor.addExtension(extension));
-
-        return editor;
-    });
+export const EditorView = ({ editor }: { editor: Editor }) => {
+    const [controller] = useState(
+        () =>
+            new EditorViewController(
+                editor,
+                editor.cameraController,
+                editor.editorViewEvents,
+                editor.contextMenuController,
+                editor.layoutController,
+                editor.lineController,
+                editor.modeController,
+                editor.pageController,
+                editor.textController,
+                editor.textEditController,
+                editor.selectionController,
+                editor.keyboardShortcutCommandManager,
+                editor.transformController
+            )
+    );
 
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
-        const onWheel = (ev: WheelEvent) => {
-            ev.preventDefault();
-
-            if (ev.ctrlKey) {
-                editor.handleZoom(Point.display(ev.clientX, ev.clientY), -0.001 * ev.deltaY);
-            } else if (ev.shiftKey) {
-                editor.handleScroll(Size.display(ev.deltaY, ev.deltaX));
-            } else {
-                editor.handleScroll(Size.display(ev.deltaX, ev.deltaY));
-            }
-        };
-
         const container = ref.current;
         if (container === null) return;
 
-        container.addEventListener('wheel', onWheel, { passive: false });
+        container.addEventListener('wheel', controller.handleWheel, { passive: false });
         return () => {
-            container.removeEventListener('wheel', onWheel);
+            container.removeEventListener('wheel', controller.handleWheel);
         };
-    }, [editor]);
+    }, [controller]);
 
     useEffect(() => {
-        const onMouseMove = (ev: MouseEvent) => {
-            const pointInDisplay = Point.display(ev.clientX, ev.clientY);
-            editor.handleMouseMove({
-                button: ev.button,
-                shiftKey: ev.shiftKey,
-                pointInDisplay,
-            });
+        const handlePointerMove = (ev: PointerEvent) => {
+            controller.handlePointerMove(ev, { type: 'empty' });
+            ev.stopPropagation();
         };
-
-        const onMouseUp = (ev: MouseEvent) => {
-            const pointInDisplay = Point.display(ev.clientX, ev.clientY);
-            editor.handleMouseUp({
-                button: ev.button,
-                shiftKey: ev.shiftKey,
-                pointInDisplay,
-            });
+        const handlePointerUp = (ev: PointerEvent) => {
+            controller.handlePointerUp(ev, { type: 'empty' });
+            ev.stopPropagation();
         };
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-        window.addEventListener('keydown', editor.handleKeyDown);
-        window.addEventListener('keyup', editor.handleKeyUp);
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', handlePointerUp);
+        window.addEventListener('keydown', controller.handleKeyDown);
+        window.addEventListener('keyup', controller.handleKeyUp);
         return () => {
-            window.removeEventListener('mousemove', onMouseMove);
-            window.removeEventListener('mouseup', onMouseUp);
-            window.removeEventListener('keydown', editor.handleKeyDown);
-            window.removeEventListener('keyup', editor.handleKeyUp);
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', handlePointerUp);
+            window.removeEventListener('keydown', controller.handleKeyDown);
+            window.removeEventListener('keyup', controller.handleKeyUp);
         };
-    }, [editor]);
-
-    const onMouseDown: MouseEventHandler = useCallback(
-        (ev) => {
-            editor.handleMouseDown({
-                button: ev.button,
-                shiftKey: ev.shiftKey,
-                pointInDisplay: Point.display(ev.clientX, ev.clientY),
-            });
-        },
-        [editor]
-    );
+    }, [controller]);
 
     return (
-        <EditorContextProvider value={editor}>
+        <EditorContextProvider value={controller}>
             <div
                 ref={ref}
                 className={css`
                     position: absolute;
                     inset: 0;
                     outline: none;
+                    touch-action: none;
+                    background: #f9fafb;
 
                     & > * {
                         pointer-events: none;
                         user-select: none;
                     }
                 `}
-                onMouseDown={onMouseDown}
+                onPointerDown={(ev) => controller.handlePointerDown(ev.nativeEvent, { type: 'empty' })}
                 onContextMenu={(ev) => ev.preventDefault()}
-                // onDoubleClick={(ev) =>
-                //     editor.handleEntityDoubleClick({
-                //         button: ev.button,
-                //         shiftKey: ev.shiftKey,
-                //         pointInDisplay: Point.display(ev.clientX, ev.clientY),
-                //     })
-                // }
+                onDoubleClick={(ev) => controller.handleDoubleClick(ev.nativeEvent, { type: 'empty' })}
             >
-                <ContentLayer />
-                <SelectionView />
-                <SelectingRangeView />
-                <SnapGuide />
+                <CameraLayer>
+                    <ContentLayer />
+                    <OutlineLayer />
+                    <SnapGuide />
+                    <SelectionView />
+                    <SelectingRangeView />
+                </CameraLayer>
                 <Toolbar />
                 <ContextMenuPopup />
             </div>
