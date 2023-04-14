@@ -1,9 +1,5 @@
 export type Patch<T> = {
-    [K in keyof T]?: null extends T[K]
-        ? T[K]
-        : T[K] extends string | number | undefined | null | Array<never>
-        ? T[K]
-        : Patch<T[K]>;
+    [K in keyof T]?: T[K] extends string | number | undefined | null | Array<never> ? T[K] : Patch<T[K]>;
 };
 
 export module Patch {
@@ -36,6 +32,44 @@ export module Patch {
         }
 
         return dirty ? nextState : prevState;
+    }
+
+    export function merge<T extends object>(patch1: Patch<T>, patch2: Patch<T>): Patch<T> {
+        const entries = Object.entries(patch2) as [keyof T, T[keyof T]][];
+        if (entries.length === 0) return patch1;
+
+        const patch = { ...patch1 };
+
+        for (const [key, value2] of entries) {
+            const value1 = patch1[key];
+            if (value1 === value2) {
+                patch[key] = value2;
+                continue;
+            }
+
+            if (!(key in patch1)) {
+                patch[key] = value2;
+                continue;
+            }
+
+            if (
+                value1 !== undefined &&
+                value1 !== null &&
+                value2 !== undefined &&
+                value2 !== null &&
+                typeof value1 === 'object' &&
+                typeof value2 === 'object' &&
+                !Array.isArray(value1) &&
+                !Array.isArray(value2)
+            ) {
+                patch[key] = merge(value1, value2) as any;
+                continue;
+            }
+
+            throw new Error('Cannot merge patches');
+        }
+
+        return patch;
     }
 
     export function computeInversePatch<T extends object>(prevState: T, patch: Patch<T>): Patch<T> {

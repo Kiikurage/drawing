@@ -18,7 +18,7 @@ export module Popup {
         box-sizing: border-box;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         border-radius: 12px;
         background: none;
         border: none;
@@ -40,6 +40,7 @@ export module Popup {
             className={css`
                 width: 40px;
                 height: 40px;
+                justify-content: center;
             `}
             onMouseDown={(ev) => ev.stopPropagation()}
             onMouseUp={(ev) => ev.stopPropagation()}

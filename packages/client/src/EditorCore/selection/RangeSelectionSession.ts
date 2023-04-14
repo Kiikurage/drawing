@@ -20,7 +20,7 @@ export class RangeSelectionSession {
 
     private readonly handleDragUpdate = () => {
         const selectingRange = Box.fromPoints(this.dragSession.startPoint, this.dragSession.currentPoint);
-        const entityIds = this.pageController.entities
+        const entityIds = this.pageController.layout
             .filter((entity) => Box.isOverlap(selectingRange, Entity.getBoundingBox(entity)))
             .map((entity) => entity.id);
 

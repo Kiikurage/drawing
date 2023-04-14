@@ -1,6 +1,6 @@
 import * as http from 'http';
 import { connection as WebSocketConnection, Message as WebSocketMessage, server as WebSocketServer } from 'websocket';
-import { EditAction, Message, MessageClient, Page, Patch } from '@drawing/common';
+import { Action, Message, MessageClient, Page, Patch } from '@drawing/common';
 
 export interface ServerOptions {
     port: number;
@@ -59,7 +59,7 @@ export class Server {
         client.onMessage.addListener((message: Message) => {
             switch (message.type) {
                 case 'edit': {
-                    this.page = Patch.apply(this.page, EditAction.toPatch(this.page, message.edit));
+                    this.page = Patch.apply(this.page, Action.toPatch(this.page, message.edit));
                     this.messageClients.forEach((c) => {
                         if (c === client) return;
                         c.send({ type: 'edit', edit: message.edit });

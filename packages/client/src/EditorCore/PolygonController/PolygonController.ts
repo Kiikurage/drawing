@@ -30,7 +30,10 @@ export class PolygonController {
     private readonly handleDragStart = (ev: MYDragEvent) => {
         if (this.modeController.mode !== PolygonController.ModeName) return;
 
-        const newEntity = PolygonEntity.create({ p1: ev.point });
+        const newEntity = PolygonEntity.create({
+            p1: ev.point,
+            zIndex: (this.pageController.layout.at(-1)?.zIndex ?? -1) + 1,
+        });
 
         const session = this.pageController.newSession();
         session.addEntities([newEntity]);

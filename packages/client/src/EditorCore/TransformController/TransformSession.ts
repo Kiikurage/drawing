@@ -37,7 +37,7 @@ export class TransformSession {
         this.entityMap = Record.mapToRecord(entities, (entity) => [entity.id, entity]);
         this.startBox = Entity.computeBoundingBox(entities);
 
-        for (const entity of this.pageController.entities) {
+        for (const entity of Object.values(this.pageController.entities).filter(nonNull)) {
             if (entity.type === 'line') {
                 if (entity.linkedEntityId1 !== null) {
                     const linkedEntity = this.entityMap[entity.linkedEntityId1];
@@ -73,12 +73,14 @@ export class TransformSession {
         ).then(transformType.translate(startBox, startPoint, currentPoint));
 
         if (this.store.state.snapEnabled) {
-            const snapTargets = this.pageController.entities.filter(
-                (entity) =>
-                    this.entityMap[entity.id] === undefined &&
-                    this.linkedLines1[entity.id] === undefined &&
-                    this.linkedLines2[entity.id] === undefined
-            );
+            const snapTargets = Object.values(this.pageController.entities)
+                .filter(nonNull)
+                .filter(
+                    (entity) =>
+                        this.entityMap[entity.id] === undefined &&
+                        this.linkedLines1[entity.id] === undefined &&
+                        this.linkedLines2[entity.id] === undefined
+                );
             const { transform: snapTransform } = snapBox(
                 transform.apply(startBox),
                 snapTargets,

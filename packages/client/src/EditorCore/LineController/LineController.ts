@@ -1,4 +1,4 @@
-import { ArrowHeadType, Entity, LineEntity, ModelCordPoint, Patch, Record } from '@drawing/common';
+import { ArrowHeadType, Entity, LineEntity, ModelCordPoint, nonNull, Patch, Record } from '@drawing/common';
 import { MouseEventButton } from '../model/MouseEventButton';
 import { MYDragEvent } from '../model/MYDragEvent';
 import { GestureRecognizer } from '../gesture/GestureRecognizer';
@@ -45,12 +45,13 @@ export class LineController {
 
     private readonly handleDragStart = (ev: MYDragEvent) => {
         if (this.modeController.mode === LineController.ModeName) {
-            const linkedEntity1 = findLinkTarget(ev.point, this.pageController.entities);
+            const linkedEntity1 = findLinkTarget(ev.point, Object.values(this.pageController.entities).filter(nonNull));
 
             const newEntity = LineEntity.create({
                 p1: ev.point,
                 p2: ev.point,
                 linkedEntityId1: linkedEntity1?.id ?? null,
+                zIndex: (this.pageController.layout.at(-1)?.zIndex ?? -1) + 1,
             });
 
             const session = this.pageController.newSession();

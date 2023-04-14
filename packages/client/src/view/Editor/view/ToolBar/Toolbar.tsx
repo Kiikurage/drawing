@@ -65,4 +65,5 @@ export const Toolbar = memo(() => {
 export const ToolbarButton = styled(Popup.Button)`
     width: 48px;
     height: 48px;
+    justify-content: center;
 `;

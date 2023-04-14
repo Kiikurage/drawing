@@ -1,18 +1,20 @@
 import {
-    AddEntitiesEditAction,
-    DeleteEntitiesEditAction,
+    Action,
+    AddEntitiesAction,
+    Box,
+    DeleteEntitiesAction,
     dispatcher,
-    EditAction,
     Entity,
     HistoryManager,
     Message,
     MessageClient,
+    nonNull,
     Page,
     Patch,
     ReadonlyStore,
     Record,
     Store,
-    UpdateEntitiesEditAction,
+    UpdateEntitiesAction,
 } from '@drawing/common';
 import { PageEditSession } from './PageEditSession';
 import { PageState } from './PageState';
@@ -27,8 +29,8 @@ export class PageController {
     private readonly history = new HistoryManager();
 
     constructor(private readonly keyboardShortcutCommandManager: KeyboardShortcutCommandManager) {
-        this.client = new ClientMessageClient();
         this.client = new MockMessageClient();
+        this.client = new ClientMessageClient();
         this.client.onMessage.addListener(this.handleMessageClientMessage);
 
         this.store.onChange.addListener((state) => this.onChange.dispatch(state));
@@ -40,27 +42,37 @@ export class PageController {
         this.keyboardShortcutCommandManager
             .set(['Control', 'Shift', 'Z'], redoCommand)
             .set(['Control', 'Y'], redoCommand);
+
+        this.onChange.addListener((state) => console.log(state));
     }
 
     get page(): Page {
         return this.store.state.page;
     }
 
-    get entities(): Entity[] {
-        return this.page.layouts.map((entityId) => this.page.entities[entityId]);
+    get entities(): Record<string, Entity | undefined> {
+        return this.page.entities;
+    }
+
+    get layout(): Entity[] {
+        return Object.values(this.page.entities)
+            .filter(nonNull)
+            .sort((e1, e2) => e1.zIndex - e2.zIndex);
     }
 
     addEntities(entities: Entity[]) {
-        const normal = AddEntitiesEditAction(entities);
-        const reverse = DeleteEntitiesEditAction(entities.map((entity) => entity.id));
+        const normal = AddEntitiesAction(entities);
+        const reverse = DeleteEntitiesAction(entities.map((entity) => entity.id));
         this.history.addEntry(normal, reverse);
         this.applyAction(normal);
         this.client.send({ type: 'edit', edit: normal });
     }
 
     deleteEntities(entityIds: string[]) {
-        const normal = DeleteEntitiesEditAction(entityIds);
-        const reverse = AddEntitiesEditAction(entityIds.map((entityId) => this.store.state.page.entities[entityId]));
+        const normal = DeleteEntitiesAction(entityIds);
+        const reverse = AddEntitiesAction(
+            entityIds.map((entityId) => this.store.state.page.entities[entityId]).filter(nonNull)
+        );
 
         this.history.addEntry(normal, reverse);
         this.applyAction(normal);
@@ -72,13 +84,94 @@ export class PageController {
             string,
             Patch<Entity>
         >;
-        const normal = UpdateEntitiesEditAction(patches);
-        const reverse = UpdateEntitiesEditAction(reversePatches);
+        const normal = UpdateEntitiesAction(patches);
+        const reverse = UpdateEntitiesAction(reversePatches);
 
         this.history.addEntry(normal, reverse);
         this.applyAction(normal);
         this.client.send({ type: 'edit', edit: normal });
     }
+
+    // order
+
+    bringForward(entityId: string): void {
+        const layout = this.layout;
+        const entity = this.page.entities[entityId];
+        if (entity === undefined) return;
+
+        const entityBox = Entity.getBoundingBox(entity);
+        const overlappedEntities = layout.filter((entity) => Box.isOverlap(Entity.getBoundingBox(entity), entityBox));
+
+        const index = overlappedEntities.findIndex((e) => e.id === entity.id);
+        if (index === overlappedEntities.length - 1) return;
+
+        const forwardEntity1 = overlappedEntities[index + 1];
+        const forwardEntity1Index = layout.findIndex((e) => e.id === forwardEntity1.id);
+
+        if (forwardEntity1Index === layout.length - 1) {
+            console.log(entity, forwardEntity1);
+            this.updateEntities({
+                [entityId]: { zIndex: forwardEntity1.zIndex + 1 },
+            });
+        } else {
+            const forwardEntity2 = layout[forwardEntity1Index + 1];
+            console.log(entity, forwardEntity1, forwardEntity2);
+            this.updateEntities({
+                [entityId]: { zIndex: (forwardEntity1.zIndex + forwardEntity2.zIndex) / 2 },
+            });
+        }
+    }
+
+    bringToTop(entityId: string): void {
+        const layout = this.layout;
+        const entityIndex = layout.findIndex((e) => e.id === entityId);
+        if (entityIndex === layout.length - 1) return;
+
+        this.updateEntities({ [entityId]: { zIndex: layout[layout.length - 1].zIndex + 1 } });
+    }
+
+    sendBackward(entityId: string): void {
+        const layout = this.layout;
+        const entity = this.page.entities[entityId];
+        if (entity === undefined) return;
+
+        const entityBox = Entity.getBoundingBox(entity);
+        const overlappedEntities = layout.filter((entity) => Box.isOverlap(Entity.getBoundingBox(entity), entityBox));
+
+        const index = overlappedEntities.findIndex((e) => e.id === entity.id);
+        if (index === 0) return;
+
+        const backwardEntity1 = overlappedEntities[index - 1];
+        const backwardEntity1Index = layout.findIndex((entity) => entity.id === backwardEntity1.id);
+
+        if (backwardEntity1Index === 0) {
+            this.updateEntities({
+                [entityId]: { zIndex: backwardEntity1.zIndex - 1 },
+            });
+        } else {
+            const backwardEntity2 = layout[backwardEntity1Index - 1];
+            this.updateEntities({
+                [entityId]: { zIndex: (backwardEntity1.zIndex + backwardEntity2.zIndex) / 2 },
+            });
+        }
+    }
+
+    sendToBottom(entityId: string): void {
+        const layout = this.layout;
+        const entityIndex = layout.findIndex((e) => e.id === entityId);
+        if (entityIndex === 0) return;
+
+        this.updateEntities({ [entityId]: { zIndex: layout[0].zIndex - 1 } });
+    }
+
+    // createNewGroup(entityIds: string[]) {
+    //     const normal = AddGroupAction(entityIds);
+    //     const reverse = DeleteGroupAction(normal.groupId);
+    //
+    //     this.history.addEntry(normal, reverse);
+    //     this.applyAction(normal);
+    //     this.client.send({ type: 'edit', edit: normal });
+    // }
 
     undo() {
         const actions = this.history.undo();
@@ -97,8 +190,8 @@ export class PageController {
         return session;
     }
 
-    private applyAction(action: EditAction) {
-        this.store.setState({ page: EditAction.toPatch(this.store.state.page, action) });
+    private applyAction(action: Action) {
+        this.store.setState({ page: Action.toPatch(this.store.state.page, action) });
     }
 
     private readonly handleMessageClientMessage = (message: Message) => {
@@ -120,7 +213,7 @@ export class PageController {
         }
     };
 
-    private readonly handleSessionAction = (action: EditAction) => {
+    private readonly handleSessionAction = (action: Action) => {
         this.applyAction(action);
         this.client.send({ type: 'edit', edit: action });
     };
@@ -131,20 +224,20 @@ export class PageController {
 class Session implements PageEditSession {
     constructor(private readonly store: ReadonlyStore<PageState>, private readonly session: HistoryManager.Session) {}
 
-    readonly onAction = dispatcher<EditAction>();
+    readonly onAction = dispatcher<Action>();
 
     commit() {
         this.session.commit();
     }
 
     addEntities(entities: Entity[]) {
-        this.apply(AddEntitiesEditAction(entities), DeleteEntitiesEditAction(entities.map((entity) => entity.id)));
+        this.apply(AddEntitiesAction(entities), DeleteEntitiesAction(entities.map((entity) => entity.id)));
     }
 
     deleteEntities(entityIds: string[]) {
         this.apply(
-            DeleteEntitiesEditAction(entityIds),
-            AddEntitiesEditAction(entityIds.map((entityId) => this.store.state.page.entities[entityId]))
+            DeleteEntitiesAction(entityIds),
+            AddEntitiesAction(entityIds.map((entityId) => this.store.state.page.entities[entityId]).filter(nonNull))
         );
     }
 
@@ -153,10 +246,10 @@ class Session implements PageEditSession {
             string,
             Patch<Entity>
         >;
-        this.apply(UpdateEntitiesEditAction(patches), UpdateEntitiesEditAction(reversePatches));
+        this.apply(UpdateEntitiesAction(patches), UpdateEntitiesAction(reversePatches));
     }
 
-    private apply(normal: EditAction, reverse: EditAction) {
+    private apply(normal: Action, reverse: Action) {
         this.session.apply(normal, reverse);
         this.onAction.dispatch(normal);
     }

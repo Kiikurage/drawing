@@ -14,6 +14,7 @@ export interface TextEntity {
     p1: ModelCordPoint;
     palette: ColorPaletteKey;
     size: ModelCordSize;
+    zIndex: number;
     contentSize: ModelCordSize;
     text: string;
     horizontalAlign: HorizontalAlign;
@@ -29,6 +30,7 @@ export module TextEntity {
                 p1: Point.model(0, 0),
                 text: '',
                 size: Size.model(1, 1),
+                zIndex: 0,
                 palette: 'BLACK',
                 contentSize: Size.model(1, 1),
                 horizontalAlign: 'left',

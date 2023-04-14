@@ -55,18 +55,16 @@ export class SelectionController {
         this.keyboardShortcutCommandManager
             .set(['Backspace'], deleteSelectedEntitiesCommand)
             .set(['Delete'], deleteSelectedEntitiesCommand);
-
-        this.onChange.addListener((state) => console.log(state));
     }
 
     readonly onChange = dispatcher<SelectionChangeEvent>();
 
     get selectedEntityIds() {
-        return this.selectedEntities.map((entity) => entity.id);
+        return Object.keys(this.store.state.selected).filter((id) => this.store.state.selected[id]);
     }
 
     get selectedEntities(): Entity[] {
-        return this.pageController.entities.filter((entity) => this.store.state.selected[entity.id]);
+        return this.pageController.layout.filter((entity) => this.store.state.selected[entity.id]);
     }
 
     setSelection(entityIds: string[]) {
@@ -94,7 +92,7 @@ export class SelectionController {
     }
 
     selectAllEntities() {
-        this.setSelection(this.pageController.entities.map((entity) => entity.id));
+        this.setSelection(this.pageController.layout.map((entity) => entity.id));
     }
 
     unselectAllEntities() {

@@ -5,7 +5,7 @@ import { Entity, getSnapPoints, Point, snapPoint } from '@drawing/common';
 import { css } from '@linaria/core';
 import { useCamera } from '../../hooks/useCamera';
 import { useSelectedEntities, useSelectedEntityIds } from '../../hooks/useSelection';
-import { useEntities } from '../../hooks/useEntities';
+import { useEntities } from '../../hooks/useEntityMap';
 
 export const SnapGuide = memo(() => {
     const controller = useEditorViewController();
@@ -14,7 +14,7 @@ export const SnapGuide = memo(() => {
     const selectedEntityIds = useSelectedEntityIds();
 
     const snapTargets = useMemo(
-        () => Object.values(entities).filter((entity) => !selectedEntityIds.includes(entity.id)),
+        () => entities.filter((entity) => !selectedEntityIds.includes(entity.id)),
         [entities, selectedEntityIds]
     );
 

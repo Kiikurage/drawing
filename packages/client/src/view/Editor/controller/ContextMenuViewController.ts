@@ -5,6 +5,7 @@ import { SelectionController } from '../../../EditorCore/selection/SelectionCont
 import { Entity } from '@drawing/common';
 import { LayoutContextMenuSection } from '../view/ContextMenu/LayoutContextMenuSection';
 import { ArrowHeadContextMenuSection } from '../view/ContextMenu/ArrowHeadContextMenuSection';
+import { OrderContextMenuSection } from '../view/ContextMenu/OrderContextMenuSection';
 
 export class ContextMenuViewController {
     constructor(
@@ -39,5 +40,17 @@ export class ContextMenuViewController {
                 return selectionController.selectedEntities.length >= 2;
             },
         });
+        this.contextMenuController.addSection({
+            view: OrderContextMenuSection,
+            activateIf: () => {
+                return selectionController.selectedEntityIds.length === 1;
+            },
+        });
+        // this.contextMenuController.addSection({
+        //     view: GroupContextMenuSection,
+        //     activateIf: () => {
+        //         return selectionController.selectedEntities.length >= 2;
+        //     },
+        // });
     }
 }

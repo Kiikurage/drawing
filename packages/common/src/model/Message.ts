@@ -1,4 +1,4 @@
-import { EditAction } from './page/action/EditAction';
+import { Action } from './page/action/Action';
 import { Page } from './page/Page';
 
 export type Message = AckMessage | RequestSyncMessage | SyncMessage | EditMessage;
@@ -18,5 +18,5 @@ export interface SyncMessage {
 
 export interface EditMessage {
     type: 'edit';
-    edit: EditAction;
+    edit: Action;
 }

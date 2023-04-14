@@ -76,7 +76,10 @@ export class TextController {
     private readonly handleDragStart = (ev: MYDragEvent) => {
         if (this.modeController.mode !== TextController.ModeName) return;
 
-        const newEntity = TextEntity.create({ p1: ev.point });
+        const newEntity = TextEntity.create({
+            p1: ev.point,
+            zIndex: (this.pageController.layout.at(-1)?.zIndex ?? -1) + 1,
+        });
 
         const session = this.pageController.newSession();
         session.addEntities([newEntity]);

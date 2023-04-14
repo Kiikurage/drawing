@@ -1,9 +1,9 @@
-import { EditAction } from '../model/page/action/EditAction';
+import { Action } from '../model/page/action/Action';
 import { dispatcher } from './Dispatcher';
 
 interface HistoryEntry {
-    normal: EditAction[];
-    reverse: EditAction[];
+    normal: Action[];
+    reverse: Action[];
 }
 
 export class HistoryManager {
@@ -18,12 +18,12 @@ export class HistoryManager {
         return session;
     }
 
-    addEntry(normal: EditAction, reverse: EditAction) {
+    addEntry(normal: Action, reverse: Action) {
         this.redoStack.length = 0;
         this.undoStack.push({ normal: [normal], reverse: [reverse] });
     }
 
-    undo(): EditAction[] {
+    undo(): Action[] {
         const entry = this.undoStack.pop();
         if (entry === undefined) return [];
 
@@ -32,7 +32,7 @@ export class HistoryManager {
         return entry.reverse;
     }
 
-    redo(): EditAction[] {
+    redo(): Action[] {
         const entry = this.redoStack.pop();
         if (entry === undefined) return [];
 
@@ -44,20 +44,20 @@ export class HistoryManager {
 
 export module HistoryManager {
     export interface Session {
-        apply(normal: EditAction, reverse: EditAction): void;
+        apply(normal: Action, reverse: Action): void;
 
         commit(): void;
     }
 }
 
 class SessionImpl implements HistoryManager.Session {
-    normalActions: EditAction[] = [];
-    reverseActions: EditAction[] = [];
+    normalActions: Action[] = [];
+    reverseActions: Action[] = [];
     private isCommit = false;
 
     readonly onCommit = dispatcher<HistoryEntry>();
 
-    apply(normal: EditAction, reverse: EditAction) {
+    apply(normal: Action, reverse: Action) {
         if (this.isCommit) {
             throw new Error('This session is already committed');
         }

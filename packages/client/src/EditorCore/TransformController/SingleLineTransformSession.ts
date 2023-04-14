@@ -4,6 +4,7 @@ import {
     getClosestValue,
     LineEntity,
     ModelCordPoint,
+    nonNull,
     Patch,
     Point,
     Store,
@@ -33,7 +34,10 @@ export class SingleLineTransformSession {
     readonly onEnd = dispatcher<Transform>();
 
     private handleDragUpdate = () => {
-        const linkedEntity = findLinkTarget(this.dragSession.currentPoint, this.pageController.entities);
+        const linkedEntity = findLinkTarget(
+            this.dragSession.currentPoint,
+            Object.values(this.pageController.entities).filter(nonNull)
+        );
         const entity = this.entity;
         const startPoint = entity[this.point];
         const otherPoint = entity[this.point === 'p1' ? 'p2' : 'p1'];

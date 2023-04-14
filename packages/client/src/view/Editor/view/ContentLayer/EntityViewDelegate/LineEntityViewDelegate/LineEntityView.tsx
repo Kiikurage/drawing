@@ -2,12 +2,12 @@ import { Box, ColorPalette, LineEntity } from '@drawing/common';
 import { SVGContainer } from '../../../CameraLayer/SVGContainer';
 import { adjustLineEdgePoints, computePath } from './util';
 import { EditableEntityText } from '../../EditableEntityText';
-import { useEntities } from '../../../../../hooks/useEntities';
+import { useEntityMap } from '../../../../../hooks/useEntityMap';
 import { useMemo } from 'react';
 import { useSelectedEntities } from '../../../../../hooks/useSelection';
 
 export const LineEntityView = ({ entity }: { entity: LineEntity }) => {
-    const entities = useEntities();
+    const entities = useEntityMap();
     const { linkedEntity1, linkedEntity2 } = useMemo(() => {
         return {
             linkedEntity1: entity.linkedEntityId1 === null ? undefined : entities[entity.linkedEntityId1],

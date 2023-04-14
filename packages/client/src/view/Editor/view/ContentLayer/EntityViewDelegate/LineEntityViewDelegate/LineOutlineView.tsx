@@ -7,14 +7,14 @@ import { EdgeHandle } from '../../../SelectionView/Handle';
 import { adjustLineEdgePoints, computePath } from './util';
 import { useCamera } from '../../../../../hooks/useCamera';
 import { useIsSelected } from '../../../../../hooks/useIsSelected';
-import { useEntities } from '../../../../../hooks/useEntities';
+import { useEntityMap } from '../../../../../hooks/useEntityMap';
 import { useMemo } from 'react';
 
 export const LineOutlineView = ({ entity }: { entity: LineEntity }) => {
     const controller = useEditorViewController();
     const selected = useIsSelected(entity.id);
     const camera = useCamera();
-    const entities = useEntities();
+    const entities = useEntityMap();
     const { linkedEntity1, linkedEntity2 } = useMemo(() => {
         return {
             linkedEntity1: entity.linkedEntityId1 === null ? undefined : entities[entity.linkedEntityId1],
