@@ -2,7 +2,6 @@ import { PageEditSession } from './PageEditSession';
 import { PageState } from './PageState';
 import { Command } from '../CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortcutCommandManager';
-import { MockMessageClient } from '../../lib/MockMessageClient';
 import { ClientMessageClient } from '../../lib/ClientMessageClient';
 import { ReadonlyStore, Store } from '@drawing/common/src/lib/Store';
 import { MessageClient } from '@drawing/common/src/lib/MessageClient';
@@ -18,6 +17,7 @@ import { Box } from '@drawing/common/src/model/Box';
 import { Action } from '@drawing/common/src/model/page/action/Action';
 import { Message } from '@drawing/common/src/model/Message';
 import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
+import { FractionalKey } from '@drawing/common/src/model/FractionalKey';
 
 export class PageController {
     readonly store = new Store(PageState.create());
@@ -25,7 +25,6 @@ export class PageController {
     private readonly history = new HistoryManager();
 
     constructor(private readonly keyboardShortcutCommandManager: KeyboardShortcutCommandManager) {
-        this.client = new MockMessageClient();
         this.client = new ClientMessageClient();
         this.client.onMessage.addListener(this.handleMessageClientMessage);
 
@@ -38,6 +37,8 @@ export class PageController {
         this.keyboardShortcutCommandManager
             .set(['Control', 'Shift', 'Z'], redoCommand)
             .set(['Control', 'Y'], redoCommand);
+
+        this.store.onChange.addListener((state) => console.log(state));
     }
 
     get page(): Page {
@@ -51,7 +52,7 @@ export class PageController {
     get layout(): Entity[] {
         return Object.values(this.page.entities)
             .filter(nonNull)
-            .sort((e1, e2) => e1.zIndex - e2.zIndex);
+            .sort((e1, e2) => FractionalKey.comparator(e1.orderKey, e2.orderKey));
     }
 
     addEntities(entities: Entity[]) {
@@ -100,20 +101,15 @@ export class PageController {
         if (index === overlappedEntities.length - 1) return;
 
         const forwardEntity1 = overlappedEntities[index + 1];
-        const forwardEntity1Index = layout.findIndex((e) => e.id === forwardEntity1.id);
 
-        if (forwardEntity1Index === layout.length - 1) {
-            console.log(entity, forwardEntity1);
-            this.updateEntities({
-                [entityId]: { zIndex: forwardEntity1.zIndex + 1 },
-            });
-        } else {
-            const forwardEntity2 = layout[forwardEntity1Index + 1];
-            console.log(entity, forwardEntity1, forwardEntity2);
-            this.updateEntities({
-                [entityId]: { zIndex: (forwardEntity1.zIndex + forwardEntity2.zIndex) / 2 },
-            });
-        }
+        this.updateEntities({
+            [entityId]: {
+                orderKey: FractionalKey.insertAfter(
+                    layout.map((e) => e.orderKey),
+                    forwardEntity1.orderKey
+                ),
+            },
+        });
     }
 
     bringToTop(entityId: string): void {
@@ -121,7 +117,14 @@ export class PageController {
         const entityIndex = layout.findIndex((e) => e.id === entityId);
         if (entityIndex === layout.length - 1) return;
 
-        this.updateEntities({ [entityId]: { zIndex: layout[layout.length - 1].zIndex + 1 } });
+        this.updateEntities({
+            [entityId]: {
+                orderKey: FractionalKey.insertAfter(
+                    layout.map((e) => e.orderKey),
+                    layout[layout.length - 1].orderKey
+                ),
+            },
+        });
     }
 
     sendBackward(entityId: string): void {
@@ -136,18 +139,15 @@ export class PageController {
         if (index === 0) return;
 
         const backwardEntity1 = overlappedEntities[index - 1];
-        const backwardEntity1Index = layout.findIndex((entity) => entity.id === backwardEntity1.id);
 
-        if (backwardEntity1Index === 0) {
-            this.updateEntities({
-                [entityId]: { zIndex: backwardEntity1.zIndex - 1 },
-            });
-        } else {
-            const backwardEntity2 = layout[backwardEntity1Index - 1];
-            this.updateEntities({
-                [entityId]: { zIndex: (backwardEntity1.zIndex + backwardEntity2.zIndex) / 2 },
-            });
-        }
+        this.updateEntities({
+            [entityId]: {
+                orderKey: FractionalKey.insertBefore(
+                    layout.map((e) => e.orderKey),
+                    backwardEntity1.orderKey
+                ),
+            },
+        });
     }
 
     sendToBottom(entityId: string): void {
@@ -155,7 +155,14 @@ export class PageController {
         const entityIndex = layout.findIndex((e) => e.id === entityId);
         if (entityIndex === 0) return;
 
-        this.updateEntities({ [entityId]: { zIndex: layout[0].zIndex - 1 } });
+        this.updateEntities({
+            [entityId]: {
+                orderKey: FractionalKey.insertBefore(
+                    layout.map((e) => e.orderKey),
+                    layout[0].orderKey
+                ),
+            },
+        });
     }
 
     // createNewGroup(entityIds: string[]) {

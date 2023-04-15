@@ -14,6 +14,7 @@ import { Patch } from '@drawing/common/src/model/Patch';
 import { nonNull } from '@drawing/common/src/lib/nonNull';
 import { ModelCordPoint } from '@drawing/common/src/model/Point';
 import { Entity } from '@drawing/common/src/model/page/entity/Entity';
+import { FractionalKey } from '@drawing/common/src/model/FractionalKey';
 
 export class LineController {
     static readonly ModeName = 'line';
@@ -57,7 +58,10 @@ export class LineController {
                 p1: ev.point,
                 p2: ev.point,
                 linkedEntityId1: linkedEntity1?.id ?? null,
-                zIndex: (this.pageController.layout.at(-1)?.zIndex ?? -1) + 1,
+                orderKey: FractionalKey.insertAfter(
+                    this.pageController.layout.map((e) => e.orderKey),
+                    null
+                ),
             });
 
             const session = this.pageController.newSession();

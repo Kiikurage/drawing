@@ -12,6 +12,7 @@ import { HorizontalAlign, VerticalAlign } from '@drawing/common/src/model/TextAl
 import { Record } from '@drawing/common/src/model/Record';
 import { TextEntity } from '@drawing/common/src/model/page/entity/TextEntity';
 import { TransformType } from '@drawing/common/src/model/TransformType';
+import { FractionalKey } from '@drawing/common/src/model/FractionalKey';
 
 export class TextController {
     static readonly ModeName = 'text';
@@ -81,7 +82,10 @@ export class TextController {
 
         const newEntity = TextEntity.create({
             p1: ev.point,
-            zIndex: (this.pageController.layout.at(-1)?.zIndex ?? -1) + 1,
+            orderKey: FractionalKey.insertAfter(
+                this.pageController.layout.map((e) => e.orderKey),
+                null
+            ),
         });
 
         const session = this.pageController.newSession();

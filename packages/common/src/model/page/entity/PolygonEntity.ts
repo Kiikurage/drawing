@@ -7,6 +7,7 @@ import { HorizontalAlign, VerticalAlign } from '../../TextAlign';
 import { EntityDelegates } from './Entity';
 import { Transform } from '../../Transform';
 import { ModelCordSize, Size } from '../../Size';
+import { FractionalKey } from '@drawing/common/src/model/FractionalKey';
 
 export interface PolygonEntity {
     id: string;
@@ -15,7 +16,7 @@ export interface PolygonEntity {
     size: ModelCordSize;
     palette: ColorPaletteKey;
     text: string;
-    zIndex: number;
+    orderKey: string;
     points: ModelCordPoint[];
     horizontalAlign: HorizontalAlign;
     verticalAlign: VerticalAlign;
@@ -30,7 +31,7 @@ export module PolygonEntity {
                 points: [Point.model(0, 0), Point.model(0, 1), Point.model(1, 1), Point.model(1, 0)],
                 p1: Point.model(0, 0),
                 text: '',
-                zIndex: 0,
+                orderKey: FractionalKey.EMPTY,
                 size: Size.model(1, 1),
                 palette: 'BLACK',
                 horizontalAlign: 'center',

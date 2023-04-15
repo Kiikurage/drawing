@@ -1,13 +1,13 @@
 import { memo, useMemo } from 'react';
 import { useEditorViewController } from './EditorControllerContext';
 import { useSlice } from '../../hooks/useSlice';
-import { css } from '@linaria/core';
 import { useCamera } from '../../hooks/useCamera';
 import { useSelectedEntities, useSelectedEntityIds } from '../../hooks/useSelection';
 import { useEntities } from '../../hooks/useEntityMap';
 import { getSnapPoints, snapPoint } from '@drawing/common/src/model/SnapUtil';
 import { Entity } from '@drawing/common/src/model/page/entity/Entity';
-import { Point } from '@drawing/common/src/model/Point';
+import { SVGContainer } from '@drawing/client/src/view/Editor/view/CameraLayer/SVGContainer';
+import { Box } from '@drawing/common/src/model/Box';
 
 export const SnapGuide = memo(() => {
     const controller = useEditorViewController();
@@ -35,26 +35,28 @@ export const SnapGuide = memo(() => {
         });
     }, [selectedEntities, snapTargets]);
 
-    if (!visible) return null;
+    if (!visible || snapResults.length === 0) return null;
+
+    const box = snapResults.map(([p1, p2]) => Box.fromPoints(p1, p2)).reduce((b1, b2) => Box.union(b1, b2));
+    const {
+        point: { x: x0, y: y0 },
+    } = box;
 
     return (
-        <svg
-            className={css`
-                position: absolute;
-                top: 0;
-                left: 0;
-            `}
-            width="100%"
-            height="100%"
-        >
-            <g>
-                {snapResults.map(([p1, p2], i) => {
-                    const p1d = Point.toDisplay(camera, p1);
-                    const p2d = Point.toDisplay(camera, p2);
-
-                    return <line key={i} x1={p1d.x} y1={p1d.y} x2={p2d.x} y2={p2d.y} stroke="#F00" strokeWidth={1} />;
-                })}
-            </g>
-        </svg>
+        <SVGContainer viewport={box}>
+            {snapResults.map(([p1, p2], i) => {
+                return (
+                    <line
+                        key={i}
+                        x1={p1.x - x0}
+                        y1={p1.y - y0}
+                        x2={p2.x - x0}
+                        y2={p2.y - y0}
+                        stroke="#F00"
+                        strokeWidth={1}
+                    />
+                );
+            })}
+        </SVGContainer>
     );
 });

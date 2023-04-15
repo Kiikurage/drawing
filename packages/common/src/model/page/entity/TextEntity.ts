@@ -7,6 +7,7 @@ import { ModelCordPoint, Point } from '../../Point';
 import { ModelCordSize, Size } from '../../Size';
 import { HorizontalAlign, VerticalAlign } from '../../TextAlign';
 import { EntityDelegates } from './Entity';
+import { FractionalKey } from '@drawing/common/src/model/FractionalKey';
 
 export interface TextEntity {
     id: string;
@@ -14,7 +15,7 @@ export interface TextEntity {
     p1: ModelCordPoint;
     palette: ColorPaletteKey;
     size: ModelCordSize;
-    zIndex: number;
+    orderKey: string;
     contentSize: ModelCordSize;
     text: string;
     horizontalAlign: HorizontalAlign;
@@ -30,7 +31,7 @@ export module TextEntity {
                 p1: Point.model(0, 0),
                 text: '',
                 size: Size.model(1, 1),
-                zIndex: 0,
+                orderKey: FractionalKey.EMPTY,
                 palette: 'BLACK',
                 contentSize: Size.model(1, 1),
                 horizontalAlign: 'left',

@@ -8,6 +8,7 @@ import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortc
 import { TransformController } from '../TransformController/TransformController';
 import { TransformType } from '@drawing/common/src/model/TransformType';
 import { PolygonEntity } from '@drawing/common/src/model/page/entity/PolygonEntity';
+import { FractionalKey } from '@drawing/common/src/model/FractionalKey';
 
 export class PolygonController {
     static readonly ModeName = 'polygon';
@@ -33,7 +34,10 @@ export class PolygonController {
 
         const newEntity = PolygonEntity.create({
             p1: ev.point,
-            zIndex: (this.pageController.layout.at(-1)?.zIndex ?? -1) + 1,
+            orderKey: FractionalKey.insertAfter(
+                this.pageController.layout.map((e) => e.orderKey),
+                null
+            ),
         });
 
         const session = this.pageController.newSession();

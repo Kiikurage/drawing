@@ -6,13 +6,14 @@ import { Patch } from '../../Patch';
 import { ModelCordPoint, Point } from '../../Point';
 import { EntityDelegates } from './Entity';
 import { ArrowHeadType } from '../../ArrowHeadType';
+import { FractionalKey } from '@drawing/common/src/model/FractionalKey';
 
 export interface LineEntity {
     id: string;
     type: 'line';
     p1: ModelCordPoint;
     palette: ColorPaletteKey;
-    zIndex: number;
+    orderKey: string;
     p2: ModelCordPoint;
     text: string;
     linkedEntityId1: string | null;
@@ -29,7 +30,7 @@ export module LineEntity {
                 type: 'line',
                 p1: Point.model(0, 0),
                 p2: Point.model(1, 1),
-                zIndex: 0,
+                orderKey: FractionalKey.EMPTY,
                 text: '',
                 palette: 'BLACK',
                 linkedEntityId1: null,

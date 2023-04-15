@@ -5,7 +5,13 @@ import { EditableText } from './EditableText';
 import { useCamera } from '../../../hooks/useCamera';
 import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 
-export const EditableEntityText = ({ entity }: { entity: Entity }) => {
+export const EditableEntityText = ({
+    entity,
+    onContentSizeChange,
+}: {
+    entity: Entity;
+    onContentSizeChange?: (contentWidth: number, contentHeight: number) => void;
+}) => {
     const controller = useEditorViewController();
     const camera = useCamera();
 
@@ -34,16 +40,7 @@ export const EditableEntityText = ({ entity }: { entity: Entity }) => {
                 editing={editing}
                 editStartPoint={editStartPoint}
                 onChange={(ev) => controller.textEditController.updateEditingText(entity.id, ev.target.value)}
-                onContentSizeChange={(contentWidth, contentHeight) => {
-                    controller.pageController.updateEntities({
-                        [entity.id]: {
-                            contentSize: {
-                                width: contentWidth,
-                                height: contentHeight,
-                            },
-                        },
-                    });
-                }}
+                onContentSizeChange={onContentSizeChange}
             />
         </div>
     );
