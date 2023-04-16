@@ -1,7 +1,6 @@
 import { PageController } from './PageController/PageController';
-import { CameraController } from './camera/CameraController';
-import { ContextMenuController } from './contextmenu/ContextMenuController';
-import { LayoutController } from './layout/LayoutController';
+import { CameraController } from '@drawing/common/src/Editor/CameraController/CameraController';
+import { ContextMenuController } from '@drawing/common/src/Editor/ContextMenuController/ContextMenuController';
 import { TextController } from './TextController/TextController';
 import { LineController } from './LineController/LineController';
 import { SelectionController } from './selection/SelectionController';
@@ -17,7 +16,6 @@ export class Editor {
         readonly pageController: PageController,
         readonly cameraController: CameraController,
         readonly contextMenuController: ContextMenuController,
-        readonly layoutController: LayoutController,
         readonly textController: TextController,
         readonly textEditController: TextEditController,
         readonly lineController: LineController,

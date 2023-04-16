@@ -1,5 +1,5 @@
 import { EditorPage } from '../EditorPage';
-import { createEditor } from '../../EditorCore';
+import { createEditor } from '../../../../common/src/Editor';
 
 const editor = createEditor();
 

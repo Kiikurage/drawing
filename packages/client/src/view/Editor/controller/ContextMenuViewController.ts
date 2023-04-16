@@ -1,7 +1,7 @@
-import { ContextMenuController } from '../../../EditorCore/contextmenu/ContextMenuController';
+import { ContextMenuController } from '@drawing/common/src/Editor/ContextMenuController/ContextMenuController';
 import { ColorContextMenuSection } from '../view/ContextMenu/ColorContextMenuSection';
 import { TextAlignmentContextMenuSection } from '../view/ContextMenu/TextAlignmentContextMenuSection';
-import { SelectionController } from '../../../EditorCore/selection/SelectionController';
+import { SelectionController } from '@drawing/common/src/Editor/selection/SelectionController';
 import { LayoutContextMenuSection } from '../view/ContextMenu/LayoutContextMenuSection';
 import { ArrowHeadContextMenuSection } from '../view/ContextMenu/ArrowHeadContextMenuSection';
 import { OrderContextMenuSection } from '../view/ContextMenu/OrderContextMenuSection';

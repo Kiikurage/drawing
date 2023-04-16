@@ -2,13 +2,12 @@ import { PageEditSession } from './PageEditSession';
 import { PageState } from './PageState';
 import { Command } from '../CommandManager/Command';
 import { KeyboardShortcutCommandManager } from '../CommandManager/KeyboardShortcutCommandManager';
-import { ClientMessageClient } from '../../lib/ClientMessageClient';
+import { ClientMessageClient } from '@drawing/client/src/lib/ClientMessageClient';
 import { ReadonlyStore, Store } from '@drawing/common/src/lib/Store';
 import { MessageClient } from '@drawing/common/src/lib/MessageClient';
 import { HistoryManager } from '@drawing/common/src/lib/HistoryManager';
 import { Page } from '@drawing/common/src/model/page/Page';
 import { Entity } from '@drawing/common/src/model/page/entity/Entity';
-import { nonNull } from '@drawing/common/src/lib/nonNull';
 import { AddEntitiesAction } from '@drawing/common/src/model/page/action/AddEntitiesAction';
 import { DeleteEntitiesAction } from '@drawing/common/src/model/page/action/DeleteEntitiesAction';
 import { Patch } from '@drawing/common/src/model/Patch';
@@ -36,7 +35,7 @@ export class PageController {
             .set(['Control', 'Shift', 'Z'], redoCommand)
             .set(['Control', 'Y'], redoCommand);
 
-        this.store.onChange.addListener((state) => console.log(state));
+        // this.store.onChange.addListener((state) => console.log(state));
     }
 
     get page(): Page {
@@ -88,6 +87,26 @@ export class PageController {
         this.dispatchAction(action);
     }
 
+    distributeHorizontally(entityIds: string[]) {
+        const action = Page.distributeHorizontally(this.page, entityIds);
+        this.dispatchAction(action);
+    }
+
+    distributeVertically(entityIds: string[]) {
+        const action = Page.distributeVertically(this.page, entityIds);
+        this.dispatchAction(action);
+    }
+
+    alignHorizontal(entityIds: string[], anchor: 'left' | 'center' | 'right') {
+        const action = Page.alignHorizontal(this.page, entityIds, anchor);
+        this.dispatchAction(action);
+    }
+
+    alignVertical(entityIds: string[], anchor: 'top' | 'center' | 'bottom') {
+        const action = Page.alignVertical(this.page, entityIds, anchor);
+        this.dispatchAction(action);
+    }
+
     // createNewGroup(entityIds: string[]) {
     //     const normal = AddGroupAction(entityIds);
     //     const reverse = DeleteGroupAction(normal.groupId);
@@ -98,13 +117,18 @@ export class PageController {
     // }
 
     undo() {
-        const actions = this.history.undo();
-        actions.forEach((action) => this.applyAction(action));
+        this.history.undo().forEach((action) => {
+            console.log(action);
+            this.applyAction(action);
+            this.client.send({ type: 'edit', edit: action });
+        });
     }
 
     redo() {
-        const actions = this.history.redo();
-        actions.forEach((action) => this.applyAction(action));
+        this.history.redo().forEach((action) => {
+            this.applyAction(action);
+            this.client.send({ type: 'edit', edit: action });
+        });
     }
 
     newSession(): PageEditSession {
@@ -161,26 +185,19 @@ class Session implements PageEditSession {
     }
 
     addEntities(entities: Entity[]) {
-        this.apply(AddEntitiesAction(entities), DeleteEntitiesAction(entities.map((entity) => entity.id)));
+        this.apply(AddEntitiesAction(entities));
     }
 
     deleteEntities(entityIds: string[]) {
-        this.apply(
-            DeleteEntitiesAction(entityIds),
-            AddEntitiesAction(entityIds.map((entityId) => this.store.state.page.entities[entityId]).filter(nonNull))
-        );
+        this.apply(DeleteEntitiesAction(entityIds));
     }
 
     updateEntities(patches: Record<string, Patch<Entity>>) {
-        const reversePatches = Patch.computeInverse(this.store.state.page.entities, patches) as Record<
-            string,
-            Patch<Entity>
-        >;
-        this.apply(UpdateEntitiesAction(patches), UpdateEntitiesAction(reversePatches));
+        this.apply(UpdateEntitiesAction(patches));
     }
 
-    private apply(normal: Action, reverse: Action) {
-        this.session.apply(normal, reverse);
-        this.onAction.dispatch(normal);
+    private apply(action: Action) {
+        this.session.apply(action, Action.computeInverse(this.store.state.page, action));
+        this.onAction.dispatch(action);
     }
 }

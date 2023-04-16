@@ -4,10 +4,10 @@ import { memo } from 'react';
 import { Popup } from '../Popup';
 import { useEditorViewController } from '../EditorControllerContext';
 import { useSlice } from '../../../hooks/useSlice';
-import { PolygonController } from '../../../../EditorCore/PolygonController/PolygonController';
-import { LineController } from '../../../../EditorCore/LineController/LineController';
-import { TextController } from '../../../../EditorCore/TextController/TextController';
-import { SelectionController } from '../../../../EditorCore/selection/SelectionController';
+import { PolygonController } from '@drawing/common/src/Editor/PolygonController/PolygonController';
+import { LineController } from '@drawing/common/src/Editor/LineController/LineController';
+import { TextController } from '@drawing/common/src/Editor/TextController/TextController';
+import { SelectionController } from '@drawing/common/src/Editor/selection/SelectionController';
 
 export const Toolbar = memo(() => {
     const controller = useEditorViewController();

@@ -3,7 +3,7 @@ import { dispatcher } from './Dispatcher';
 
 interface HistoryEntry {
     normal: Action[];
-    reverse: Action[];
+    inverse: Action[];
 }
 
 export class HistoryManager {
@@ -18,9 +18,9 @@ export class HistoryManager {
         return session;
     }
 
-    addEntry(normal: Action, reverse: Action) {
+    addEntry(normal: Action, inverse: Action) {
         this.redoStack.length = 0;
-        this.undoStack.push({ normal: [normal], reverse: [reverse] });
+        this.undoStack.push({ normal: [normal], inverse: [inverse] });
     }
 
     undo(): Action[] {
@@ -29,7 +29,7 @@ export class HistoryManager {
 
         this.redoStack.push(entry);
 
-        return entry.reverse;
+        return entry.inverse;
     }
 
     redo(): Action[] {
@@ -44,32 +44,32 @@ export class HistoryManager {
 
 export module HistoryManager {
     export interface Session {
-        apply(normal: Action, reverse: Action): void;
+        apply(normal: Action, inverse: Action): void;
 
         commit(): void;
     }
 }
 
 class SessionImpl implements HistoryManager.Session {
-    normalActions: Action[] = [];
-    reverseActions: Action[] = [];
+    private normalActions: Action[] = [];
+    private inverseActions: Action[] = [];
     private isCommit = false;
 
     readonly onCommit = dispatcher<HistoryEntry>();
 
-    apply(normal: Action, reverse: Action) {
+    apply(normal: Action, inverse: Action) {
         if (this.isCommit) {
             throw new Error('This session is already committed');
         }
 
         this.normalActions.push(normal);
-        this.reverseActions.push(reverse);
+        this.inverseActions.push(inverse);
     }
 
     commit(): void {
         this.onCommit.dispatch({
             normal: this.normalActions,
-            reverse: this.reverseActions.reverse(),
+            inverse: this.inverseActions.reverse(),
         });
 
         this.isCommit = true;

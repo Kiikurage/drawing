@@ -1,17 +1,16 @@
 import { ModeController } from './mode/ModeController';
 import { PageController } from './PageController/PageController';
-import { GestureRecognizer } from './gesture/GestureRecognizer';
-import { CameraController } from './camera/CameraController';
+import { GestureRecognizer } from '@drawing/common/src/Editor/GestureRecognizer/GestureRecognizer';
+import { CameraController } from '@drawing/common/src/Editor/CameraController/CameraController';
 import { KeyPatternRecognizer } from './CommandManager/KeyPatternRecognizer';
-import { ContextMenuController } from './contextmenu/ContextMenuController';
-import { LayoutController } from './layout/LayoutController';
+import { ContextMenuController } from '@drawing/common/src/Editor/ContextMenuController/ContextMenuController';
 import { TextController } from './TextController/TextController';
 import { TextEditController } from './textEdit/TextEditController';
 import { LineController } from './LineController/LineController';
 import { PolygonController } from './PolygonController/PolygonController';
 import { SelectionController } from './selection/SelectionController';
 import { EditorViewEvents } from './EditorViewEvents/EditorViewEvents';
-import { DependencyContainer } from './DependencyContainer';
+import { DependencyContainer } from '../lib/DependencyContainer';
 import { Editor } from './Editor';
 import { CommandManager } from './CommandManager/CommandManager';
 import { KeyboardShortcutCommandManager } from './CommandManager/KeyboardShortcutCommandManager';
@@ -42,9 +41,6 @@ export function createEditor(): Editor {
                 $.get(ModeController),
                 $.get(SelectionController)
             );
-        })
-        .lazy(LayoutController, () => {
-            return new LayoutController($.get(SelectionController), $.get(PageController));
         })
         .lazy(TextEditController, () => {
             return new TextEditController(
@@ -113,7 +109,6 @@ export function createEditor(): Editor {
                 $.get(PageController),
                 $.get(CameraController),
                 $.get(ContextMenuController),
-                $.get(LayoutController),
                 $.get(TextController),
                 $.get(TextEditController),
                 $.get(LineController),

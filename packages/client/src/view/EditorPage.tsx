@@ -1,6 +1,6 @@
 import { css } from '@linaria/core';
 import { EditorView } from './Editor/EditorView';
-import { Editor } from '../EditorCore/Editor';
+import { Editor } from '@drawing/common/src/Editor/Editor';
 
 export const EditorPage = ({ editor }: { editor: Editor }) => {
     return (

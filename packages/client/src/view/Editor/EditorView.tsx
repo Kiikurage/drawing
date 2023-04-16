@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Editor } from '../../EditorCore/Editor';
+import { Editor } from '@drawing/common/src/Editor/Editor';
 import { EditorContextProvider } from './view/EditorControllerContext';
 import { css } from '@linaria/core';
 import { ContentLayer } from './view/ContentLayer/ContentLayer';
@@ -20,7 +20,6 @@ export const EditorView = ({ editor }: { editor: Editor }) => {
                 editor.cameraController,
                 editor.editorViewEvents,
                 editor.contextMenuController,
-                editor.layoutController,
                 editor.lineController,
                 editor.modeController,
                 editor.pageController,

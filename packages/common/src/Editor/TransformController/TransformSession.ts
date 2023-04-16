@@ -1,8 +1,8 @@
-import { DragSession } from '../gesture/DragSession';
+import { DragSession } from '@drawing/common/src/Editor/GestureRecognizer/DragSession';
 import { PageEditSession } from '../PageController/PageEditSession';
 import { PageController } from '../PageController/PageController';
 import { TransformState } from './TransformState';
-import { CameraController } from '../camera/CameraController';
+import { CameraController } from '@drawing/common/src/Editor/CameraController/CameraController';
 import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 import { ModelCordBox } from '@drawing/common/src/model/Box';
 import { Transform } from '@drawing/common/src/model/Transform';

@@ -1,4 +1,4 @@
-import { DragSession } from '../gesture/DragSession';
+import { DragSession } from '@drawing/common/src/Editor/GestureRecognizer/DragSession';
 import { PageEditSession } from '../PageController/PageEditSession';
 import { PageController } from '../PageController/PageController';
 import { TransformState } from './TransformState';

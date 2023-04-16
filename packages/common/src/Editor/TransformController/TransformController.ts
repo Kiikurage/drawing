@@ -1,9 +1,9 @@
-import { DragSession } from '../gesture/DragSession';
+import { DragSession } from '@drawing/common/src/Editor/GestureRecognizer/DragSession';
 import { PageEditSession } from '../PageController/PageEditSession';
 import { PageController } from '../PageController/PageController';
 import { TransformSession } from './TransformSession';
 import { TransformState } from './TransformState';
-import { CameraController } from '../camera/CameraController';
+import { CameraController } from '@drawing/common/src/Editor/CameraController/CameraController';
 import { EditorViewEvents } from '../EditorViewEvents/EditorViewEvents';
 import { SingleLineTransformSession } from './SingleLineTransformSession';
 import { Store } from '@drawing/common/src/lib/Store';

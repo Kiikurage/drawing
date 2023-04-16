@@ -112,4 +112,24 @@ export module Page {
 
         return bringBefore(page, entityId, backEntity.id);
     }
+
+    export function distributeHorizontally(page: Page, entityIds: string[]): Action {
+        const patch = Entity.distributeHorizontally(entityIds.map((id) => page.entities[id]).filter(nonNull));
+        return UpdateEntitiesAction(patch);
+    }
+
+    export function distributeVertically(page: Page, entityIds: string[]): Action {
+        const patch = Entity.distributeVertically(entityIds.map((id) => page.entities[id]).filter(nonNull));
+        return UpdateEntitiesAction(patch);
+    }
+
+    export function alignHorizontal(page: Page, entityIds: string[], anchor: 'left' | 'center' | 'right'): Action {
+        const patch = Entity.alignHorizontal(entityIds.map((id) => page.entities[id]).filter(nonNull), anchor);
+        return UpdateEntitiesAction(patch);
+    }
+
+    export function alignVertical(page: Page, entityIds: string[], anchor: 'top' | 'center' | 'bottom'): Action {
+        const patch = Entity.alignVertical(entityIds.map((id) => page.entities[id]).filter(nonNull), anchor);
+        return UpdateEntitiesAction(patch);
+    }
 }

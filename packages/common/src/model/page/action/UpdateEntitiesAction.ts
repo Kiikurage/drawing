@@ -25,7 +25,7 @@ export const UpdateEntitiesActionDelegate: ActionDelegate<UpdateEntitiesAction> 
         return { entities: patch };
     },
     computeInverse(page: Page, action: UpdateEntitiesAction): UpdateEntitiesAction {
-        const inversePatch = Patch.computeInverse(page, action.patch) as Record<string, Patch<Entity>>;
+        const inversePatch = Patch.computeInverse(page.entities, action.patch) as Record<string, Patch<Entity>>;
 
         return UpdateEntitiesAction(inversePatch);
     },

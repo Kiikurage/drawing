@@ -1,19 +1,18 @@
-import { Editor } from '../../../EditorCore/Editor';
+import { Editor } from '@drawing/common/src/Editor/Editor';
 import { ClipboardController } from './ClipboardController';
-import { EditorViewEvents } from '../../../EditorCore/EditorViewEvents/EditorViewEvents';
-import { ModeController } from '../../../EditorCore/mode/ModeController';
-import { CameraController } from '../../../EditorCore/camera/CameraController';
-import { PageController } from '../../../EditorCore/PageController/PageController';
-import { TextEditController } from '../../../EditorCore/textEdit/TextEditController';
-import { SelectionController } from '../../../EditorCore/selection/SelectionController';
-import { TextController } from '../../../EditorCore/TextController/TextController';
-import { LayoutController } from '../../../EditorCore/layout/LayoutController';
-import { LineController } from '../../../EditorCore/LineController/LineController';
+import { EditorViewEvents } from '@drawing/common/src/Editor/EditorViewEvents/EditorViewEvents';
+import { ModeController } from '@drawing/common/src/Editor/mode/ModeController';
+import { CameraController } from '@drawing/common/src/Editor/CameraController/CameraController';
+import { PageController } from '@drawing/common/src/Editor/PageController/PageController';
+import { TextEditController } from '@drawing/common/src/Editor/textEdit/TextEditController';
+import { SelectionController } from '@drawing/common/src/Editor/selection/SelectionController';
+import { TextController } from '@drawing/common/src/Editor/TextController/TextController';
+import { LineController } from '@drawing/common/src/Editor/LineController/LineController';
 import { ContextMenuViewController } from './ContextMenuViewController';
-import { MouseEventTarget } from '../../../EditorCore/model/MYMouseEvent';
-import { ContextMenuController } from '../../../EditorCore/contextmenu/ContextMenuController';
-import { KeyboardShortcutCommandManager } from '../../../EditorCore/CommandManager/KeyboardShortcutCommandManager';
-import { TransformController } from '../../../EditorCore/TransformController/TransformController';
+import { MouseEventTarget } from '@drawing/common/src/Editor/model/MYMouseEvent';
+import { ContextMenuController } from '@drawing/common/src/Editor/ContextMenuController/ContextMenuController';
+import { KeyboardShortcutCommandManager } from '@drawing/common/src/Editor/CommandManager/KeyboardShortcutCommandManager';
+import { TransformController } from '@drawing/common/src/Editor/TransformController/TransformController';
 import { singleton } from '@drawing/common/src/lib/singleton';
 import { Point } from '@drawing/common/src/model/Point';
 import { Size } from '@drawing/common/src/model/Size';
@@ -24,7 +23,6 @@ export class EditorViewController {
         readonly cameraController: CameraController,
         readonly editorViewEvents: EditorViewEvents,
         readonly contextMenuController: ContextMenuController,
-        readonly layoutController: LayoutController,
         readonly lineController: LineController,
         readonly modeController: ModeController,
         readonly pageController: PageController,

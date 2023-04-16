@@ -3,7 +3,7 @@ import { useEditorViewController } from '../EditorControllerContext';
 import { Popup } from '../Popup';
 
 export const LayoutContextMenuSection = () => {
-    const layout = useEditorViewController().layoutController;
+    const selectionController = useEditorViewController().selectionController;
 
     return (
         <Popup.Section
@@ -14,29 +14,29 @@ export const LayoutContextMenuSection = () => {
                 gap: 4px;
             `}
         >
-            <Popup.IconButton onClick={() => layout.distributeSelectedEntitiesHorizontal()}>
+            <Popup.IconButton onClick={() => selectionController.distributeSelectedEntitiesHorizontal()}>
                 <span className="material-symbols-outlined">horizontal_distribute</span>
             </Popup.IconButton>
             <span></span>
-            <Popup.IconButton onClick={() => layout.distributeSelectedEntitiesVertical()}>
+            <Popup.IconButton onClick={() => selectionController.distributeSelectedEntitiesVertical()}>
                 <span className="material-symbols-outlined">vertical_distribute</span>
             </Popup.IconButton>
-            <Popup.IconButton onClick={() => layout.alignSelectedEntitiesHorizontal('left')}>
+            <Popup.IconButton onClick={() => selectionController.alignSelectedEntitiesHorizontal('left')}>
                 <span className="material-symbols-outlined">align_horizontal_left</span>
             </Popup.IconButton>
-            <Popup.IconButton onClick={() => layout.alignSelectedEntitiesHorizontal('center')}>
+            <Popup.IconButton onClick={() => selectionController.alignSelectedEntitiesHorizontal('center')}>
                 <span className="material-symbols-outlined">align_horizontal_center</span>
             </Popup.IconButton>
-            <Popup.IconButton onClick={() => layout.alignSelectedEntitiesHorizontal('right')}>
+            <Popup.IconButton onClick={() => selectionController.alignSelectedEntitiesHorizontal('right')}>
                 <span className="material-symbols-outlined">align_horizontal_right</span>
             </Popup.IconButton>
-            <Popup.IconButton onClick={() => layout.alignSelectedEntitiesVertical('top')}>
+            <Popup.IconButton onClick={() => selectionController.alignSelectedEntitiesVertical('top')}>
                 <span className="material-symbols-outlined">align_vertical_top</span>
             </Popup.IconButton>
-            <Popup.IconButton onClick={() => layout.alignSelectedEntitiesVertical('center')}>
+            <Popup.IconButton onClick={() => selectionController.alignSelectedEntitiesVertical('center')}>
                 <span className="material-symbols-outlined">align_vertical_center</span>
             </Popup.IconButton>
-            <Popup.IconButton onClick={() => layout.alignSelectedEntitiesVertical('bottom')}>
+            <Popup.IconButton onClick={() => selectionController.alignSelectedEntitiesVertical('bottom')}>
                 <span className="material-symbols-outlined">align_vertical_bottom</span>
             </Popup.IconButton>
         </Popup.Section>

@@ -6,7 +6,7 @@ import { MYPointerEvent } from '../model/MYPointerEvent';
 import { ModeController } from '../mode/ModeController';
 import { EditorViewEvents } from '../EditorViewEvents/EditorViewEvents';
 import { SelectionController } from '../selection/SelectionController';
-import { GestureRecognizer } from '../gesture/GestureRecognizer';
+import { GestureRecognizer } from '@drawing/common/src/Editor/GestureRecognizer/GestureRecognizer';
 import { Store } from '@drawing/common/src/lib/Store';
 import { DisplayCordPoint } from '@drawing/common/src/model/Point';
 

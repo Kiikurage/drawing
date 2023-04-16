@@ -1,6 +1,6 @@
 import { MouseEventButton } from '../model/MouseEventButton';
 import { MYDragEvent } from '../model/MYDragEvent';
-import { GestureRecognizer } from '../gesture/GestureRecognizer';
+import { GestureRecognizer } from '@drawing/common/src/Editor/GestureRecognizer/GestureRecognizer';
 import { ModeController } from '../mode/ModeController';
 import { PageController } from '../PageController/PageController';
 import { SelectionController } from '../selection/SelectionController';

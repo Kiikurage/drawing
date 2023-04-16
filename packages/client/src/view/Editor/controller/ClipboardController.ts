@@ -1,7 +1,7 @@
-import { PageController } from '../../../EditorCore/PageController/PageController';
-import { SelectionController } from '../../../EditorCore/selection/SelectionController';
-import { Command } from '../../../EditorCore/CommandManager/Command';
-import { KeyboardShortcutCommandManager } from '../../../EditorCore/CommandManager/KeyboardShortcutCommandManager';
+import { PageController } from '@drawing/common/src/Editor/PageController/PageController';
+import { SelectionController } from '@drawing/common/src/Editor/selection/SelectionController';
+import { Command } from '@drawing/common/src/Editor/CommandManager/Command';
+import { KeyboardShortcutCommandManager } from '@drawing/common/src/Editor/CommandManager/KeyboardShortcutCommandManager';
 import { Entity } from '@drawing/common/src/model/page/entity/Entity';
 import { randomId } from '@drawing/common/src/lib/randomId';
 

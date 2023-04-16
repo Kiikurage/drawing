@@ -2,7 +2,7 @@ import { SelectionChangeEvent } from '../model/SelectionChangeEvent';
 import { PageState } from '../PageController/PageState';
 import { MYDragEvent } from '../model/MYDragEvent';
 import { MouseEventButton } from '../model/MouseEventButton';
-import { GestureRecognizer } from '../gesture/GestureRecognizer';
+import { GestureRecognizer } from '@drawing/common/src/Editor/GestureRecognizer/GestureRecognizer';
 import { ModeController } from '../mode/ModeController';
 import { SelectionState } from './SelectionState';
 import { PageController } from '../PageController/PageController';
@@ -113,8 +113,26 @@ export class SelectionController {
         this.store.setState({ selecting: false });
     }
 
+    // Utility methods
+
     deleteSelectedEntities() {
         this.pageController.deleteEntities(this.selectedEntityIds);
+    }
+
+    distributeSelectedEntitiesHorizontal() {
+        this.pageController.distributeHorizontally(this.selectedEntityIds);
+    }
+
+    distributeSelectedEntitiesVertical() {
+        this.pageController.distributeVertically(this.selectedEntityIds);
+    }
+
+    alignSelectedEntitiesHorizontal(anchor: 'left' | 'center' | 'right') {
+        this.pageController.alignHorizontal(this.selectedEntityIds, anchor);
+    }
+
+    alignSelectedEntitiesVertical(anchor: 'top' | 'center' | 'bottom') {
+        this.pageController.alignVertical(this.selectedEntityIds, anchor);
     }
 
     private readonly handlePointerDown = (ev: MYPointerEvent) => {

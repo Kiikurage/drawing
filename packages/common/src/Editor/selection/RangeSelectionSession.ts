@@ -1,5 +1,5 @@
 import { SelectionController } from './SelectionController';
-import { DragSession } from '../gesture/DragSession';
+import { DragSession } from '@drawing/common/src/Editor/GestureRecognizer/DragSession';
 import { PageController } from '../PageController/PageController';
 import { Box } from '@drawing/common/src/model/Box';
 import { Entity } from '@drawing/common/src/model/page/entity/Entity';

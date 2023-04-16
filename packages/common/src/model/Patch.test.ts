@@ -164,4 +164,53 @@ describe('Patch', () => {
             }).toThrowError();
         });
     });
+
+    describe('inversePatch', () => {
+        it('浅いフィールドのパッチ', () => {
+            expect(
+                Patch.computeInverse(
+                    {
+                        x: 1,
+                        y: 2,
+                    },
+                    { y: 3 }
+                )
+            ).toEqual({ y: 2 });
+        });
+
+        it('深いフィールドのパッチ', () => {
+            expect(
+                Patch.computeInverse(
+                    {
+                        x: 1,
+                        y: { z: 2, w: 3 },
+                    },
+                    { x: 2, y: { z: 4 } }
+                )
+            ).toEqual({ x: 1, y: { z: 2 } });
+        });
+
+        it('フィールドの追加', () => {
+            expect(
+                Patch.computeInverse(
+                    {
+                        x: 1,
+                    } as Record<string, number>,
+                    { y: 2 }
+                )
+            ).toEqual({ y: undefined });
+        });
+
+        it('フィールドの削除', () => {
+            expect(
+                Patch.computeInverse(
+                    {
+                        x: 1,
+                        y: 2,
+                    },
+                    { y: undefined }
+                )
+            ).toEqual({ y: 2 });
+        });
+    });
 });
