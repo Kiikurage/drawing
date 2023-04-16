@@ -10,7 +10,7 @@ describe('Patch', () => {
             expect(nextState).toEqual({ x: 3, y: 4 });
             expect(prevState).toEqual({ x: 1, y: 2 });
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
         });
 
@@ -22,7 +22,7 @@ describe('Patch', () => {
             expect(nextState).toEqual({ x: 4, y: { z: 5, w: 6 } });
             expect(prevState).toEqual({ x: 1, y: { z: 2, w: 3 } });
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
         });
 
@@ -34,7 +34,7 @@ describe('Patch', () => {
             expect(nextState).toEqual({ x: 3, y: 2 });
             expect(prevState).toEqual({ x: 1, y: 2 });
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
         });
 
@@ -46,7 +46,7 @@ describe('Patch', () => {
             expect(nextState).toEqual({ x: 1, y: { z: 2, w: 6 } });
             expect(prevState).toEqual({ x: 1, y: { z: 2, w: 3 } });
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
         });
 
@@ -63,7 +63,7 @@ describe('Patch', () => {
             expect(nextState).toEqual({ x: 1, y: null });
             expect(prevState).toEqual({ x: 1, y: { z: 2, w: 3 } });
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
         });
 
@@ -83,7 +83,7 @@ describe('Patch', () => {
             expect(nextState).toEqual({ x: { y: { z: 1 } } });
             expect(prevState).toEqual({ x: undefined });
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
         });
 
@@ -95,7 +95,7 @@ describe('Patch', () => {
             expect(nextState).toEqual({ x: [4, 5] });
             expect(prevState).toEqual({ x: [1, 2, 3] });
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
         });
 
@@ -107,7 +107,7 @@ describe('Patch', () => {
             expect(nextState).toEqual({ x: 3 });
             expect(prevState).toEqual({ x: 1, y: 2 });
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(Patch.apply(nextState, inversePatch)).toEqual(prevState);
         });
 
@@ -118,7 +118,7 @@ describe('Patch', () => {
 
             expect(nextState).toBe(prevState);
 
-            const inversePatch = Patch.computeInversePatch(prevState, patch);
+            const inversePatch = Patch.computeInverse(prevState, patch);
             expect(inversePatch).toEqual({ x: 1, y: { z: 2, w: 3 } });
         });
     });

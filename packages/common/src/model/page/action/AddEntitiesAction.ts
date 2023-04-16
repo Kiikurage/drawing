@@ -3,6 +3,7 @@ import { Page } from '../Page';
 import { Patch } from '../../Patch';
 import { Entity } from '../entity/Entity';
 import { Record } from '../../Record';
+import { DeleteEntitiesAction } from '@drawing/common/src/model/page/action/DeleteEntitiesAction';
 
 export interface AddEntitiesAction {
     type: 'addEntities';
@@ -18,5 +19,8 @@ export const AddEntitiesActionDelegate: ActionDelegate<AddEntitiesAction> = {
         return {
             entities: Record.mapToRecord(action.entities, (entity) => [entity.id, entity]),
         };
+    },
+    computeInverse(page: Page, action: AddEntitiesAction): DeleteEntitiesAction {
+        return DeleteEntitiesAction(action.entities.map((entity) => entity.id));
     },
 };

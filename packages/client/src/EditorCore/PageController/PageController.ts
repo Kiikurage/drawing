@@ -13,11 +13,9 @@ import { AddEntitiesAction } from '@drawing/common/src/model/page/action/AddEnti
 import { DeleteEntitiesAction } from '@drawing/common/src/model/page/action/DeleteEntitiesAction';
 import { Patch } from '@drawing/common/src/model/Patch';
 import { UpdateEntitiesAction } from '@drawing/common/src/model/page/action/UpdateEntitiesAction';
-import { Box } from '@drawing/common/src/model/Box';
 import { Action } from '@drawing/common/src/model/page/action/Action';
 import { Message } from '@drawing/common/src/model/Message';
 import { dispatcher } from '@drawing/common/src/lib/Dispatcher';
-import { FractionalKey } from '@drawing/common/src/model/FractionalKey';
 
 export class PageController {
     readonly store = new Store(PageState.create());
@@ -50,119 +48,44 @@ export class PageController {
     }
 
     get layout(): Entity[] {
-        return Object.values(this.page.entities)
-            .filter(nonNull)
-            .sort((e1, e2) => FractionalKey.comparator(e1.orderKey, e2.orderKey));
+        return Page.computeLayout(this.page);
     }
 
     addEntities(entities: Entity[]) {
-        const normal = AddEntitiesAction(entities);
-        const reverse = DeleteEntitiesAction(entities.map((entity) => entity.id));
-        this.history.addEntry(normal, reverse);
-        this.applyAction(normal);
-        this.client.send({ type: 'edit', edit: normal });
+        const action = AddEntitiesAction(entities);
+        this.dispatchAction(action);
     }
 
     deleteEntities(entityIds: string[]) {
-        const normal = DeleteEntitiesAction(entityIds);
-        const reverse = AddEntitiesAction(
-            entityIds.map((entityId) => this.store.state.page.entities[entityId]).filter(nonNull)
-        );
-
-        this.history.addEntry(normal, reverse);
-        this.applyAction(normal);
-        this.client.send({ type: 'edit', edit: normal });
+        const action = DeleteEntitiesAction(entityIds);
+        this.dispatchAction(action);
     }
 
     updateEntities(patches: Record<string, Patch<Entity>>) {
-        const reversePatches = Patch.computeInversePatch(this.store.state.page.entities, patches) as Record<
-            string,
-            Patch<Entity>
-        >;
-        const normal = UpdateEntitiesAction(patches);
-        const reverse = UpdateEntitiesAction(reversePatches);
-
-        this.history.addEntry(normal, reverse);
-        this.applyAction(normal);
-        this.client.send({ type: 'edit', edit: normal });
+        const action = UpdateEntitiesAction(patches);
+        this.dispatchAction(action);
     }
 
     // order
 
     bringForward(entityId: string): void {
-        const layout = this.layout;
-        const entity = this.page.entities[entityId];
-        if (entity === undefined) return;
-
-        const entityBox = Entity.getBoundingBox(entity);
-        const overlappedEntities = layout.filter((entity) => Box.isOverlap(Entity.getBoundingBox(entity), entityBox));
-
-        const index = overlappedEntities.findIndex((e) => e.id === entity.id);
-        if (index === overlappedEntities.length - 1) return;
-
-        const forwardEntity1 = overlappedEntities[index + 1];
-
-        this.updateEntities({
-            [entityId]: {
-                orderKey: FractionalKey.insertAfter(
-                    layout.map((e) => e.orderKey),
-                    forwardEntity1.orderKey
-                ),
-            },
-        });
+        const action = Page.bringForward(this.page, entityId);
+        this.dispatchAction(action);
     }
 
     bringToTop(entityId: string): void {
-        const layout = this.layout;
-        const entityIndex = layout.findIndex((e) => e.id === entityId);
-        if (entityIndex === layout.length - 1) return;
-
-        this.updateEntities({
-            [entityId]: {
-                orderKey: FractionalKey.insertAfter(
-                    layout.map((e) => e.orderKey),
-                    layout[layout.length - 1].orderKey
-                ),
-            },
-        });
+        const action = Page.bringToTop(this.page, entityId);
+        this.dispatchAction(action);
     }
 
     sendBackward(entityId: string): void {
-        const layout = this.layout;
-        const entity = this.page.entities[entityId];
-        if (entity === undefined) return;
-
-        const entityBox = Entity.getBoundingBox(entity);
-        const overlappedEntities = layout.filter((entity) => Box.isOverlap(Entity.getBoundingBox(entity), entityBox));
-
-        const index = overlappedEntities.findIndex((e) => e.id === entity.id);
-        if (index === 0) return;
-
-        const backwardEntity1 = overlappedEntities[index - 1];
-
-        this.updateEntities({
-            [entityId]: {
-                orderKey: FractionalKey.insertBefore(
-                    layout.map((e) => e.orderKey),
-                    backwardEntity1.orderKey
-                ),
-            },
-        });
+        const action = Page.bringBackward(this.page, entityId);
+        this.dispatchAction(action);
     }
 
     sendToBottom(entityId: string): void {
-        const layout = this.layout;
-        const entityIndex = layout.findIndex((e) => e.id === entityId);
-        if (entityIndex === 0) return;
-
-        this.updateEntities({
-            [entityId]: {
-                orderKey: FractionalKey.insertBefore(
-                    layout.map((e) => e.orderKey),
-                    layout[0].orderKey
-                ),
-            },
-        });
+        const action = Page.bringToBack(this.page, entityId);
+        this.dispatchAction(action);
     }
 
     // createNewGroup(entityIds: string[]) {
@@ -189,6 +112,12 @@ export class PageController {
         session.onAction.addListener(this.handleSessionAction);
 
         return session;
+    }
+
+    private dispatchAction(action: Action) {
+        this.history.addEntry(action, Action.computeInverse(this.page, action));
+        this.applyAction(action);
+        this.client.send({ type: 'edit', edit: action });
     }
 
     private applyAction(action: Action) {
@@ -243,7 +172,7 @@ class Session implements PageEditSession {
     }
 
     updateEntities(patches: Record<string, Patch<Entity>>) {
-        const reversePatches = Patch.computeInversePatch(this.store.state.page.entities, patches) as Record<
+        const reversePatches = Patch.computeInverse(this.store.state.page.entities, patches) as Record<
             string,
             Patch<Entity>
         >;

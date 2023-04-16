@@ -72,7 +72,7 @@ export module Patch {
         return patch;
     }
 
-    export function computeInversePatch<T extends object>(prevState: T, patch: Patch<T>): Patch<T> {
+    export function computeInverse<T extends object>(prevState: T, patch: Patch<T>): Patch<T> {
         const entries = Object.entries(patch) as [keyof T, T[keyof T]][];
         if (entries.length === 0) return {};
 
@@ -85,7 +85,7 @@ export module Patch {
             } else if (prevValue === undefined || prevValue === null) {
                 inversePatch[key] = undefined;
             } else if (typeof nextValue === 'object' && nextValue !== null && !Array.isArray(nextValue)) {
-                inversePatch[key] = Patch.computeInversePatch(prevValue, nextValue) as never;
+                inversePatch[key] = Patch.computeInverse(prevValue, nextValue) as never;
             } else {
                 inversePatch[key] = prevState[key];
             }

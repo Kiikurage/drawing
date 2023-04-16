@@ -1,6 +1,8 @@
 import { ActionDelegate } from './Action';
 import { Page } from '../Page';
 import { Patch } from '../../Patch';
+import { AddEntitiesAction } from '@drawing/common/src/model/page/action/AddEntitiesAction';
+import { nonNull } from '@drawing/common/src/lib/nonNull';
 
 export interface DeleteEntitiesAction {
     type: 'deleteEntities';
@@ -24,5 +26,8 @@ export const DeleteEntitiesActionDelegate: ActionDelegate<DeleteEntitiesAction> 
         }
 
         return patch;
+    },
+    computeInverse(page: Page, action: DeleteEntitiesAction): AddEntitiesAction {
+        return AddEntitiesAction(action.entityIds.map((id) => page.entities[id]).filter(nonNull));
     },
 };

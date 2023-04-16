@@ -27,8 +27,14 @@ export module Action {
     export function toPatch(page: Page, action: Action): Patch<Page> {
         return getDelegate(action).toPatch(page, action);
     }
+
+    export function computeInverse(page: Page, action: Action): Action {
+        return getDelegate(action).computeInverse(page, action);
+    }
 }
 
 export interface ActionDelegate<T extends Action> {
     toPatch(page: Page, action: T): Patch<Page>;
+
+    computeInverse(page: Page, action: T): Action;
 }
